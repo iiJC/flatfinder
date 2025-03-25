@@ -1,7 +1,7 @@
-# Dunedin Flat Finder
-Find a flat!
-For students, by students.
-Visit the website here: iijc.github.io/flatfinder/
+# Dunedin Flat Finder  
+Find a flat!  
+For students, by students.  
+Visit the website here: https://iijc.github.io/flatfinder/  
 
 
 ---
