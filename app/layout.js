@@ -16,9 +16,8 @@ export default function RootLayout({ children }) {
           </h1>
           <nav className="space-x-4">
             <Link href="/flats" className="hover:underline">Flats</Link>
-            <Link href="/flatmates" className="hover:underline">Flatmates</Link>
+            <Link href="/map" className="hover:underline">Map</Link>
             <Link href="/dashboard" className="hover:underline">Dashboard</Link>
-            <Link href="/landlord" className="hover:underline">Landlord</Link>
             <Link href="/login" className="hover:underline">Login</Link>
           </nav>
         </header>
