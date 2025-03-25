@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-gray-50 text-gray-900">
-        <header className="bg-white shadow p-4 flex justify-between items-center">
+        <header className="bg-black shadow p-4 flex justify-between items-center">
           <h1 className="text-xl font-bold">
             <Link href="/">🏠 FlatMate Finder</Link>
           </h1>
