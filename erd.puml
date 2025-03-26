@@ -1,0 +1,73 @@
+@startuml
+
+' Define User entity
+entity "User" as user {
+  +user_id : int
+  name : string
+  email : string
+  password : string
+  role : string
+  contact_info : string
+  profile_picture : string
+}
+
+' Define Flat entity
+entity "Flat" as flat {
+  +flat_id : int
+  address : string
+  city : string
+  price : float
+  bedrooms : int
+  bathrooms : int
+  type : string
+  description : string
+  availability_status : string
+  date_listed : date
+}
+
+' Define StudentApplication entity
+entity "StudentApplication" as studentApplication {
+  +application_id : int
+  status : string
+  application_date : date
+}
+
+' Define FlatShareListing entity
+entity "FlatShareListing" as flatShareListing {
+  +listing_id : int
+  room_type : string
+  room_description : string
+  room_price : float
+  room_availability : string
+}
+
+' Define Message entity
+entity "Message" as message {
+  +message_id : int
+  message_body : string
+  sent_date : date
+}
+
+' Define Review entity
+entity "Review" as review {
+  +review_id : int
+  rating : int
+  review_text : string
+  review_date : date
+}
+
+' Relationships
+
+user --{ flat : "1..M owns"
+flat --{ studentApplication : "1..M receives"
+user --{ studentApplication : "1..M applies"
+
+flat --{ flatShareListing : "1..M lists"
+user --{ flatShareListing : "1..M lists room"
+
+user --{ message : "1..M sends/receives"
+user --{ review : "1..M writes"
+
+flat --{ review : "1..M receives"
+
+@enduml
