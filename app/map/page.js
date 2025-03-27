@@ -3,26 +3,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
+  const [map, setMap] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg';
 
-    const map = new mapboxgl.Map({
+    const initializedMap = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/satellite-v9',
+      style: 'mapbox://styles/mapbox/streets-v11',
       center: [170.5028, -45.8788],
       zoom: 12,
-      pitch: 45,
+      pitch: 0,
       bearing: 0,
       antialias: true,
     });
 
-    map.on('load', () => {
-      map.addLayer({
+    setMap(initializedMap);
+
+    initializedMap.on('load', () => {
+      initializedMap.addLayer({
         id: 'terrain',
         type: 'raster-dem',
         source: {
@@ -34,7 +38,7 @@ export default function MapPage() {
         maxzoom: 13,
       });
 
-      map.addLayer({
+      initializedMap.addLayer({
         id: '3d-buildings',
         type: 'fill-extrusion',
         source: {
@@ -54,7 +58,7 @@ export default function MapPage() {
       color: '#314ccd',
     });
 
-    marker.setLngLat([170.5028, -45.8788]).addTo(map);
+    marker.setLngLat([170.5028, -45.8788]).addTo(initializedMap);
 
     const geolocate = new mapboxgl.GeolocateControl({
       positionOptions: {
@@ -64,11 +68,29 @@ export default function MapPage() {
       showUserLocation: true,
     });
 
-    map.addControl(geolocate);
+    initializedMap.addControl(geolocate);
     geolocate.trigger();
 
-    return () => map.remove();
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+      marker: {
+        color: '#314ccd',
+      },
+      placeholder: 'Search for a place...',
+      proximity: { longitude: 170.5028, latitude: -45.8788 },
+    });
+
+    initializedMap.addControl(geocoder);
+
+    return () => initializedMap.remove();
   }, []);
+
+  const changeMapStyle = (style) => {
+    if (map) {
+      map.setStyle(style);
+    }
+  };
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -82,9 +104,15 @@ export default function MapPage() {
       </div>
       {menuVisible && (
         <div className="menu">
-          <button onClick={() => alert('Switch to Satellite View')}>Satellite View</button>
-          <button onClick={() => alert('Switch to Street View')}>Street View</button>
-          <button onClick={() => alert('Switch to Default View')}>Default View</button>
+          <button onClick={() => changeMapStyle('mapbox://styles/mapbox/satellite-v9')}>
+            Satellite View
+          </button>
+          <button onClick={() => changeMapStyle('mapbox://styles/mapbox/streets-v11')}>
+            Street View
+          </button>
+          <button onClick={() => changeMapStyle('mapbox://styles/mapbox/outdoors-v11')}>
+            Outdoor View
+          </button>
         </div>
       )}
       <div id="map" ref={mapContainerRef} style={{ height: '700px', width: '100%' }} />
