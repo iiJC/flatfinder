@@ -18,7 +18,7 @@
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-error: var(--error);
-  --font-sans: 'Inter', Arial, sans-serif; /* Use a clean, modern font */
+  --font-sans: 'Inter', Arial, sans-serif; 
   --font-mono: 'Courier New', Courier, monospace; /* Use a monospace font for code or other monospaced elements */
 }
 
@@ -45,7 +45,7 @@ body {
 }
 
 a {
-  color: var(--primary);
+  color: var(--secondary);
   text-decoration: none;
   transition: color 0.3s ease;
 }
