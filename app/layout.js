@@ -29,6 +29,8 @@ export default function RootLayout({ children }) {
             <Link href="/map" className="text-white hover:underline">Map</Link>
             <Link href="/dashboard" className="text-white hover:underline">Dashboard</Link>
             <Link href="/login" className="text-white hover:underline">Login</Link>
+            <Link href="/addflat" className="text-white hover:underline">add flat</Link>
+          
           </nav>
         </header>
 
