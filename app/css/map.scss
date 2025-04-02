@@ -1,0 +1,64 @@
+.map-container {
+    position: relative;
+    padding: 20px;
+  
+    .map-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+    }
+  
+    .menu-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #333;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+  
+      &:hover {
+        background-color: #555;
+      }
+    }
+  
+    .menu {
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+  
+      .menu-item {
+        padding: 8px 12px;
+        font-size: 14px;
+        text-align: left;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        border-radius: 4px;
+  
+        &:hover {
+          background-color: #f0f0f0;
+        }
+      }
+    }
+  
+    .map {
+      width: 100%;
+      height: 700px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+  }
+  

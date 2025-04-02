@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import "../css/map.scss"; 
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
@@ -97,39 +98,28 @@ export default function MapPage() {
 
   // ⬇️ The missing `return (...)` was the issue
   return (
-    <div>
-      <h2 className="text-2xl font-semibold">Map View</h2>
-      <div className="hamburger-menu" onClick={toggleMenu}>
-        ☰
-      </div>
+    <div className="map-container">
+      <h2 className="map-title">Map View</h2>
+
+      <button className="menu-button" onClick={() => setMenuVisible(!menuVisible)}>
+        ☰ Menu
+      </button>
+
       {menuVisible && (
         <div className="menu">
-          <button
-            onClick={() =>
-              changeMapStyle("mapbox://styles/mapbox/satellite-v9")
-            }
-          >
+          <button className="menu-item" onClick={() => changeMapStyle("mapbox://styles/mapbox/satellite-v9")}>
             Satellite View
           </button>
-          <button
-            onClick={() => changeMapStyle("mapbox://styles/mapbox/streets-v11")}
-          >
+          <button className="menu-item" onClick={() => changeMapStyle("mapbox://styles/mapbox/streets-v11")}>
             Street View
           </button>
-          <button
-            onClick={() =>
-              changeMapStyle("mapbox://styles/mapbox/outdoors-v11")
-            }
-          >
+          <button className="menu-item" onClick={() => changeMapStyle("mapbox://styles/mapbox/outdoors-v11")}>
             Outdoor View
           </button>
         </div>
       )}
-      <div
-        id="map"
-        ref={mapContainerRef}
-        style={{ height: "700px", width: "100%" }}
-      />
+
+      <div ref={mapContainerRef} className="map" />
     </div>
   );
 }

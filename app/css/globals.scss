@@ -1,0 +1,132 @@
+// Root layout styles
+.root-layout {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+// Header styles
+.header {
+  background-color: black;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Logo styles
+.logo {
+  font-size: 1.25rem;
+  font-weight: bold;
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+}
+
+// Search bar styles
+.search-bar {
+  flex: 1;
+  margin: 0 16px;
+  position: relative;
+
+  input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+    }
+  }
+}
+
+// Navigation links
+.nav-links {
+  display: flex;
+  gap: 16px;
+
+  a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.2s;
+
+    &:hover {
+      text-decoration: underline;
+      opacity: 0.8;
+    }
+  }
+}
+
+// Main content styles
+.main-content {
+  padding: 24px;
+}
+
+// Home Page Styles
+.home-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #3b82f6, #14b8a6);
+  color: white;
+  padding: 24px;
+}
+
+// Title Styles
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+// Description Styles
+.description {
+  font-size: 1.125rem;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+// Button Container Styles
+.buttons-container {
+  display: flex;
+  gap: 16px;
+}
+
+// Button Styles
+.button {
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  &-flat {
+    background-color: white;
+    color: #3b82f6;
+    
+    &:hover {
+      background-color: #e0f2fe;
+    }
+  }
+
+  &-flatmate {
+    background-color: white;
+    color: #14b8a6;
+    
+    &:hover {
+      background-color: #ccf2f4;
+    }
+  }
+}
+
