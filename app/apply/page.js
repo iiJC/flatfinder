@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ".../css/apply.scss"; // Import the SCSS file
+import "../css/applyPage.scss"; 
 
 export default function ApplyPage() {
   const [type, setType] = useState("looking_for_flat");
