@@ -29,6 +29,7 @@
       position: absolute;
       top: 60px;
       left: 20px;
+      z-index: 10;
       background: white;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       border-radius: 8px;
@@ -38,14 +39,15 @@
       gap: 5px;
   
       .menu-item {
+        display: block;
         padding: 8px 12px;
+        margin: 5px 0;
         font-size: 14px;
         text-align: left;
         cursor: pointer;
         border: none;
+        border-radius: 5px;
         background: none;
-        width: 100%;
-        border-radius: 4px;
   
         &:hover {
           background-color: #f0f0f0;
@@ -54,6 +56,9 @@
     }
   
     .map {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 700px;
       border-radius: 8px;
