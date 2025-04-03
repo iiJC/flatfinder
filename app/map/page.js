@@ -1,5 +1,6 @@
 "use client";
 
+import '../css/map.scss';
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -9,8 +10,17 @@ export default function MapPage() {
   const mapContainerRef = useRef(null);
   const [map, setMap] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [isClient, setIsClient] = useState(false); 
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+
+  useEffect(() => {
+
+    if (!isClient || !mapContainerRef.current) return;
+
     mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
 
     const initializedMap = new mapboxgl.Map({
@@ -99,19 +109,21 @@ export default function MapPage() {
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
-
-  <div>
-    <h2 className="text-2xl font-semibold">Map View</h2>
-    <div className="hamburger-menu" onClick={toggleMenu}>
-      ☰
+  return (
+    <div className="map-container">
+       <h2 className="map-title">Map View</h2>
+ 
+       <button className="menu-button" onClick={() => setMenuVisible(!menuVisible)}>
+         ☰ Menu
+       </button>
+      {menuVisible && (
+        <div className="menu">
+          <button onClick={() => changeMapStyle("mapbox://styles/mapbox/satellite-v9")}>Satellite View</button>
+          <button onClick={() => changeMapStyle("mapbox://styles/mapbox/streets-v11")}>Street View</button>
+          <button onClick={() => changeMapStyle("mapbox://styles/mapbox/outdoors-v11")}>Outdoor View</button>
+        </div>
+      )}
+      <div ref={mapContainerRef} className="map" />
     </div>
-    {menuVisible && (
-      <div className="menu">
-        <button onClick={() => changeMapStyle("mapbox://styles/mapbox/satellite-v9")}>Satellite View</button>
-        <button onClick={() => changeMapStyle("mapbox://styles/mapbox/streets-v11")}>Street View</button>
-        <button onClick={() => changeMapStyle("mapbox://styles/mapbox/outdoors-v11")}>Outdoor View</button>
-      </div>
-    )}
-    <div id="map" ref={mapContainerRef} style={{ height: "700px", width: "100%" }} />
-  </div>;
+  );
 }
