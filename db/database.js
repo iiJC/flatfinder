@@ -1,5 +1,5 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://rimmerfinn:find123find@flatfinderdb.jaurqtl.mongodb.net/?retryWrites=true&w=majority&appName=flatfinderdb";
+const uri = "mongodb+srv://main-db:find123find@flatfinderdb.jaurqtl.mongodb.net/?retryWrites=true&w=majority&appName=flatfinderdb";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
