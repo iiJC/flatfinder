@@ -1,5 +1,6 @@
 import React from "react";
-import "../css/register.scss"; // Import SCSS styles
+import "../css/register.scss"; 
+import "../css/globals.scss"; 
 
 export default function RegisterPage() {
   return (

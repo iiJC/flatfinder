@@ -1,6 +1,7 @@
 "use client";
 
 import '../css/map.scss';
+import "../css/globals.scss"; 
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import "../css/addFlat.scss"; 
+import "../css/globals.scss"; 
 
 export default function AddFlat() {
   const [formData, setFormData] = useState({
@@ -63,66 +65,68 @@ export default function AddFlat() {
   };
 
   return (
-    <div>
-      <h1>Add a New Flat</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          ID:
-          <input type="text" name="_id" value={formData._id} onChange={handleChange} required />
-        </label>
-        <label>
-          Address:
-          <input type="text" name="address" value={formData.address} onChange={handleChange} required />
-        </label>
-        <label>
-          Location:
-          <input type="text" name="location" value={formData.location} onChange={handleChange} required />
-        </label>
-        <label>
-          Rent per Week:
-          <input type="number" name="rent_per_week" value={formData.rent_per_week} onChange={handleChange} required />
-        </label>
-        <label>
-          Bond:
-          <input type="number" name="bond" value={formData.bond} onChange={handleChange} required />
-        </label>
-        <label>
-          Rooms:
-          <input type="number" name="rooms" value={formData.rooms} onChange={handleChange} required />
-        </label>
-        <label>
-          Available Rooms:
-          <input type="number" name="available_rooms" value={formData.available_rooms} onChange={handleChange} required />
-        </label>
-        <label>
-          Features (comma-separated):
-          <input type="text" name="features" value={formData.features} onChange={handleChange} />
-        </label>
-        <label>
-          Description:
-          <textarea name="description" value={formData.description} onChange={handleChange} required />
-        </label>
-        <label>
-          Tags (comma-separated):
-          <input type="text" name="tags" value={formData.tags} onChange={handleChange} />
-        </label>
-        <label>
-          Distance from University:
-          <input type="text" name="distance_from_uni" value={formData.distance_from_uni} onChange={handleChange} required />
-        </label>
-        <label>
-          Utilities Included (comma-separated):
-          <input type="text" name="utilities_included" value={formData.utilities_included} onChange={handleChange} />
-        </label>
-        <label>
-          Images (comma-separated URLs):
-          <input type="text" name="images" value={formData.images} onChange={handleChange} />
-        </label>
-        <label>
-          Listed Date:
-          <input type="date" name="listed_date" value={formData.listed_date} onChange={handleChange} required />
-        </label>
-        <button type="submit">Add Flat</button>
+    <div className="add-flat-container">
+      <h1 className="title">🏡 Add a New Flat</h1>
+      <form className="add-flat-form" onSubmit={handleSubmit}>
+        <div className="form-grid">
+          <div className="form-group">
+            <label>ID:</label>
+            <input type="text" name="_id" value={formData._id} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Address:</label>
+            <input type="text" name="address" value={formData.address} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Location:</label>
+            <input type="text" name="location" value={formData.location} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Rent per Week:</label>
+            <input type="number" name="rent_per_week" value={formData.rent_per_week} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Bond:</label>
+            <input type="number" name="bond" value={formData.bond} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Rooms:</label>
+            <input type="number" name="rooms" value={formData.rooms} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Available Rooms:</label>
+            <input type="number" name="available_rooms" value={formData.available_rooms} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Features:</label>
+            <input type="text" name="features" value={formData.features} onChange={handleChange} placeholder="e.g., Furnished, Balcony" />
+          </div>
+          <div className="form-group">
+            <label>Description:</label>
+            <textarea name="description" value={formData.description} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Tags:</label>
+            <input type="text" name="tags" value={formData.tags} onChange={handleChange} placeholder="e.g., Quiet, Student-friendly" />
+          </div>
+          <div className="form-group">
+            <label>Distance from University:</label>
+            <input type="text" name="distance_from_uni" value={formData.distance_from_uni} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Utilities Included:</label>
+            <input type="text" name="utilities_included" value={formData.utilities_included} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Images (URLs):</label>
+            <input type="text" name="images" value={formData.images} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Listed Date:</label>
+            <input type="date" name="listed_date" value={formData.listed_date} onChange={handleChange} required />
+          </div>
+        </div>
+        <button className="submit-button" type="submit">Add Flat</button>
       </form>
     </div>
   );

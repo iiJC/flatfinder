@@ -1,4 +1,5 @@
-import "../css/flats.scss"; // Import SCSS file
+import "../css/flats.scss";
+import "../css/globals.scss"; 
 
 export default function FlatsPage() {
   // TODO: Replace with real data later

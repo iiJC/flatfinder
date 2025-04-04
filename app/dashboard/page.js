@@ -1,5 +1,5 @@
-// import Header from "@global/header.jsx";
-import "../css/dashboard.scss"; // Import SCSS file
+import "../css/dashboard.scss"
+import "../css/globals.scss"; 
 
 export default function DashboardPage() {
   return (
