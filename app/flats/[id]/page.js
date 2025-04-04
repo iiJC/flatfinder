@@ -1,7 +1,7 @@
 // TODO - setup MongoDB vvv
 // import clientPromise from "@/lib/mongodb";
 import "../../css/flatDetails.scss";
-import "../css/globals.scss"; 
+import "../../css/globals.scss"; 
 
 export async function generateStaticParams() {
   // TODO replace with real data later
