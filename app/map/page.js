@@ -61,7 +61,7 @@ export default function MapPage() {
     const marker = new mapboxgl.Marker({ color: "#314ccd" });
     marker.setLngLat([170.5028, -45.8788]).addTo(initializedMap);
     const popup = new mapboxgl.Popup({ offset: 25 })
-      .setHTML('<h3>Test Marker</h3><p>Test pop up.</p>');
+      .setHTML('<h3>Address Flat Name</h3><img src="https://media.istockphoto.com/id/1402134774/photo/professional-road-cyclist-on-a-training-ride.jpg?s=612x612&w=0&k=20&c=CB2o_DXMgH15MLa1CEqWwZVtVb3rpRgejV3UFnUwF_U=" alt="Ga" width="150" height="100"><p>Rent PW:</p><p>Rooms Avaliable:</p><p>Rooms Avaliable:</p>');
     marker.setPopup(popup);
 
     const geolocate = new mapboxgl.GeolocateControl({
