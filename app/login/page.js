@@ -1,4 +1,5 @@
-import "../css/login.scss"; // Import SCSS file
+import "../css/login.scss";
+import "../css/globals.scss"; 
 
 export default function LoginPage() {
   return (

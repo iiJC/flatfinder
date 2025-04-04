@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import "../css/applyPage.scss"; 
+import "../css/globals.scss";  
 
 export default function ApplyPage() {
   const [type, setType] = useState("looking_for_flat");

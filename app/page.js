@@ -9,7 +9,8 @@ export default function HomePage() {
         Find the perfect place to call home or connect with a flatmate today!
       </p>
 
-      <div className="buttons-container">
+      {/* Link these to the correct pages */}
+      <div className="buttons-container"> 
         <button className="button button-flat">
           Looking for a Flat
         </button>
