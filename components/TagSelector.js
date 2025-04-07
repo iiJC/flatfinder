@@ -12,38 +12,63 @@ export default function TagSelector({ selectedTags, setSelectedTags }) {
     );
   };
 
+  const removeTag = (tag) => {
+    setSelectedTags((prev) => prev.filter((t) => t !== tag));
+  };
+
   const filteredTags = TAG_SUGGESTIONS.filter((tag) =>
     tag.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <input
         type="text"
         placeholder="Search tags..."
-        className="w-full p-2 border rounded"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        className="w-full p-2 border border-gray-300 rounded"
       />
+
+      {/* Suggested tags */}
       <div className="flex flex-wrap gap-2">
         {filteredTags.map((tag) => (
           <button
-            key={tag}
             type="button"
+            key={tag}
             onClick={() => toggleTag(tag)}
-            className={`px-3 py-1 rounded-full border text-sm ${
+            className={`px-3 py-1 rounded-full border text-sm transition ${
               selectedTags.includes(tag)
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-800"
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-gray-100 text-gray-800 border-gray-300"
             }`}
           >
             {tag}
           </button>
         ))}
       </div>
+
+      {/* Selected tags with × buttons */}
       {selectedTags.length > 0 && (
-        <div className="pt-2 text-sm text-gray-700">
-          <strong>Selected:</strong> {selectedTags.join(", ")}
+        <div className="pt-4">
+          <p className="font-medium mb-2">Selected Tags:</p>
+          <div className="flex flex-wrap gap-2">
+            {selectedTags.map((tag) => (
+              <span
+                key={tag}
+                className="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => removeTag(tag)}
+                  className="text-blue-800 hover:text-red-600 font-bold"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </div>
