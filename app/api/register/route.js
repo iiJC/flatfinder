@@ -1,4 +1,3 @@
-// app/api/register/route.js
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs"; // For password hashing
 import clientPromise from "../../../db/database"; // Make sure this path is correct for your db connection file
