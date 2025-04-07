@@ -1,12 +1,29 @@
 import "../css/flats.scss";
-import "../css/globals.scss"; 
+import "../css/globals.scss";
 
 export default function FlatsPage() {
-  // TODO: Replace with real data later
   const flats = [
-    { id: "flat1", location: "Downtown", price: "$250/week", rooms: 2 },
-    { id: "flat2", location: "Suburb", price: "$200/week", rooms: 3 },
-    { id: "flat3", location: "City Center", price: "$300/week", rooms: 1 },
+    {
+      id: "flat1",
+      location: "Downtown",
+      price: "$250/week",
+      rooms: 2,
+      image: "https://source.unsplash.com/featured/?apartment,downtown",
+    },
+    {
+      id: "flat2",
+      location: "Suburb",
+      price: "$200/week",
+      rooms: 3,
+      image: "https://source.unsplash.com/featured/?house,suburb",
+    },
+    {
+      id: "flat3",
+      location: "City Center",
+      price: "$300/week",
+      rooms: 1,
+      image: "https://source.unsplash.com/featured/?loft,city",
+    },
   ];
 
   return (
@@ -17,13 +34,16 @@ export default function FlatsPage() {
         <ul className="flats-list">
           {flats.map((flat) => (
             <li key={flat.id} className="flat-item">
-              <h3 className="flat-id">Flat ID: {flat.id}</h3>
-              <p className="flat-info">Location: {flat.location}</p>
-              <p className="flat-info">Price: {flat.price}</p>
-              <p className="flat-info">Rooms: {flat.rooms}</p>
-              <a href={`/flats/${flat.id}`} className="flat-details-link">
-                View Details
-              </a>
+              <img src={flat.image} alt={`Flat in ${flat.location}`} className="flat-image" />
+              <div className="flat-details">
+                <h3 className="flat-id">Flat ID: {flat.id}</h3>
+                <p className="flat-info">Location: {flat.location}</p>
+                <p className="flat-info">Price: {flat.price}</p>
+                <p className="flat-info">Rooms: {flat.rooms}</p>
+                <a href={`/flats/${flat.id}`} className="flat-details-link">
+                  View Details
+                </a>
+              </div>
             </li>
           ))}
         </ul>
@@ -31,4 +51,5 @@ export default function FlatsPage() {
     </div>
   );
 }
+
 

@@ -113,7 +113,7 @@ export default function AddFlat() {
 
   return (
     <div className="add-flat-container">
-      <h1 className="title">🏡 Add a New Flat</h1>
+      <h1 className="title">Add a New Flat</h1>
       <form className="add-flat-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <div className="form-group">

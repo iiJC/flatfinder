@@ -1,4 +1,5 @@
 import "./css/globals.scss";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -12,7 +13,7 @@ export default function HomePage() {
       {/* Link these to the correct pages */}
       <div className="buttons-container"> 
         <button className="button button-flat">
-          Looking for a Flat
+        <Link href="/flats">Looking for a flat</Link>
         </button>
 
         <button className="button button-flatmate">
