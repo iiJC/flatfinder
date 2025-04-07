@@ -20,6 +20,8 @@ export default function AddFlat() {
     utilities_included: '',
     images: '',
     listed_date: '',
+    latitude: '',
+    longitude: '',
   });
 
   const handleChange = (e) => {
@@ -27,15 +29,47 @@ export default function AddFlat() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const getCoordinates = async (address) => {
+    const accessToken = 'pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg'; // Replace with your Mapbox access token
+    const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${accessToken}`;
+
+    try {
+      const response = await fetch(endpoint);
+      const data = await response.json();
+
+      if (data.features.length > 0) {
+        const coordinates = data.features[0].geometry.coordinates;
+        return { latitude: coordinates[1], longitude: coordinates[0] };
+      } else {
+        throw new Error('Address not found');
+      }
+    } catch (error) {
+      console.error("Error fetching coordinates:", error);
+      alert('Failed to get coordinates');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Get coordinates for the address
+    const { latitude, longitude } = await getCoordinates(formData.address);
+
+    if (!latitude || !longitude) {
+      alert('Unable to fetch coordinates');
+      return;
+    }
+
+    // Add the coordinates to the form data
+    const dataToSubmit = { ...formData, latitude, longitude };
+
     try {
       const response = await fetch('/api/addFlat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSubmit),
       });
       if (response.ok) {
         alert('Flat added successfully!');
@@ -54,6 +88,8 @@ export default function AddFlat() {
           utilities_included: '',
           images: '',
           listed_date: '',
+          latitude: '',
+          longitude: '',
         });
       } else {
         alert('Failed to add flat.');
