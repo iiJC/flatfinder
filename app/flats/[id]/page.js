@@ -10,19 +10,23 @@ export default function FlatDetailsPage({ params }) {
   return (
     <div className="flat-details-container">
       <div className="flat-hero">
-        <img src={flatImages[0]} alt="Main image of the flat" className="flat-main-image" />
+        <img src="../../thumbnailpic.webp" className="flat-main-image"/>
+        <h2 className="flat-details-title">Flat in Suburb</h2>
+        {/* make this the main image they choose from the database or the first image? */}
+        {/* <img src={flatImages[0]} alt="Main image of the flat" className="flat-main-image" /> */}
       </div>
 
       <div className="flat-details-box">
-        <h2 className="flat-details-title">Flat in Suburb</h2>
+        {/* make this title the name of flat or the address? */}
         <p className="flat-details-text">
           You're viewing details for: <strong className="flat-id">{id}</strong>
         </p>
+        <p className="flat-details-price">Price:</p>
 
         <div className="flat-images-grid" aria-label="Additional flat images">
-          {flatImages.map((src, index) => (
+          {/* {flatImages.map((src, index) => (
             <img key={index} src={src} alt={`Flat ${id} image ${index + 1}`} className="flat-thumbnail" />
-          ))}
+          ))} */}
         </div>
 
         <div className="flat-info-grid">
