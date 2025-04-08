@@ -36,7 +36,7 @@ export default function AddFlat() {
     const accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg"; // Replace with your Mapbox access token
     const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-      address
+      address + ' Dunedin'
     )}.json?access_token=${accessToken}`;
 
     try {

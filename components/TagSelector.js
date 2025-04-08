@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TAG_SUGGESTIONS } from "@/lib/tags";
+import { CATEGORIZED_TAGS } from "@/lib/tags";
 
 export default function TagSelector({ selectedTags, setSelectedTags }) {
   const [search, setSearch] = useState("");
@@ -16,9 +16,8 @@ export default function TagSelector({ selectedTags, setSelectedTags }) {
     setSelectedTags((prev) => prev.filter((t) => t !== tag));
   };
 
-  const filteredTags = TAG_SUGGESTIONS.filter((tag) =>
-    tag.toLowerCase().includes(search.toLowerCase())
-  );
+  const filterBySearch = (tags) =>
+    tags.filter((tag) => tag.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="space-y-4">
@@ -30,25 +29,37 @@ export default function TagSelector({ selectedTags, setSelectedTags }) {
         className="w-full p-2 border border-gray-300 rounded"
       />
 
-      {/* Suggested tags */}
-      <div className="flex flex-wrap gap-2">
-        {filteredTags.map((tag) => (
-          <button
-            type="button"
-            key={tag}
-            onClick={() => toggleTag(tag)}
-            className={`px-3 py-1 rounded-full border text-sm transition ${
-              selectedTags.includes(tag)
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-gray-100 text-gray-800 border-gray-300"
-            }`}
-          >
-            {tag}
-          </button>
-        ))}
-      </div>
+      {/* Collapsible categories */}
+      {Object.entries(CATEGORIZED_TAGS).map(([category, tags]) => {
+        const visibleTags = filterBySearch(tags);
+        if (visibleTags.length === 0) return null;
 
-      {/* Selected tags with × buttons */}
+        return (
+          <details key={category} className="mb-4" open>
+            <summary className="font-semibold cursor-pointer">
+              {category}
+            </summary>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {visibleTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1 rounded-full border text-sm transition ${
+                    selectedTags.includes(tag)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-gray-100 text-gray-800 border-gray-300"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </details>
+        );
+      })}
+
+      {/* Selected tag summary with remove buttons */}
       {selectedTags.length > 0 && (
         <div className="pt-4">
           <p className="font-medium mb-2">Selected Tags:</p>
