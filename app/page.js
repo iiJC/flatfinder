@@ -17,7 +17,7 @@ export default function HomePage() {
         </button>
 
         <button className="button button-flatmate">
-          Looking for a Flatmate
+        <Link href="/addflat">Looking for a flatmate</Link>
         </button>
       </div>
     </div>

@@ -36,7 +36,7 @@ export default function AddFlat() {
     const accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg"; // Replace with your Mapbox access token
     const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-      address
+      address + ' Dunedin'
     )}.json?access_token=${accessToken}`;
 
     try {
@@ -113,7 +113,7 @@ export default function AddFlat() {
 
   return (
     <div className="add-flat-container">
-      <h1 className="title">Add a New Flat</h1>
+      <h1 className="title">List Your Flat</h1>
       <form className="add-flat-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <div className="form-group">
@@ -212,7 +212,16 @@ export default function AddFlat() {
               setSelectedTags={setSelectedTags}
             />
           </div>
-
+          <div className="form-group">
+            <label>Flat Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.flat_name}
+              onChange={handleChange}
+              placeholder="e.g., Debacle, Fridgette"
+            />
+          </div>
           <div className="form-group">
             <label>Distance from University:</label>
             <input

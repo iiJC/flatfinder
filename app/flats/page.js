@@ -31,6 +31,7 @@ export default function FlatsPage() {
       <div className="flats-box">
         <h2 className="flats-title">Browse Available Flats</h2>
 
+{/* Create an if to display the flat name if there is one */}
         <ul className="flats-list">
           {flats.map((flat) => (
             <li key={flat.id} className="flat-item">

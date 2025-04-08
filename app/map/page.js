@@ -11,7 +11,7 @@ export default function MapPage() {
   const mapContainerRef = useRef(null);
   const [map, setMap] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [isClient, setIsClient] = useState(false); 
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
