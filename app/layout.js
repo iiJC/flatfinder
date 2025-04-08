@@ -24,19 +24,20 @@ export default function RootLayout({ children }) {
 
           {/* Dropdown Menus */}
 
-          <nav className="nav-links">
-            <Link href="/flats">Flats</Link>
-            <Link href="/map">Map</Link>
-          </nav>
-
           <div className="dropdown-container">
+            <nav className="nav-links">
+            <Link href="/flats" className="dropbtn">Flats</Link>
+            <Link href="/map" className="dropbtn">Map</Link>
+            </nav>
             <div className="dropdown">
               <button className="dropbtn">Applying ▾</button>
               <div className="dropdown-content">
-                <Link href="/apply">Apply</Link>
-                <Link href="/addflat">Add Flat</Link>
+                <Link href="/apply">Apply to join a Flat</Link>
+                <Link href="/addflat">List your flat</Link>
               </div>
             </div>
+
+            {/* add a place to show when someone is logged in */}
             <div className="dropdown">
               <button className="dropbtn">Personal ▾</button>
               <div className="dropdown-content">

@@ -83,7 +83,6 @@
 // anything that is navigation such as the header buttons
 .nav-links {
   display: flex;
-  gap: var(--spacing-sm);
 
   a {
     color: var(--color-white);
@@ -101,7 +100,6 @@
 .dropdown-container {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
 }
 
 // Dropdown base

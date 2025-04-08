@@ -113,7 +113,7 @@ export default function AddFlat() {
 
   return (
     <div className="add-flat-container">
-      <h1 className="title">Add a New Flat</h1>
+      <h1 className="title">List Your Flat</h1>
       <form className="add-flat-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <div className="form-group">
@@ -212,7 +212,16 @@ export default function AddFlat() {
               setSelectedTags={setSelectedTags}
             />
           </div>
-
+          <div className="form-group">
+            <label>Flat Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.flat_name}
+              onChange={handleChange}
+              placeholder="e.g., Debacle, Fridgette"
+            />
+          </div>
           <div className="form-group">
             <label>Distance from University:</label>
             <input
