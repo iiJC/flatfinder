@@ -19,55 +19,49 @@ export default function FlatDetailsPage({ params }) {
 
   return (
     <div className="flat-details-container">
-      <div className="flat-hero">
-        <img src="../../thumbnailpic.webp" className="flat-main-image"/>
-        <h2 className="flat-details-title">Flat in Suburb</h2>
-        {/* make this the main image they choose from the database or the first image? */}
-        {/* <img src={flatImages[0]} alt="Main image of the flat" className="flat-main-image" /> */}
-      </div>
-
-      <div className="flat-details-box">
-        {/* make this title the name of flat or the address? */}
-        <p className="flat-details-text">
-          You're viewing details for: <strong className="flat-id">{id}</strong>
-        </p>
-        <p className="flat-details-price">Price:</p>
-
-        <div className="flat-images-grid" aria-label="Additional flat images">
-          {/* {flatImages.map((src, index) => (
-            <img key={index} src={src} alt={`Flat ${id} image ${index + 1}`} className="flat-thumbnail" />
-          ))} */}
-        </div>
-
-        <div className="flat-info-grid">
-          <section className="flat-section">
-            <h3 className="flat-section-title">Flat Information</h3>
-            <p className="flat-info">Location: Suburb</p>
-            <p className="flat-info">Price: $200 per week</p>
-            <p className="flat-info">Rooms: 3</p>
-            <p className="flat-info">Furnished: Yes</p>
-            <p className="flat-info">Pets allowed: No</p>
-          </section>
-
-          <section className="flat-section">
-            <h3 className="flat-section-title">Flatmate Preferences</h3>
-            <p className="flat-info">Looking for: Clean, tidy professional</p>
-            <p className="flat-info">Move-in Date: ASAP</p>
-            <p className="flat-info">Lease: Minimum 6 months</p>
-          </section>
-        </div>
-
-        <section className="flat-description">
-          <h3 className="flat-section-title">Description</h3>
-          <p>This sunny 3-bedroom home is perfect for someone who loves peace and a good community vibe. Close to shops, buses, and parks.</p>
-        </section>
-
-        <div className="button-container">
-          <button className="flat-contact-button" aria-label="Contact the flat owner">
-            Contact Flat Owner
-          </button>
-        </div>
-      </div>
+  <div className="flat-hero">
+    <img src="../../thumbnailpic.webp" alt="Main flat view" className="flat-main-image" />
+    <div className="flat-hero-overlay">
+      <h1 className="flat-hero-title">Mt Wellington Townhouse – Females Only</h1>
+      <p className="flat-hero-subtitle">3-bedroom home · Mt Wellington, Auckland</p>
     </div>
+  </div>
+
+  <div className="flat-content">
+    <div className="flat-main-column">
+      <section className="flat-section">
+        <h2>About this place</h2>
+        <p>This tidy, sunny townhouse is available now. It has a fully equipped kitchen, cozy shared lounge, and a small backyard.</p>
+      </section>
+
+      <section className="flat-section">
+        <h2>Flatmate Preferences</h2>
+        <ul>
+          <li>Looking for: Female, professional or student</li>
+          <li>Move-in date: ASAP</li>
+          <li>Lease: 6-month minimum</li>
+        </ul>
+      </section>
+
+      <section className="flat-section">
+        <h2>Features</h2>
+        <ul className="flat-tags">
+          <li>Furnished</li>
+          <li>Wi-Fi</li>
+          <li>Off-street parking</li>
+          <li>No pets</li>
+        </ul>
+      </section>
+    </div>
+
+    <aside className="flat-sidebar">
+      <div className="flat-price-box">
+        <p className="flat-price">$200/week</p>
+        <p className="flat-bills">Bills not included</p>
+      </div>
+      <button className="flat-contact-button">Contact Flat Owner</button>
+    </aside>
+  </div>
+</div>
   );
 }
