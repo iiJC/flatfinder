@@ -41,8 +41,8 @@ export default function RootLayout({ children }) {
             <div className="dropdown">
               <button className="dropbtn">Personal ▾</button>
               <div className="dropdown-content">
-                <Link href="/dashboard">Dashboard</Link>
                 <Link href="/login">Login</Link>
+                <Link href="/dashboard">Dashboard</Link>
               </div>
             </div>
           </div>
