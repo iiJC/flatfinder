@@ -8,21 +8,21 @@ export default function FlatsPage() {
       location: "Downtown",
       price: "$250/week",
       rooms: 2,
-      image: "https://source.unsplash.com/featured/?apartment,downtown",
+      image: "./thumbnailpic.webp",
     },
     {
       id: "flat2",
       location: "Suburb",
       price: "$200/week",
       rooms: 3,
-      image: "https://source.unsplash.com/featured/?house,suburb",
+      image: "./thumbnailpic.webp",
     },
     {
       id: "flat3",
       location: "City Center",
       price: "$300/week",
       rooms: 1,
-      image: "https://source.unsplash.com/featured/?loft,city",
+      image: "./thumbnailpic.webp",
     },
   ];
 
