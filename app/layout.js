@@ -1,6 +1,8 @@
 // RootLayout.jsx
 import Link from "next/link";
 import "./css/globals.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 export const metadata = {
   title: "FlatMate Finder",
@@ -19,15 +21,21 @@ export default function RootLayout({ children }) {
 
           {/* Search Bar */}
           <div className="search-bar">
-            <input type="text" placeholder="Search for flats or flatmates..." aria-label="Search" />
+            <input type="text" placeholder="Search for flats or flatmates..." aria-label="Search"/>
+            <FontAwesomeIcon icon={faSearch} className="search-icon" /> 
+            {/* onClick={() => search()} */}
           </div>
 
           {/* Dropdown Menus */}
 
           <div className="dropdown-container">
             <nav className="nav-links">
-            <Link href="/flats" className="dropbtn">Flats</Link>
-            <Link href="/map" className="dropbtn">Map</Link>
+              <Link href="/flats" className="dropbtn">
+                Flats
+              </Link>
+              <Link href="/map" className="dropbtn">
+                Map
+              </Link>
             </nav>
             <div className="dropdown">
               <button className="dropbtn">Applying ▾</button>

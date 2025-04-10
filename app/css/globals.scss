@@ -58,15 +58,16 @@
   }
 }
 
-// for the serach bar
 .search-bar {
   flex: 2;
   margin: 0 var(--spacing-sm);
+  display: flex; // Add this
   justify-content: center;
   align-items: center;
+  gap: 0.5rem; // Space between input and icon
 
   input {
-    width: 80%;
+    flex: 1; // Take up remaining space
     padding: 10px 14px;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-md);
@@ -78,7 +79,17 @@
       box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
     }
   }
+
+  .search-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--color-text-muted); // Optional muted grey
+    cursor: pointer; // Make it feel clickable
+    transition: color 0.2s;
+
+  }
 }
+
 
 // anything that is navigation such as the header buttons
 .nav-links {
