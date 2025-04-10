@@ -1,24 +1,48 @@
-import clientPromise from "@/db/database";
-import { ObjectId, isValidObjectId } from "mongodb"; // helpful utility
-import "../../css/flatDetails.scss";
-import "../../css/globals.scss";
+export const dynamic = "force-static"; // required for static export (GitHub Pages)
 
-export default async function FlatDetailsPage({ params }) {
-  const { id } = params;
-
-  // Check if the ID is a valid Mongo ObjectId (24-char hex string)
-  if (!ObjectId.isValid(id)) {
-    return (
-      <div className="p-8 text-center text-red-500">Invalid Flat ID: {id}</div>
-    );
+const mockFlats = [
+  {
+    _id: "flat1",
+    address: "123 Castle Street",
+    location: "North Dunedin",
+    rent_per_week: 220,
+    rooms: 3,
+    tags: ["Party", "Furnished"],
+    images: "/thumbnailpic.webp",
+    features: "Sunny and spacious flat with great vibes.",
+    description: "Legendary Castle Street Flat!",
+    utilities_included: "Power + Internet included"
+  },
+  {
+    _id: "flat2",
+    address: "456 Leith Street",
+    location: "Central Dunedin",
+    rent_per_week: 250,
+    rooms: 4,
+    tags: ["Quiet", "Fibre internet"],
+    images: "/thumbnailpic.webp",
+    features: "Peaceful street with big kitchen and nice lounge.",
+    description: "Perfect for postgrads!",
+    utilities_included: "Power included"
   }
+];
 
-  const client = await clientPromise;
-  const db = client.db("flatfinderdb");
-  const flat = await db.collection("flats").findOne({ _id: new ObjectId(id) });
+export async function generateStaticParams() {
+  return mockFlats.map((flat) => ({
+    id: flat._id
+  }));
+}
+
+export default function FlatDetailsPage({ params }) {
+  const { id } = params;
+  const flat = mockFlats.find((f) => f._id === id);
 
   if (!flat) {
-    return <div className="p-8 text-center text-red-500">Flat not found.</div>;
+    return (
+      <div className="p-8 text-center text-red-500">
+        Flat with ID "{id}" not found.
+      </div>
+    );
   }
 
   return (
@@ -30,9 +54,7 @@ export default async function FlatDetailsPage({ params }) {
           className="flat-main-image"
         />
         <div className="flat-hero-overlay">
-          <h1 className="flat-hero-title">
-            {flat.description || "Flat Listing"}
-          </h1>
+          <h1 className="flat-hero-title">{flat.description}</h1>
           <p className="flat-hero-subtitle">{flat.address}</p>
         </div>
       </div>
@@ -41,7 +63,7 @@ export default async function FlatDetailsPage({ params }) {
         <div className="flat-main-column">
           <section className="flat-section">
             <h2>About this place</h2>
-            <p>{flat.features || "No description provided."}</p>
+            <p>{flat.features}</p>
           </section>
 
           {flat.tags?.length > 0 && (
