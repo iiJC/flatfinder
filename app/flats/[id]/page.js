@@ -1,28 +1,39 @@
+import clientPromise from "@/db/database";
+import { ObjectId, isValidObjectId } from "mongodb"; // helpful utility
 import "../../css/flatDetails.scss";
 import "../../css/globals.scss";
 
-export async function generateStaticParams() {
-  // Replace this with real data later
-  const flatIds = ["flat1", "flat2", "flat3"]; // Example IDs
-
-  return flatIds.map((id) => ({
-    id,
-  }));
-}
-
-export default function FlatDetailsPage({ params }) {
+export default async function FlatDetailsPage({ params }) {
   const { id } = params;
 
-  // Temp: mock image and info
-  const flatImages = ["/images/flat1.jpg", "/images/flat2.jpg", "/images/flat3.jpg"];
+  // Check if the ID is a valid Mongo ObjectId (24-char hex string)
+  if (!ObjectId.isValid(id)) {
+    return (
+      <div className="p-8 text-center text-red-500">Invalid Flat ID: {id}</div>
+    );
+  }
+
+  const client = await clientPromise;
+  const db = client.db("flatfinderdb");
+  const flat = await db.collection("flats").findOne({ _id: new ObjectId(id) });
+
+  if (!flat) {
+    return <div className="p-8 text-center text-red-500">Flat not found.</div>;
+  }
 
   return (
     <div className="flat-details-container">
       <div className="flat-hero">
-        <img src="../../thumbnailpic.webp" alt="Main flat view" className="flat-main-image" />
+        <img
+          src={flat.images || "/thumbnailpic.webp"}
+          alt={`Flat at ${flat.address}`}
+          className="flat-main-image"
+        />
         <div className="flat-hero-overlay">
-          <h1 className="flat-hero-title">Mt Wellington Townhouse – Females Only</h1>
-          <p className="flat-hero-subtitle">3-bedroom home · Mt Wellington, Auckland</p>
+          <h1 className="flat-hero-title">
+            {flat.description || "Flat Listing"}
+          </h1>
+          <p className="flat-hero-subtitle">{flat.address}</p>
         </div>
       </div>
 
@@ -30,33 +41,27 @@ export default function FlatDetailsPage({ params }) {
         <div className="flat-main-column">
           <section className="flat-section">
             <h2>About this place</h2>
-            <p>This tidy, sunny townhouse is available now. It has a fully equipped kitchen, cozy shared lounge, and a small backyard.</p>
+            <p>{flat.features || "No description provided."}</p>
           </section>
 
-          <section className="flat-section">
-            <h2>Flatmate Preferences</h2>
-            <ul>
-              <li>Looking for: Female, professional or student</li>
-              <li>Move-in date: ASAP</li>
-              <li>Lease: 6-month minimum</li>
-            </ul>
-          </section>
-
-          <section className="flat-section">
-            <h2>Features</h2>
-            <ul className="flat-tags">
-              <li>Furnished</li>
-              <li>Wi-Fi</li>
-              <li>Off-street parking</li>
-              <li>No pets</li>
-            </ul>
-          </section>
+          {flat.tags?.length > 0 && (
+            <section className="flat-section">
+              <h2>Features</h2>
+              <ul className="flat-tags">
+                {flat.tags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
 
         <aside className="flat-sidebar">
           <div className="flat-price-box">
-            <p className="flat-price">$200/week</p>
-            <p className="flat-bills">Bills not included</p>
+            <p className="flat-price">${flat.rent_per_week}/week</p>
+            <p className="flat-bills">
+              {flat.utilities_included || "Bills info not provided"}
+            </p>
           </div>
           <button className="flat-contact-button">Contact Flat Owner</button>
         </aside>
