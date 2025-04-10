@@ -7,6 +7,7 @@ import TagSelector from "@/components/TagSelector";
 
 export default function AddFlat() {
   const [selectedTags, setSelectedTags] = useState([]);
+  const [addressSuggestions, setAddressSuggestions] = useState([]); 
 
   const [formData, setFormData] = useState({
     _id: "",
@@ -32,11 +33,49 @@ export default function AddFlat() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleAddressChange = async (e) => {
+    const addressInput = e.target.value;
+    setFormData({ ...formData, address: addressInput });
+
+    if (addressInput.length > 2) {
+      const accessToken =
+        "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg"; // Replace with your Mapbox access token
+      
+      const centerLatitude = -45.8788; // Dunedin 
+      const centerLongitude = 170.5028; // Dunedin
+
+      const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+        addressInput
+      )}.json?access_token=${accessToken}&proximity=${centerLongitude},${centerLatitude}`;
+
+      try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+
+        if (data.features.length > 0) {
+          const suggestions = data.features.map((feature) => feature.place_name);
+          setAddressSuggestions(suggestions);
+        } else {
+          setAddressSuggestions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching address suggestions:", error);
+      }
+    } else {
+      setAddressSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setFormData({ ...formData, address: suggestion });
+    setAddressSuggestions([]); 
+  };
+
   const getCoordinates = async (address) => {
     const accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg"; // Replace with your Mapbox access token
     const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-      address + ' Dunedin'
+      address + " Dunedin"
     )}.json?access_token=${accessToken}`;
 
     try {
@@ -132,9 +171,21 @@ export default function AddFlat() {
               type="text"
               name="address"
               value={formData.address}
-              onChange={handleChange}
+              onChange={handleAddressChange}
               required
             />
+            {addressSuggestions.length > 0 && (
+              <ul className="address-suggestions">
+                {addressSuggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="form-group">
             <label>Location:</label>
