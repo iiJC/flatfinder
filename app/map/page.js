@@ -112,7 +112,7 @@ export default function MapPage() {
   };
   return (
     <div className="map-container">
-       <h2 className="map-title">Map View</h2>
+       <h2 className="title">Map View</h2>
  
        <button className="menu-button" onClick={() => setMenuVisible(!menuVisible)}>
          ☰ Menu

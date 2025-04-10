@@ -33,7 +33,7 @@ export default function RegisterPage() {
   return (
     <div className="register-container">
       <div className="register-box">
-        <h2 className="register-title">Create an Account</h2>
+        <h2 className="title">Create an Account</h2>
 
         <form className="register-form" onSubmit={handleSubmit}>
           <div className="form-group">

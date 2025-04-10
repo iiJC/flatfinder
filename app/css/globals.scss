@@ -223,6 +223,8 @@ body {
 .buttons-container {
   display: flex;
   gap: var(--spacing-sm);
+  flex-direction: row;
+  justify-content: space-evenly;
 }
 
 .button {
@@ -270,7 +272,7 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-evenly;
 
   img {
     width: 100%;

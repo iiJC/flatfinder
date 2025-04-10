@@ -29,7 +29,7 @@ export default function FlatsPage() {
   return (
     <div className="flats-container">
       <div className="flats-box">
-        <h2 className="flats-title">Browse Available Flats</h2>
+        <h2 className="title">Browse Available Flats</h2>
 
 {/* Create an if to display the flat name if there is one */}
         <ul className="flats-list">
