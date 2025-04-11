@@ -1,10 +1,10 @@
 import clientPromise from "@/db/database";
 import { ObjectId } from "mongodb";
-import "../../../css/flatDetails.scss";
-import "../../../css/globals.scss";
+import "../../css/flatDetails.scss";
+import "../../css/globals.scss";
 
 export default async function FlatDetailsPage({ params }) {
-  const { id } = params;
+  const { id } = await params;
 
   // Validate ObjectId
   if (!ObjectId.isValid(id)) {

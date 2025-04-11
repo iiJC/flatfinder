@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import "../../css/flats.scss";
-import "../../css/globals.scss";
+import "../css/flats.scss";
+import "../css/globals.scss";
 
 export default function FlatsPage() {
   const [flats, setFlats] = useState([]);
