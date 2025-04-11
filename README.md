@@ -2,7 +2,7 @@
 
 Find a flat!  
 For students, by students.  
-Visit the website here: https://iijc.github.io/flatfinder/
+Visit the website here: https://vercel.com/iijcs-projects/flatfinder/J16gkk8A4oGi7v5ogTSnv69PFq7D
 
 ---
 
