@@ -1,7 +1,6 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: "standalone" // switch to standalone for server-side features (e.g. MongoDB, APIs)
+  output: "standalone" // ✅ This supports API routes, SSR, MongoDB, etc.
 };
 
 export default nextConfig;
