@@ -17,10 +17,8 @@ export default function MapPage() {
     setIsClient(true);
   }, []);
 
-
   useEffect(() => {
-
-    if (typeof window === "undefined" || !mapContainerRef.current) return;
+    if (!isClient || typeof window === "undefined" || !mapContainerRef.current) return;
 
     mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
 
@@ -36,70 +34,59 @@ export default function MapPage() {
 
     setMap(initializedMap);
 
-    initializedMap.on("load", () => {
-      initializedMap.addLayer({
-        id: "terrain",
-        type: "raster-dem",
-        source: {
-          type: "raster",
-          url: "mapbox://mapbox.terrain-rgb",
-          tileSize: 512,
-        },
-        minzoom: 0,
-        maxzoom: 13,
+    initializedMap.on("load", async () => {
+      // Fetch flats from API
+      const res = await fetch("/api/getFlats");
+      const flats = await res.json();
+
+      flats.forEach(flat => {
+        if (flat.location?.coordinates?.length === 2) {
+          const [lng, lat] = flat.location.coordinates;
+
+          const popupHtml = `
+            <h3>${flat.name}</h3>
+            <p><strong>Address:</strong> ${flat.address}</p>
+            <p><strong>Rent:</strong> $${flat.rent} / week</p>
+            <p><strong>Rooms:</strong> ${flat.rooms}</p>
+            <p><strong>Bathrooms:</strong> ${flat.bathrooms}</p>
+            <p><strong>Bond:</strong> $${flat.bond}</p>
+            <p><strong>From Uni:</strong> ${flat.distanceUni}m</p>
+            <p><strong>From Supermarket:</strong> ${flat.distanceSupermarket}m</p>
+            <p><strong>From Gym:</strong> ${flat.distanceGym}m</p>
+            <p>${flat.description}</p>
+          `;
+
+          new mapboxgl.Marker({ color: "#314ccd" })
+            .setLngLat([lng, lat])
+            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
+            .addTo(initializedMap);
+        }
       });
 
-      initializedMap.addLayer({
-        id: "3d-buildings",
-        type: "fill-extrusion",
-        source: {
-          type: "vector",
-          url: "mapbox://mapbox.buildings",
-        },
-        "source-layer": "building",
-        paint: {
-          "fill-extrusion-color": "#aaa",
-          "fill-extrusion-height": ["get", "height"],
-          "fill-extrusion-base": ["get", "min_height"],
-        },
+      // Geolocate control
+      const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserLocation: true,
       });
+
+      initializedMap.addControl(geolocate);
+      geolocate.trigger();
+
+      // Search bar
+      const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        marker: { color: "#314ccd" },
+        placeholder: "Search for a place...",
+        proximity: { longitude: 170.5028, latitude: -45.8788 },
+      });
+
+      initializedMap.addControl(geocoder);
     });
-
-    const marker = new mapboxgl.Marker({
-      color: "#314ccd",
-    });
-
-    marker.setLngLat([170.5028, -45.8788]).addTo(initializedMap);
-    const popup = new mapboxgl.Popup({ offset: 25 })
-      .setHTML('<h3>Address Flat Name</h3><img src="https://media.istockphoto.com/id/1402134774/photo/professional-road-cyclist-on-a-training-ride.jpg?s=612x612&w=0&k=20&c=CB2o_DXMgH15MLa1CEqWwZVtVb3rpRgejV3UFnUwF_U=" alt="Ga" width="150" height="100"><p>Rent PW:</p><p>Rooms Avaliable:</p><p>Rooms Avaliable:</p>');
-    marker.setPopup(popup);
-
-
-    const geolocate = new mapboxgl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true,
-      },
-      trackUserLocation: true,
-      showUserLocation: true,
-    });
-
-    initializedMap.addControl(geolocate);
-    geolocate.trigger();
-
-    const geocoder = new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      mapboxgl: mapboxgl,
-      marker: {
-        color: "#314ccd",
-      },
-      placeholder: "Search for a place...",
-      proximity: { longitude: 170.5028, latitude: -45.8788 },
-    });
-
-    initializedMap.addControl(geocoder);
 
     return () => initializedMap.remove();
-  }, []);
+  }, [isClient]);
 
   const changeMapStyle = (style) => {
     if (map) {
@@ -107,16 +94,10 @@ export default function MapPage() {
     }
   };
 
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-  };
   return (
     <div className="map-container">
-       <h2 className="title">Map View</h2>
- 
-       <button className="menu-button" onClick={() => setMenuVisible(!menuVisible)}>
-         ☰ Menu
-       </button>
+      <h2 className="title">Map View</h2>
+      <button className="menu-button" onClick={() => setMenuVisible(!menuVisible)}>☰ Menu</button>
       {menuVisible && (
         <div className="menu">
           <button onClick={() => changeMapStyle("mapbox://styles/mapbox/satellite-v9")}>Satellite View</button>

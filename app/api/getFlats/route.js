@@ -1,18 +1,16 @@
-import clientPromise from "@/db/database";
+import clientPromise from "../db/database.js";
+import Flat from "../../models/flat";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
     const client = await clientPromise;
-    const db = client.db("flatfinderdb");
+    const db = client.db("flatfinderdb"); // <- your database name
+    const flats = await db.collection("flats").find({}).toArray(); // use native driver here
 
-    const flats = await db.collection("flats").find({}).toArray();
     return NextResponse.json(flats);
   } catch (err) {
-    console.error("Failed to fetch flats:", err);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.error("Error fetching flats:", err);
+    return NextResponse.json({ error: "Failed to fetch flats" }, { status: 500 });
   }
 }
