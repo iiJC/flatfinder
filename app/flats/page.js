@@ -1,26 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import "../css/flats.scss";
 import "../css/globals.scss";
+import Link from "next/link";
+
+const mockFlats = [
+  {
+    _id: "flat1",
+    address: "123 Castle Street",
+    location: "North Dunedin",
+    rent_per_week: 220,
+    rooms: 3,
+    tags: ["Party", "Furnished"],
+    images: "/thumbnailpic.webp"
+  },
+  {
+    _id: "flat2",
+    address: "456 Leith Street",
+    location: "Central Dunedin",
+    rent_per_week: 250,
+    rooms: 4,
+    tags: ["Quiet", "Fibre internet"],
+    images: "/thumbnailpic.webp"
+  }
+];
 
 export default function FlatsPage() {
-  const [flats, setFlats] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchFlats = async () => {
-      const res = await fetch("/api/getFlats");
-      const data = await res.json();
-      setFlats(data);
-      setLoading(false);
-    };
-
-    fetchFlats();
-  }, []);
-
-  if (loading) return <p className="p-6">Loading flats...</p>;
-
+  const flats = mockFlats; // No need for state or fetch
   return (
     <div className="flats-container">
       <div className="flats-box">
@@ -39,9 +45,9 @@ export default function FlatsPage() {
                 <p className="flat-info">Location: {flat.location}</p>
                 <p className="flat-info">Price: ${flat.rent_per_week}/week</p>
                 <p className="flat-info">Rooms: {flat.rooms}</p>
-                <a href={`/flats/${flat._id}`} className="flat-details-link">
+                <Link href={`/flats/${flat._id}`} className="flat-details-link">
                   View Details
-                </a>
+                </Link>
               </div>
             </li>
           ))}
