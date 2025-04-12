@@ -86,10 +86,8 @@
     color: var(--color-text-muted); // Optional muted grey
     cursor: pointer; // Make it feel clickable
     transition: color 0.2s;
-
   }
 }
-
 
 // anything that is navigation such as the header buttons
 .nav-links {
@@ -111,7 +109,6 @@
 .dropdown-container {
   display: flex;
   align-items: center;
-
 }
 
 // Dropdown base
@@ -163,7 +160,6 @@
   display: block;
 }
 
-
 // Map link next to dropdowns
 .map-link {
   color: var(--color-white);
@@ -175,7 +171,6 @@
     opacity: 0.8;
   }
 }
-
 
 // global main content styles
 .main-content {
@@ -233,9 +228,10 @@ body {
 // Button Styles
 .buttons-container {
   display: flex;
-  gap: var(--spacing-sm);
-  flex-direction: row;
-  justify-content: space-evenly;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
 }
 
 .button {
@@ -267,7 +263,7 @@ body {
   }
 }
 
-.looking-flat{
+.looking-flat {
   flex: 1;
   max-width: 17%;
 }
@@ -276,32 +272,92 @@ body {
   max-width: 30%;
 }
 
-
 // for the home page cards
 .card {
   position: relative;
   overflow: hidden;
-  display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: var(--border-radius-lg);
   }
 
   .overlay {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
     width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    backdrop-filter: blur(4px);
+    transition: background 0.3s ease;
+  }
 
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--box-shadow-md);
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
+}
+
+/* Remove overly tight max-width constraints */
+.looking-flat,
+.looking-flatmate {
+  max-width: none;
+  flex: none;
+}
+
+/* Responsive layout for small screens */
+@media (max-width: 768px) {
+  .buttons-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 90vw;
+    height: 180px;
+  }
+}
+
+.role-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-sm);
+  transition: all 0.3s ease;
+  display: inline-block;
+  background-color: var(--color-white);
+  color: var(--color-primary);
+
+  &:hover {
+    background-color: #e0f2fe;
+    transform: translateY(-2px);
+  }
+
+  &.flatmate {
+    color: var(--color-secondary);
+
+    &:hover {
+      background-color: #ccf2f4;
+    }
   }
 }
