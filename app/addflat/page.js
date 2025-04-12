@@ -4,9 +4,26 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import { POIS } from "@/lib/pois";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const AddFlat = () => {
+function haversineDistance(coord1, coord2) {
+  const R = 6371e3;
+  const toRad = (deg) => (deg * Math.PI) / 180;
+  const lat1 = toRad(coord1.lat);
+  const lat2 = toRad(coord2.lat);
+  const dLat = toRad(coord2.lat - coord1.lat);
+  const dLng = toRad(coord2.lng - coord1.lng);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+export default function AddFlat() {
   const [formData, setFormData] = useState({
     flat_name: "",
     address: "",
@@ -19,16 +36,24 @@ const AddFlat = () => {
     description: "",
     tags: "",
     distance_from_uni: "",
+    distance_from_gym: "",
+    distance_from_supermarket: "",
     utilities_included: "",
     images: "",
     coordinates: null
   });
 
   const [selectedTags, setSelectedTags] = useState([]);
-  const mapRef = useRef(null);
+  const [poiVisibility, setPoiVisibility] = useState({
+    gyms: true,
+    supermarkets: true,
+    university: true
+  });
+
   const geocoderRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const markerRef = useRef(null);
+  const mapRef = useRef(null);
+  const geocoderControlRef = useRef(null);
+  const userMarkerRef = useRef(null);
 
   const tagOptions = [
     "Warm",
@@ -47,75 +72,108 @@ const AddFlat = () => {
     );
   };
 
+  const getPoiColor = (category) => {
+    switch (category) {
+      case "gyms":
+        return "#1e90ff";
+      case "supermarkets":
+        return "#ff7f50";
+      case "university":
+        return "#32cd32";
+      default:
+        return "#aaa";
+    }
+  };
+
   useEffect(() => {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
 
-    const geocoder = new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      placeholder: "Search for an address...",
-      marker: false,
-      countries: "nz",
-      proximity: { longitude: 170.5028, latitude: -45.8788 }
+    const map = new mapboxgl.Map({
+      container: mapRef.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [170.5028, -45.8788],
+      zoom: 13
     });
 
-    if (geocoderRef.current) {
+    if (!geocoderControlRef.current) {
+      const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        placeholder: "Search for an address...",
+        marker: false,
+        countries: "nz",
+        proximity: { longitude: 170.5028, latitude: -45.8788 }
+      });
+
       geocoder.addTo(geocoderRef.current);
-    }
+      geocoderControlRef.current = geocoder;
 
-    geocoder.on("result", (e) => {
-      const selected = e.result;
-      const [lng, lat] = selected.center;
+      geocoder.on("result", (e) => {
+        const [lng, lat] = e.result.center;
+        const userCoords = { lat, lng };
 
-      // Extract suburb or city name (if present)
-      const context = selected.context || [];
-      const locality =
-        context.find((c) => c.id.startsWith("place"))?.text || "";
-      const region = context.find((c) => c.id.startsWith("region"))?.text || "";
+        const closest = (category) =>
+          POIS[category].reduce((closest, poi) => {
+            const dist = haversineDistance(userCoords, {
+              lat: poi.coordinates[1],
+              lng: poi.coordinates[0]
+            });
+            return !closest || dist < closest.distance
+              ? { ...poi, distance: dist }
+              : closest;
+          }, null);
 
-      setFormData((prev) => ({
-        ...prev,
-        address: selected.place_name,
-        location: locality || region,
-        coordinates: {
-          type: "Point",
-          coordinates: [lng, lat]
+        const closestGym = closest("gyms");
+        const closestSupermarket = closest("supermarkets");
+        const closestUni = closest("university");
+
+        // Extract city if available from context
+        const context = e.result.context || [];
+        const region = context.find((c) => c.id.includes("place"));
+
+        setFormData((prev) => ({
+          ...prev,
+          address: e.result.place_name,
+          location: region?.text || "Dunedin", // default to Dunedin if not found
+          coordinates: {
+            type: "Point",
+            coordinates: [lng, lat]
+          },
+          distance_from_uni: `${Math.round(closestUni.distance)} m`,
+          distance_from_gym: `${Math.round(closestGym.distance)} m`,
+          distance_from_supermarket: `${Math.round(
+            closestSupermarket.distance
+          )} m`
+        }));
+
+        if (userMarkerRef.current) {
+          userMarkerRef.current.remove();
         }
-      }));
 
-      // Update map preview
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.flyTo({ center: [lng, lat], zoom: 15 });
-        if (markerRef.current) {
-          markerRef.current.setLngLat([lng, lat]);
-        } else {
-          markerRef.current = new mapboxgl.Marker()
-            .setLngLat([lng, lat])
-            .addTo(mapInstanceRef.current);
-        }
-      }
-    });
-
-    // Setup minimap
-    if (mapRef.current && !mapInstanceRef.current) {
-      mapInstanceRef.current = new mapboxgl.Map({
-        container: mapRef.current,
-        style: "mapbox://styles/mapbox/streets-v11",
-        center: [170.5028, -45.8788],
-        zoom: 12
+        userMarkerRef.current = new mapboxgl.Marker({ color: "#111" })
+          .setLngLat([lng, lat])
+          .addTo(map);
       });
     }
 
-    return () => {
-      geocoder.clear();
-    };
-  }, []);
+    map.on("load", () => {
+      Object.entries(POIS).forEach(([category, pois]) => {
+        if (poiVisibility[category]) {
+          pois.forEach((poi) => {
+            new mapboxgl.Marker({ color: getPoiColor(category) })
+              .setLngLat(poi.coordinates)
+              .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
+              .addTo(map);
+          });
+        }
+      });
+    });
+  }, [poiVisibility]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!formData.coordinates) {
-      alert("Please select an address from the suggestions.");
+      alert("Please select a valid address from suggestions.");
       return;
     }
 
@@ -145,6 +203,8 @@ const AddFlat = () => {
           description: "",
           tags: "",
           distance_from_uni: "",
+          distance_from_gym: "",
+          distance_from_supermarket: "",
           utilities_included: "",
           images: "",
           coordinates: null
@@ -153,8 +213,8 @@ const AddFlat = () => {
       } else {
         alert("Failed to add flat.");
       }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    } catch (err) {
+      console.error("Error submitting form:", err);
       alert("An error occurred.");
     }
   };
@@ -162,6 +222,24 @@ const AddFlat = () => {
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Add Flat</h1>
+      <div>
+        <strong>Toggle POI Categories:</strong>
+        {Object.keys(poiVisibility).map((category) => (
+          <label key={category} style={{ marginLeft: "1rem" }}>
+            <input
+              type="checkbox"
+              checked={poiVisibility[category]}
+              onChange={(e) =>
+                setPoiVisibility((prev) => ({
+                  ...prev,
+                  [category]: e.target.checked
+                }))
+              }
+            />
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </label>
+        ))}
+      </div>
       <form
         onSubmit={handleSubmit}
         style={{
@@ -181,19 +259,17 @@ const AddFlat = () => {
           }
           required
         />
-
         <div>
           <label>Address (Search):</label>
           <div
             ref={geocoderRef}
-            style={{
-              minHeight: "48px",
-              border: "1px solid #ccc",
-              borderRadius: "4px"
-            }}
+            style={{ minHeight: "48px", border: "1px solid #ccc" }}
           />
         </div>
-
+        <div
+          ref={mapRef}
+          style={{ height: "300px", marginBottom: "1rem", borderRadius: "8px" }}
+        />
         <input
           type="text"
           name="location"
@@ -204,8 +280,6 @@ const AddFlat = () => {
           }
           required
         />
-
-        {/* More input fields... */}
         <input
           type="text"
           name="rent_per_week"
@@ -216,7 +290,6 @@ const AddFlat = () => {
           }
           required
         />
-
         <input
           type="text"
           name="bond"
@@ -225,7 +298,6 @@ const AddFlat = () => {
           onChange={(e) => setFormData({ ...formData, bond: e.target.value })}
           required
         />
-
         <input
           type="text"
           name="rooms"
@@ -234,7 +306,6 @@ const AddFlat = () => {
           onChange={(e) => setFormData({ ...formData, rooms: e.target.value })}
           required
         />
-
         <input
           type="text"
           name="available_rooms"
@@ -245,7 +316,6 @@ const AddFlat = () => {
           }
           required
         />
-
         <input
           type="text"
           name="features"
@@ -255,7 +325,6 @@ const AddFlat = () => {
             setFormData({ ...formData, features: e.target.value })
           }
         />
-
         <textarea
           name="description"
           placeholder="Description"
@@ -264,17 +333,27 @@ const AddFlat = () => {
             setFormData({ ...formData, description: e.target.value })
           }
         />
-
         <input
           type="text"
-          name="distance_from_uni"
-          placeholder="Distance from University"
           value={formData.distance_from_uni}
-          onChange={(e) =>
-            setFormData({ ...formData, distance_from_uni: e.target.value })
-          }
+          placeholder="Distance from University"
+          name="distance_from_uni"
+          readOnly
         />
-
+        <input
+          type="text"
+          value={formData.distance_from_gym}
+          placeholder="Distance from Gym"
+          name="distance_from_gym"
+          readOnly
+        />
+        <input
+          type="text"
+          value={formData.distance_from_supermarket}
+          placeholder="Distance from Supermarket"
+          name="distance_from_supermarket"
+          readOnly
+        />
         <input
           type="text"
           name="utilities_included"
@@ -284,7 +363,6 @@ const AddFlat = () => {
             setFormData({ ...formData, utilities_included: e.target.value })
           }
         />
-
         <input
           type="text"
           name="images"
@@ -317,21 +395,10 @@ const AddFlat = () => {
           </div>
         </div>
 
-        {/* 🗺️ Mini map preview */}
-        <div>
-          <label>Location Preview:</label>
-          <div
-            ref={mapRef}
-            style={{ height: "300px", width: "100%", borderRadius: "8px" }}
-          />
-        </div>
-
         <button type="submit" style={{ padding: "1rem", marginTop: "1rem" }}>
           Submit Flat
         </button>
       </form>
     </div>
   );
-};
-
-export default AddFlat;
+}

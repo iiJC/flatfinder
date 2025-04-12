@@ -6,6 +6,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import { POIS } from "@/lib/pois";
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
@@ -73,6 +74,16 @@ export default function MapPage() {
 
       initializedMap.addControl(geolocate);
       geolocate.trigger();
+
+      // Adding POIs
+      Object.values(POIS)
+        .flat()
+        .forEach((poi) => {
+          new mapboxgl.Marker({ color: "#f97316" }) // orange for POIs
+            .setLngLat(poi.coordinates)
+            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
+            .addTo(initializedMap);
+        });
 
       // Search bar
       const geocoder = new MapboxGeocoder({
