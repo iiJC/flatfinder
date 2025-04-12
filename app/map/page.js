@@ -1,11 +1,11 @@
 "use client";
 
-import '../css/map.scss';
+import "../css/map.scss";
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"; 
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
@@ -18,9 +18,11 @@ export default function MapPage() {
   }, []);
 
   useEffect(() => {
-    if (!isClient || typeof window === "undefined" || !mapContainerRef.current) return;
+    if (!isClient || typeof window === "undefined" || !mapContainerRef.current)
+      return;
 
-    mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
 
     const initializedMap = new mapboxgl.Map({
       container: mapContainerRef.current,
@@ -29,7 +31,7 @@ export default function MapPage() {
       zoom: 12,
       pitch: 0,
       bearing: 0,
-      antialias: true,
+      antialias: true
     });
 
     setMap(initializedMap);
@@ -39,21 +41,20 @@ export default function MapPage() {
       const res = await fetch("/api/getFlats");
       const flats = await res.json();
 
-      flats.forEach(flat => {
-        if (flat.location?.coordinates?.length === 2) {
-          const [lng, lat] = flat.location.coordinates;
+      flats.forEach((flat) => {
+        if (flat.coordinates?.coordinates?.length === 2) {
+          const [lng, lat] = flat.coordinates.coordinates;
 
           const popupHtml = `
             <h3>${flat.name}</h3>
-            <p><strong>Address:</strong> ${flat.address}</p>
-            <p><strong>Rent:</strong> $${flat.rent} / week</p>
-            <p><strong>Rooms:</strong> ${flat.rooms}</p>
-            <p><strong>Bathrooms:</strong> ${flat.bathrooms}</p>
-            <p><strong>Bond:</strong> $${flat.bond}</p>
-            <p><strong>From Uni:</strong> ${flat.distanceUni}m</p>
-            <p><strong>From Supermarket:</strong> ${flat.distanceSupermarket}m</p>
-            <p><strong>From Gym:</strong> ${flat.distanceGym}m</p>
-            <p>${flat.description}</p>
+   <h3>${flat.flat_name || "Unnamed Flat"}</h3>
+  <p><strong>Address:</strong> ${flat.address}</p>
+  <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
+  <p><strong>Bond:</strong> $${flat.bond}</p>
+  <p><strong>Rooms:</strong> ${flat.rooms}</p>
+  <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
+  <p><strong>Distance from Uni:</strong> ${flat.distance_from_uni}</p>
+  <p>${flat.description || ""}</p>
           `;
 
           new mapboxgl.Marker({ color: "#314ccd" })
@@ -67,7 +68,7 @@ export default function MapPage() {
       const geolocate = new mapboxgl.GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         trackUserLocation: true,
-        showUserLocation: true,
+        showUserLocation: true
       });
 
       initializedMap.addControl(geolocate);
@@ -79,7 +80,7 @@ export default function MapPage() {
         mapboxgl: mapboxgl,
         marker: { color: "#314ccd" },
         placeholder: "Search for a place...",
-        proximity: { longitude: 170.5028, latitude: -45.8788 },
+        proximity: { longitude: 170.5028, latitude: -45.8788 }
       });
 
       initializedMap.addControl(geocoder);
@@ -97,12 +98,33 @@ export default function MapPage() {
   return (
     <div className="map-container">
       <h2 className="title">Map View</h2>
-      <button className="menu-button" onClick={() => setMenuVisible(!menuVisible)}>☰ Menu</button>
+      <button
+        className="menu-button"
+        onClick={() => setMenuVisible(!menuVisible)}
+      >
+        ☰ Menu
+      </button>
       {menuVisible && (
         <div className="menu">
-          <button onClick={() => changeMapStyle("mapbox://styles/mapbox/satellite-v9")}>Satellite View</button>
-          <button onClick={() => changeMapStyle("mapbox://styles/mapbox/streets-v11")}>Street View</button>
-          <button onClick={() => changeMapStyle("mapbox://styles/mapbox/outdoors-v11")}>Outdoor View</button>
+          <button
+            onClick={() =>
+              changeMapStyle("mapbox://styles/mapbox/satellite-v9")
+            }
+          >
+            Satellite View
+          </button>
+          <button
+            onClick={() => changeMapStyle("mapbox://styles/mapbox/streets-v11")}
+          >
+            Street View
+          </button>
+          <button
+            onClick={() =>
+              changeMapStyle("mapbox://styles/mapbox/outdoors-v11")
+            }
+          >
+            Outdoor View
+          </button>
         </div>
       )}
       <div ref={mapContainerRef} className="map" />
