@@ -15,6 +15,21 @@ export default function MapPage() {
     supermarkets: true,
     university: true
   });
+  const [tagFilters, setTagFilters] = useState([]);
+  const [minRent, setMinRent] = useState(0);
+  const [maxRent, setMaxRent] = useState(2000);
+  const [minRooms, setMinRooms] = useState(0);
+
+  const allTags = [
+    "Warm",
+    "Sunny",
+    "Modern",
+    "Quiet",
+    "Party",
+    "Social",
+    "Close to Uni",
+    "Furnished"
+  ];
 
   const getPoiColor = (category) => {
     switch (category) {
@@ -48,7 +63,14 @@ export default function MapPage() {
       setFlats(data);
 
       data.forEach((flat) => {
-        if (flat.coordinates?.coordinates?.length === 2) {
+        if (
+          flat.coordinates?.coordinates?.length === 2 &&
+          flat.rent_per_week >= minRent &&
+          flat.rent_per_week <= maxRent &&
+          parseInt(flat.rooms) >= minRooms &&
+          (tagFilters.length === 0 ||
+            tagFilters.every((tag) => flat.tags?.includes(tag)))
+        ) {
           const [lng, lat] = flat.coordinates.coordinates;
 
           const popupHtml = `
@@ -69,7 +91,6 @@ export default function MapPage() {
         }
       });
 
-      // Add POIs
       Object.entries(POIS).forEach(([category, pois]) => {
         if (visiblePOIs[category]) {
           pois.forEach((poi) => {
@@ -83,32 +104,92 @@ export default function MapPage() {
     });
 
     return () => map.remove();
-  }, [visiblePOIs]);
+  }, [visiblePOIs, tagFilters, minRent, maxRent, minRooms]);
 
   return (
-    <div className="map-page">
-      <h1>Explore Flats</h1>
-      <div>
-        <strong>Toggle POI Categories:</strong>
-        {Object.keys(visiblePOIs).map((category) => (
-          <label key={category} style={{ marginLeft: "1rem" }}>
-            <input
-              type="checkbox"
-              checked={visiblePOIs[category]}
-              onChange={(e) =>
-                setVisiblePOIs((prev) => ({
-                  ...prev,
-                  [category]: e.target.checked
-                }))
-              }
-            />
-            {category.charAt(0).toUpperCase() + category.slice(1)}
+    <div className="map-page" style={{ display: "flex" }}>
+      <div style={{ minWidth: "240px", padding: "1rem" }}>
+        <h2>Filter Flats</h2>
+        <div>
+          <label>Tags:</label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() =>
+                  setTagFilters((prev) =>
+                    prev.includes(tag)
+                      ? prev.filter((t) => t !== tag)
+                      : [...prev, tag]
+                  )
+                }
+                style={{
+                  padding: "0.25rem 0.5rem",
+                  backgroundColor: tagFilters.includes(tag)
+                    ? "#4caf50"
+                    : "#ccc",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer"
+                }}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <label>
+            Rent: ${minRent} - ${maxRent}
           </label>
-        ))}
+          <input
+            type="range"
+            min="0"
+            max="2000"
+            step="50"
+            value={minRent}
+            onChange={(e) => setMinRent(Number(e.target.value))}
+          />
+          <input
+            type="range"
+            min="0"
+            max="2000"
+            step="50"
+            value={maxRent}
+            onChange={(e) => setMaxRent(Number(e.target.value))}
+          />
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <label>Minimum Rooms: {minRooms}</label>
+          <input
+            type="number"
+            min="0"
+            value={minRooms}
+            onChange={(e) => setMinRooms(Number(e.target.value))}
+          />
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <strong>Toggle POI Categories:</strong>
+          {Object.keys(visiblePOIs).map((category) => (
+            <label key={category} style={{ display: "block" }}>
+              <input
+                type="checkbox"
+                checked={visiblePOIs[category]}
+                onChange={(e) =>
+                  setVisiblePOIs((prev) => ({
+                    ...prev,
+                    [category]: e.target.checked
+                  }))
+                }
+              />
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </label>
+          ))}
+        </div>
       </div>
       <div
         ref={mapContainerRef}
-        style={{ height: "80vh", borderRadius: "8px", marginTop: "1rem" }}
+        style={{ height: "90vh", flex: 1, borderRadius: "8px" }}
       />
     </div>
   );
