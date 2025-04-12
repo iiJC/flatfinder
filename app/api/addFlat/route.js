@@ -1,23 +1,34 @@
-import clientPromise from "../../../db/database";  // This goes up 3 levels from app/api/addFlat/route.js
+import clientPromise from "../../../db/database";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    // Get the data from the request body
     const flat = await req.json();
 
-    // Wait for the database connection
+    // Strip out any manually assigned _id (Mongo will auto-generate one)
+    if ("_id" in flat) {
+      delete flat._id;
+    }
+
     const client = await clientPromise;
-    const db = client.db("flatfinderdb");  // Use the database name
-    const collection = db.collection("flats"); // Access the "flats" collection
+    const db = client.db("flatfinderdb");
+    const collection = db.collection("flats");
 
-    // Insert the flat data into the collection
-    await collection.insertOne(flat);
+    const result = await collection.insertOne(flat);
 
-    // Return a success response
-    return NextResponse.json({ success: true, message: "Flat added!" }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Flat added!",
+        insertedId: result.insertedId
+      },
+      { status: 201 }
+    );
   } catch (err) {
     console.error("Failed to add flat:", err);
-    return NextResponse.json({ success: false, message: "Error adding flat." }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Error adding flat." },
+      { status: 500 }
+    );
   }
 }
