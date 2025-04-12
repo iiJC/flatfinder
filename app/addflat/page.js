@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 const AddFlat = () => {
   const [formData, setFormData] = useState({
@@ -16,10 +20,15 @@ const AddFlat = () => {
     tags: "",
     distance_from_uni: "",
     utilities_included: "",
-    images: ""
+    images: "",
+    coordinates: null
   });
 
   const [selectedTags, setSelectedTags] = useState([]);
+  const mapRef = useRef(null);
+  const geocoderRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markerRef = useRef(null);
 
   const tagOptions = [
     "Warm",
@@ -38,39 +47,81 @@ const AddFlat = () => {
     );
   };
 
-  const getCoordinates = async (address) => {
-    const encodedAddress = encodeURIComponent(address);
-    const API_KEY =
+  useEffect(() => {
+    mapboxgl.accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
-    const res = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${API_KEY}`
-    );
-    const data = await res.json();
 
-    if (data && data.features && data.features.length > 0) {
-      const [lon, lat] = data.features[0].center;
-      return { latitude: lat, longitude: lon };
-    } else {
-      return null;
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      placeholder: "Search for an address...",
+      marker: false,
+      countries: "nz",
+      proximity: { longitude: 170.5028, latitude: -45.8788 }
+    });
+
+    if (geocoderRef.current) {
+      geocoder.addTo(geocoderRef.current);
     }
-  };
+
+    geocoder.on("result", (e) => {
+      const selected = e.result;
+      const [lng, lat] = selected.center;
+
+      // Extract suburb or city name (if present)
+      const context = selected.context || [];
+      const locality =
+        context.find((c) => c.id.startsWith("place"))?.text || "";
+      const region = context.find((c) => c.id.startsWith("region"))?.text || "";
+
+      setFormData((prev) => ({
+        ...prev,
+        address: selected.place_name,
+        location: locality || region,
+        coordinates: {
+          type: "Point",
+          coordinates: [lng, lat]
+        }
+      }));
+
+      // Update map preview
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo({ center: [lng, lat], zoom: 15 });
+        if (markerRef.current) {
+          markerRef.current.setLngLat([lng, lat]);
+        } else {
+          markerRef.current = new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .addTo(mapInstanceRef.current);
+        }
+      }
+    });
+
+    // Setup minimap
+    if (mapRef.current && !mapInstanceRef.current) {
+      mapInstanceRef.current = new mapboxgl.Map({
+        container: mapRef.current,
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [170.5028, -45.8788],
+        zoom: 12
+      });
+    }
+
+    return () => {
+      geocoder.clear();
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const coords = await getCoordinates(formData.address);
-    if (!coords) {
-      alert("Could not get coordinates from address.");
+    if (!formData.coordinates) {
+      alert("Please select an address from the suggestions.");
       return;
     }
 
     const dataToSubmit = {
       ...formData,
-      tags: selectedTags,
-      coordinates: {
-        type: "Point",
-        coordinates: [coords.longitude, coords.latitude]
-      }
+      tags: selectedTags
     };
 
     try {
@@ -95,7 +146,8 @@ const AddFlat = () => {
           tags: "",
           distance_from_uni: "",
           utilities_included: "",
-          images: ""
+          images: "",
+          coordinates: null
         });
         setSelectedTags([]);
       } else {
@@ -129,16 +181,19 @@ const AddFlat = () => {
           }
           required
         />
-        <input
-          type="text"
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={(e) =>
-            setFormData({ ...formData, address: e.target.value })
-          }
-          required
-        />
+
+        <div>
+          <label>Address (Search):</label>
+          <div
+            ref={geocoderRef}
+            style={{
+              minHeight: "48px",
+              border: "1px solid #ccc",
+              borderRadius: "4px"
+            }}
+          />
+        </div>
+
         <input
           type="text"
           name="location"
@@ -149,6 +204,8 @@ const AddFlat = () => {
           }
           required
         />
+
+        {/* More input fields... */}
         <input
           type="text"
           name="rent_per_week"
@@ -159,6 +216,7 @@ const AddFlat = () => {
           }
           required
         />
+
         <input
           type="text"
           name="bond"
@@ -167,6 +225,7 @@ const AddFlat = () => {
           onChange={(e) => setFormData({ ...formData, bond: e.target.value })}
           required
         />
+
         <input
           type="text"
           name="rooms"
@@ -175,6 +234,7 @@ const AddFlat = () => {
           onChange={(e) => setFormData({ ...formData, rooms: e.target.value })}
           required
         />
+
         <input
           type="text"
           name="available_rooms"
@@ -185,6 +245,7 @@ const AddFlat = () => {
           }
           required
         />
+
         <input
           type="text"
           name="features"
@@ -194,6 +255,7 @@ const AddFlat = () => {
             setFormData({ ...formData, features: e.target.value })
           }
         />
+
         <textarea
           name="description"
           placeholder="Description"
@@ -202,6 +264,7 @@ const AddFlat = () => {
             setFormData({ ...formData, description: e.target.value })
           }
         />
+
         <input
           type="text"
           name="distance_from_uni"
@@ -211,6 +274,7 @@ const AddFlat = () => {
             setFormData({ ...formData, distance_from_uni: e.target.value })
           }
         />
+
         <input
           type="text"
           name="utilities_included"
@@ -220,6 +284,7 @@ const AddFlat = () => {
             setFormData({ ...formData, utilities_included: e.target.value })
           }
         />
+
         <input
           type="text"
           name="images"
@@ -250,6 +315,15 @@ const AddFlat = () => {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* 🗺️ Mini map preview */}
+        <div>
+          <label>Location Preview:</label>
+          <div
+            ref={mapRef}
+            style={{ height: "300px", width: "100%", borderRadius: "8px" }}
+          />
         </div>
 
         <button type="submit" style={{ padding: "1rem", marginTop: "1rem" }}>
