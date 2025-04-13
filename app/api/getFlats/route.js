@@ -1,4 +1,4 @@
-import clientPromise from "../db/database.js";
+import clientPromise from "../../../db/database.js";
 import Flat from "../../models/flat";
 import { NextResponse } from "next/server";
 

@@ -38,7 +38,6 @@ export default function MapPage() {
       // Fetch flats from API
       const res = await fetch("/api/getFlats");
       const flats = await res.json();
-
       flats.forEach(flat => {
         if (flat.location?.coordinates?.length === 2) {
           const [lng, lat] = flat.location.coordinates;
