@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
-import { useState } from "react";
-import { signIn, useSession } from "next-auth/react"; // Import necessary functions
+import React, { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 import "../../css/applyform.scss";
 
 export default function FlatDetailsClient({ flat, userId }) {
@@ -10,18 +9,27 @@ export default function FlatDetailsClient({ flat, userId }) {
   const [refereeName, setRefereeName] = useState("");
   const [refereePhone, setRefereePhone] = useState("");
   const [aboutYou, setAboutYou] = useState("");
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // New state for login prompt modal
-  const { data: session } = useSession(); // Get the session data
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const { data: session } = useSession();
+
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({
+    address: flat.address || "",
+    description: flat.description || "",
+    rent_per_week: flat.rent_per_week || "",
+    features: flat.features || "",
+    tags: flat.tags?.join(", ") || ""
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const applicationData = {
-      flatId: flat._id, // Assuming `flat._id` contains the flat ID.
-      address: flat.address, // Adding the flat address
-      message: aboutYou, // Adding your message about the flat
-      refereeName, // Adding the referee's name
-      refereePhone // Adding the referee's phone number
+      flatId: flat._id,
+      address: flat.address,
+      message: aboutYou,
+      refereeName,
+      refereePhone
     };
 
     try {
@@ -30,7 +38,7 @@ export default function FlatDetailsClient({ flat, userId }) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(applicationData) // Sending the application data
+        body: JSON.stringify(applicationData)
       });
 
       if (response.ok) {
@@ -46,16 +54,40 @@ export default function FlatDetailsClient({ flat, userId }) {
     }
   };
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+
+    const response = await fetch("/api/editFlat", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: flat._id,
+        ...formData,
+        tags: formData.tags.split(",").map((tag) => tag.trim())
+      })
+    });
+
+    if (response.ok) {
+      alert("Flat updated successfully.");
+      setEditMode(false);
+      location.reload();
+    } else {
+      alert("Failed to update flat.");
+    }
+  };
+
   const handleApplyClick = () => {
     if (!session?.user?.email) {
-      setShowLoginPrompt(true); // Show login prompt modal
+      setShowLoginPrompt(true);
     } else {
-      setShowForm(true); // Show form if user is logged in
+      setShowForm(true);
     }
   };
 
   const handleLoginRedirect = () => {
-    signIn(); // Redirect to login page
+    signIn();
   };
 
   return (
@@ -72,6 +104,70 @@ export default function FlatDetailsClient({ flat, userId }) {
           </h1>
           <p className="flat-hero-subtitle">{flat.address}</p>
         </div>
+      </div>
+
+      <div style={{ padding: "1rem" }}>
+        {!editMode ? (
+          <button
+            className="flat-contact-button"
+            onClick={() => setEditMode(true)}
+          >
+            ✏️ Edit Flat
+          </button>
+        ) : (
+          <form className="edit-flat-form" onSubmit={handleEditSubmit}>
+            <label>
+              Address:
+              <input
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              Description:
+              <input
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              Rent per week:
+              <input
+                type="number"
+                value={formData.rent_per_week}
+                onChange={(e) =>
+                  setFormData({ ...formData, rent_per_week: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              Features:
+              <input
+                value={formData.features}
+                onChange={(e) =>
+                  setFormData({ ...formData, features: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              Tags (comma-separated):
+              <input
+                value={formData.tags}
+                onChange={(e) =>
+                  setFormData({ ...formData, tags: e.target.value })
+                }
+              />
+            </label>
+            <button type="submit">Save Changes</button>
+            <button type="button" onClick={() => setEditMode(false)}>
+              Cancel
+            </button>
+          </form>
+        )}
       </div>
 
       <div className="flat-content">
@@ -100,10 +196,7 @@ export default function FlatDetailsClient({ flat, userId }) {
               {flat.utilities_included || "Bills info not provided"}
             </p>
           </div>
-          <button
-            className="flat-contact-button"
-            onClick={handleApplyClick} // Use the new handler here
-          >
+          <button className="flat-contact-button" onClick={handleApplyClick}>
             Apply Here
           </button>
         </aside>
