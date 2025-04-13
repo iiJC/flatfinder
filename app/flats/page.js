@@ -29,8 +29,9 @@ export default function FlatsPage() {
           {flats.map((flat) => (
             <li key={flat._id} className="flat-item">
               <img
-                src={flat.images || "/thumbnailpic.webp"}
+                src={flat.images?.[0] ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}` : "/thumbnailpic.webp"}
                 className="flat-image"
+                alt="Flat Image"
               />
               <div className="flat-details">
                 <h3 className="flat-id">{flat.address}</h3>
