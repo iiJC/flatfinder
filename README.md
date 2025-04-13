@@ -2,11 +2,11 @@
 
 Find a flat!  
 For students, by students.  
-Visit the website here: https://flatfindervercel.vercel.app/
+Visit the website here: https://flatfinder-iijcs-projects.vercel.app/
 
 ---
 
-Renavling Vercel
+Vercel domain fix
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
