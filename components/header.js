@@ -42,13 +42,16 @@ export default function Header() {
           </Link>
         </nav>
 
-        <div className="dropdown">
-          <button className="dropbtn">Applying ▾</button>
-          <div className="dropdown-content">
-            <Link href="/apply">Apply to join a Flat</Link>
-            <Link href="/addflat">List your flat</Link>
+        {/* Apply dropdown only if logged in */}
+        {session && (
+          <div className="dropdown">
+            <button className="dropbtn">Applying ▾</button>
+            <div className="dropdown-content">
+              <Link href="/apply">Apply to join a Flat</Link>
+              <Link href="/addflat">List your flat</Link>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Auth button */}
         <div className="dropdown">
