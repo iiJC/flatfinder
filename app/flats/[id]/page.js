@@ -1,3 +1,4 @@
+import React from "react";
 import clientPromise from "@/db/database";
 import { ObjectId } from "mongodb";
 import FlatDetailsClient from "./flatdetailsclient";

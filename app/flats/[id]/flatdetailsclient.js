@@ -1,7 +1,8 @@
 "use client";
 
+import React from "react";
 import { useState } from "react";
-import { signIn, useSession } from "next-auth/react";  // Import necessary functions
+import { signIn, useSession } from "next-auth/react"; // Import necessary functions
 import "../../css/applyform.scss";
 
 export default function FlatDetailsClient({ flat, userId }) {
@@ -9,27 +10,27 @@ export default function FlatDetailsClient({ flat, userId }) {
   const [refereeName, setRefereeName] = useState("");
   const [refereePhone, setRefereePhone] = useState("");
   const [aboutYou, setAboutYou] = useState("");
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);  // New state for login prompt modal
-  const { data: session } = useSession();  // Get the session data
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // New state for login prompt modal
+  const { data: session } = useSession(); // Get the session data
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const applicationData = {
-      flatId: flat._id,  // Assuming `flat._id` contains the flat ID.
-      address: flat.address,  // Adding the flat address
-      message: aboutYou,  // Adding your message about the flat
-      refereeName,  // Adding the referee's name
-      refereePhone,  // Adding the referee's phone number
+      flatId: flat._id, // Assuming `flat._id` contains the flat ID.
+      address: flat.address, // Adding the flat address
+      message: aboutYou, // Adding your message about the flat
+      refereeName, // Adding the referee's name
+      refereePhone // Adding the referee's phone number
     };
 
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(applicationData),  // Sending the application data
+        body: JSON.stringify(applicationData) // Sending the application data
       });
 
       if (response.ok) {
@@ -47,14 +48,14 @@ export default function FlatDetailsClient({ flat, userId }) {
 
   const handleApplyClick = () => {
     if (!session?.user?.email) {
-      setShowLoginPrompt(true);  // Show login prompt modal
+      setShowLoginPrompt(true); // Show login prompt modal
     } else {
-      setShowForm(true);  // Show form if user is logged in
+      setShowForm(true); // Show form if user is logged in
     }
   };
 
   const handleLoginRedirect = () => {
-    signIn();  // Redirect to login page
+    signIn(); // Redirect to login page
   };
 
   return (
@@ -101,7 +102,7 @@ export default function FlatDetailsClient({ flat, userId }) {
           </div>
           <button
             className="flat-contact-button"
-            onClick={handleApplyClick}  // Use the new handler here
+            onClick={handleApplyClick} // Use the new handler here
           >
             Apply Here
           </button>
