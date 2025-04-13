@@ -31,14 +31,16 @@ export default function MapPage() {
     "Furnished"
   ];
 
-  const getPoiColor = (category) => {
+  const getPoiIcon = (category) => {
     switch (category) {
       case "gyms":
-        return "#1e90ff";
+        return "🏋️";
       case "supermarkets":
-        return "#ff7f50";
+        return "🛒";
       case "university":
-        return "#32cd32";
+        return "🎓";
+      case "bus stops":
+        return "#aaa";
       default:
         return "#aaa";
     }
@@ -94,7 +96,14 @@ export default function MapPage() {
       Object.entries(POIS).forEach(([category, pois]) => {
         if (visiblePOIs[category]) {
           pois.forEach((poi) => {
-            new mapboxgl.Marker({ color: getPoiColor(category) })
+            const el = document.createElement("div");
+            el.className = "custom-marker";
+            el.textContent = getPoiIcon(category);
+            el.style.fontSize = "24px";
+            el.style.lineHeight = "1";
+            el.style.cursor = "pointer";
+
+            new mapboxgl.Marker(el)
               .setLngLat(poi.coordinates)
               .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
               .addTo(map);
