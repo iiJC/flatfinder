@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";  // Import necessary functions
 import "../../css/applyform.scss";
 
-export default function FlatDetailsClient({ flat, userId }) {  // Pass `userId` as a prop
+export default function FlatDetailsClient({ flat, userId }) {
   const [showForm, setShowForm] = useState(false);
   const [refereeName, setRefereeName] = useState("");
   const [refereePhone, setRefereePhone] = useState("");
   const [aboutYou, setAboutYou] = useState("");
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);  // New state for login prompt modal
+  const { data: session } = useSession();  // Get the session data
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const applicationData = {
       flatId: flat._id,  // Assuming `flat._id` contains the flat ID.
       address: flat.address,  // Adding the flat address
@@ -19,7 +22,7 @@ export default function FlatDetailsClient({ flat, userId }) {  // Pass `userId` 
       refereeName,  // Adding the referee's name
       refereePhone,  // Adding the referee's phone number
     };
-  
+
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
@@ -28,7 +31,7 @@ export default function FlatDetailsClient({ flat, userId }) {  // Pass `userId` 
         },
         body: JSON.stringify(applicationData),  // Sending the application data
       });
-  
+
       if (response.ok) {
         alert("Application submitted!");
         setShowForm(false);
@@ -41,7 +44,18 @@ export default function FlatDetailsClient({ flat, userId }) {  // Pass `userId` 
       alert("Error submitting application.");
     }
   };
-  
+
+  const handleApplyClick = () => {
+    if (!session?.user?.email) {
+      setShowLoginPrompt(true);  // Show login prompt modal
+    } else {
+      setShowForm(true);  // Show form if user is logged in
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    signIn();  // Redirect to login page
+  };
 
   return (
     <div className="flat-details-container">
@@ -87,7 +101,7 @@ export default function FlatDetailsClient({ flat, userId }) {  // Pass `userId` 
           </div>
           <button
             className="flat-contact-button"
-            onClick={() => setShowForm(true)}
+            onClick={handleApplyClick}  // Use the new handler here
           >
             Apply Here
           </button>
@@ -132,6 +146,17 @@ export default function FlatDetailsClient({ flat, userId }) {  // Pass `userId` 
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showLoginPrompt && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Please log in to apply</h2>
+            <p>You need to be logged in to apply for this flat.</p>
+            <button onClick={handleLoginRedirect}>Log In</button>
+            <button onClick={() => setShowLoginPrompt(false)}>Cancel</button>
           </div>
         </div>
       )}
