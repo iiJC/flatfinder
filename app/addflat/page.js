@@ -176,19 +176,34 @@ export default function AddFlat() {
       alert("Please select a valid address from suggestions.");
       return;
     }
-
-    const dataToSubmit = {
-      ...formData,
-      tags: selectedTags
-    };
-
+  
+    const form = new FormData();
+  
+    // Append all regular fields
+    for (const [key, value] of Object.entries(formData)) {
+      if (key === "coordinates") {
+        form.append("coordinates", JSON.stringify(value));
+      } else {
+        form.append(key, value);
+      }
+    }
+  
+    // Append tags
+    selectedTags.forEach((tag) => form.append("tags[]", tag));
+  
+    // Append image files
+    if (formData.images && formData.images.length > 0) {
+      Array.from(formData.images).forEach((file) => {
+        form.append("images", file);
+      });
+    }
+  
     try {
       const response = await fetch("/api/addFlat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSubmit)
+        body: form
       });
-
+  
       if (response.ok) {
         alert("Flat added successfully!");
         setFormData({
@@ -218,6 +233,7 @@ export default function AddFlat() {
       alert("An error occurred.");
     }
   };
+  
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -364,12 +380,28 @@ export default function AddFlat() {
           }
         />
         <input
-          type="text"
-          name="images"
-          placeholder="Image URL"
-          value={formData.images}
-          onChange={(e) => setFormData({ ...formData, images: e.target.value })}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => {
+            setFormData({ ...formData, images: e.target.files });
+          }}
+          
+          
         />
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "10px" }}>
+          {formData.images &&
+            Array.from(formData.images).map((file, index) => (
+              <img
+                key={index}
+                src={URL.createObjectURL(file)}
+                alt={`Preview ${index}`}
+                style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px" }}
+              />
+            ))}
+        </div>
+
 
         <div>
           <label>Tags:</label>
