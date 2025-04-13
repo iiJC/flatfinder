@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { POIS } from "@/lib/pois";
+import "../css/popUp.scss";
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
@@ -60,28 +61,38 @@ export default function MapPage() {
           tagFilters.every((tag) => flat.tags?.includes(tag)))
       ) {
         const [lng, lat] = flat.coordinates.coordinates;
-
+  
         const popupHtml = `
-          <h3>${flat.flat_name || "Unnamed Flat"}</h3>
-          <p><strong>Address:</strong> ${flat.address}</p>
-          <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
-          <p><strong>Bond:</strong> $${flat.bond}</p>
-          <p><strong>Rooms:</strong> ${flat.rooms}</p>
-          <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
-          <p><strong>Distance from Uni:</strong> ${flat.distance_from_uni}</p>
-          <p>${flat.description || ""}</p>
-        `;
+  <div class="flat-popup">
+    <h3>${flat.flat_name || "Unnamed Flat"}</h3>
+    <p><strong>Address:</strong> ${flat.address}</p>
+    <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
+    <p><strong>Bond:</strong> $${flat.bond}</p>
+    <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
+    <img 
+      src="${
+        flat.images?.[0]
+          ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+          : "/thumbnailpic.webp"
+      }" 
+      class="flat-image" 
+      alt="Flat Image"
+    />
+  </div>
+`;
 
+  
         const marker = new mapboxgl.Marker({ color: "#314ccd" })
           .setLngLat([lng, lat])
           .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
           .addTo(map);
-
+  
         newMarkers.push(marker);
       }
     });
     return newMarkers;
   };
+  
 
   // Function to add POI markers to the map
   const addPOIsToMap = (map, pois) => {
@@ -94,6 +105,7 @@ export default function MapPage() {
           el.style.fontSize = "24px";
           el.style.lineHeight = "1";
           el.style.cursor = "pointer";
+          el.style.borderRadius = "8px";
 
           new mapboxgl.Marker(el)
             .setLngLat(poi.coordinates)
