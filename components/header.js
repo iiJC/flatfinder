@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,7 +13,7 @@ export default function Header() {
     signOut({ callbackUrl: "/" });
   };
 
-  const username = session?.user?.name || session?.user?.email?.split('@')[0]; // fallback if name is missing
+  const username = session?.user?.name || session?.user?.email?.split("@")[0]; // fallback if name is missing
 
   return (
     <header className="header">

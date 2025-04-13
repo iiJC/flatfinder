@@ -1,10 +1,11 @@
+import React from "react";
 import "./css/globals.scss";
 import Providers from "./provider";
 import Header from "../components/header";
 
 export const metadata = {
   title: "FlatMate Finder",
-  description: "Find flats, flatmates, or tenants in Dunedin",
+  description: "Find flats, flatmates, or tenants in Dunedin"
 };
 
 export default function RootLayout({ children }) {
