@@ -1,8 +1,9 @@
 "use client";
 
+import React from "react";
 import { useState } from "react";
-import "../css/applyPage.scss"; 
-import "../css/globals.scss";  
+import "../css/applyPage.scss";
+import "../css/globals.scss";
 
 export default function ApplyPage() {
   const [type, setType] = useState("looking_for_flat");
@@ -22,7 +23,11 @@ export default function ApplyPage() {
           <input type="tel" required />
 
           <label>Are you looking for a flat or a flatmate?</label>
-          <select value={type} onChange={(e) => setType(e.target.value)} required>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            required
+          >
             <option value="looking_for_flat">Looking for a flat</option>
             <option value="looking_for_flatmate">Looking for a flatmate</option>
           </select>

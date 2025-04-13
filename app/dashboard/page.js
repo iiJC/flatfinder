@@ -1,6 +1,7 @@
 import "../css/dashboard.scss";
 import "../css/globals.scss";
 
+import React from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route.js";
 import clientPromise from "../../db/database.js"; // your existing connection
@@ -12,14 +13,18 @@ export default async function DashboardPage() {
   if (!session) {
     return (
       <div className="dashboard-container">
-        <h2 className="dashboard-title">Please log in to view your applications.</h2>
+        <h2 className="dashboard-title">
+          Please log in to view your applications.
+        </h2>
       </div>
     );
   }
 
   const client = await clientPromise;
   const db = client.db("flatfinderdb");
-  const user = await db.collection("users").findOne({ email: session.user.email });
+  const user = await db
+    .collection("users")
+    .findOne({ email: session.user.email });
 
   const applications = user?.applications || [];
 
@@ -38,7 +43,8 @@ export default async function DashboardPage() {
                   Flat Address: {app.address.toString()}
                 </p>
                 <p className={`application-status ${app.status.toLowerCase()}`}>
-                  Status: {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                  Status:{" "}
+                  {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                 </p>
               </li>
             ))}

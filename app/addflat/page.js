@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -176,9 +177,9 @@ export default function AddFlat() {
       alert("Please select a valid address from suggestions.");
       return;
     }
-  
+
     const form = new FormData();
-  
+
     // Append all regular fields
     for (const [key, value] of Object.entries(formData)) {
       if (key === "coordinates") {
@@ -187,23 +188,23 @@ export default function AddFlat() {
         form.append(key, value);
       }
     }
-  
+
     // Append tags
     selectedTags.forEach((tag) => form.append("tags[]", tag));
-  
+
     // Append image files
     if (formData.images && formData.images.length > 0) {
       Array.from(formData.images).forEach((file) => {
         form.append("images", file);
       });
     }
-  
+
     try {
       const response = await fetch("/api/addFlat", {
         method: "POST",
         body: form
       });
-  
+
       if (response.ok) {
         alert("Flat added successfully!");
         setFormData({
@@ -233,7 +234,6 @@ export default function AddFlat() {
       alert("An error occurred.");
     }
   };
-  
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -386,22 +386,31 @@ export default function AddFlat() {
           onChange={(e) => {
             setFormData({ ...formData, images: e.target.files });
           }}
-          
-          
         />
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "10px",
+            marginTop: "10px"
+          }}
+        >
           {formData.images &&
             Array.from(formData.images).map((file, index) => (
               <img
                 key={index}
                 src={URL.createObjectURL(file)}
                 alt={`Preview ${index}`}
-                style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px" }}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "8px"
+                }}
               />
             ))}
         </div>
-
 
         <div>
           <label>Tags:</label>

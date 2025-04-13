@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -59,7 +60,7 @@ export default function MapPage() {
           tagFilters.every((tag) => flat.tags?.includes(tag)))
       ) {
         const [lng, lat] = flat.coordinates.coordinates;
-  
+
         const popupHtml = `
   <div class="flat-popup">
     <h3>${flat.flat_name || "Unnamed Flat"}</h3>
@@ -79,18 +80,21 @@ export default function MapPage() {
   </div>
 `;
 
-  
         const marker = new mapboxgl.Marker({ color: "#314ccd" })
           .setLngLat([lng, lat])
-          .setPopup(new mapboxgl.Popup({ offset: 25, className: 'custom-popup'}).setHTML(popupHtml))
+          .setPopup(
+            new mapboxgl.Popup({
+              offset: 25,
+              className: "custom-popup"
+            }).setHTML(popupHtml)
+          )
           .addTo(map);
-  
+
         newMarkers.push(marker);
       }
     });
     return newMarkers;
   };
-  
 
   // Function to add POI markers to the map
   const addPOIsToMap = (map, pois) => {

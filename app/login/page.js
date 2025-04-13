@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -9,7 +10,7 @@ import "../css/globals.scss";
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
+    password: ""
   });
 
   const [error, setError] = useState("");
@@ -26,7 +27,7 @@ export default function LoginPage() {
     const res = await signIn("credentials", {
       redirect: false,
       email: formData.email,
-      password: formData.password,
+      password: formData.password
     });
 
     if (res?.ok) {

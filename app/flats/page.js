@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import "../css/flats.scss";
@@ -29,7 +30,11 @@ export default function FlatsPage() {
           {flats.map((flat) => (
             <li key={flat._id} className="flat-item">
               <img
-                src={flat.images?.[0] ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}` : "/thumbnailpic.webp"}
+                src={
+                  flat.images?.[0]
+                    ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+                    : "/thumbnailpic.webp"
+                }
                 className="flat-image"
                 alt="Flat Image"
               />
