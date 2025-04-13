@@ -33,4 +33,21 @@
         object-fit: cover;
       }
   }
+
+.mapboxgl-popup.custom-popup {
+    background: none !important;
+    box-shadow: none !important;
+  }
+  
+  .mapboxgl-popup.custom-popup .mapboxgl-popup-content {
+    background: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+  
+  .mapboxgl-popup.custom-popup .mapboxgl-popup-tip {
+    display: none !important;
+  }
+  
   

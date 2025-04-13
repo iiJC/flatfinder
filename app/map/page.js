@@ -82,7 +82,7 @@ export default function MapPage() {
   
         const marker = new mapboxgl.Marker({ color: "#314ccd" })
           .setLngLat([lng, lat])
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
+          .setPopup(new mapboxgl.Popup({ offset: 25, className: 'custom-popup'}).setHTML(popupHtml))
           .addTo(map);
   
         newMarkers.push(marker);
