@@ -10,7 +10,7 @@ export default function ApplyPage() {
   return (
     <div className="apply-container">
       <div className="apply-box">
-        <h2 className="title">Flat Finder Signup</h2>
+        <h2 className="title">Apply</h2>
         <form className="apply-form">
           <label>Full Name:</label>
           <input type="text" required />

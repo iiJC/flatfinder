@@ -1,5 +1,7 @@
 import clientPromise from "@/db/database";
 import { ObjectId } from "mongodb";
+import Link from "next/link";
+
 import "../../css/flatDetails.scss";
 import "../../css/globals.scss";
 
@@ -62,7 +64,9 @@ export default async function FlatDetailsPage({ params }) {
               {flat.utilities_included || "Bills info not provided"}
             </p>
           </div>
-          <button className="flat-contact-button">Contact Flat Owner</button>
+          <Link href={`/flats/${id}/apply`}>
+    <button className="flat-contact-button">Apply Here</button>
+  </Link>
         </aside>
       </div>
     </div>
