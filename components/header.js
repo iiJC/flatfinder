@@ -12,6 +12,8 @@ export default function Header() {
     signOut({ callbackUrl: "/" });
   };
 
+  const username = session?.user?.name || session?.user?.email?.split('@')[0]; // fallback if name is missing
+
   return (
     <header className="header">
       {/* Logo */}
@@ -50,7 +52,9 @@ export default function Header() {
 
         {/* Auth button */}
         <div className="dropdown">
-          <button className="dropbtn">Personal ▾</button>
+          <button className="dropbtn">
+            {session ? `Hi ${username}!` : "Personal"} ▾
+          </button>
           <div className="dropdown-content">
             {session ? (
               <>
