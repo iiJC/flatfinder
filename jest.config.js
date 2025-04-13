@@ -9,7 +9,10 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/components/(.*)$": "<rootDir>/components/$1",
     "^@/lib/(.*)$": "<rootDir>/lib/$1",
-    "\\.(css|scss|sass)$": "identity-obj-proxy"
+    "\\.(css|scss|sass)$": "identity-obj-proxy",
+    "^mapbox-gl$": "<rootDir>/__mocks__/mapbox-gl.js",
+    "^@mapbox/mapbox-gl-geocoder$":
+      "<rootDir>/__mocks__/@mapbox/mapbox-gl-geocoder.js"
   },
   transformIgnorePatterns: [
     "/node_modules/(?!(@mapbox/mapbox-gl-geocoder|nanoid)/)" // 👈 allow these modules to be transformed

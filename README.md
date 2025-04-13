@@ -1,3 +1,5 @@
+![Tests](https://github.com/iijc/flatfinder/actions/workflows/test.yml/badge.svg)
+
 # Dunedin Flat Finder
 
 Find a flat!  
