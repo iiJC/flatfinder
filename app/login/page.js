@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import "../css/login.scss";
 import "../css/globals.scss";
 
@@ -10,6 +12,9 @@ export default function LoginPage() {
     password: "",
   });
 
+  const [error, setError] = useState("");
+  const router = useRouter();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -18,22 +23,18 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+    const res = await signIn("credentials", {
+      redirect: false,
+      email: formData.email,
+      password: formData.password,
     });
 
-    if (res.ok) {
-      const data = await res.json();
-      alert(data.message); // Success message
-      // Optionally, you can redirect to a protected page, e.g., dashboard
-      // window.location.href = "/dashboard"; 
+    if (res?.ok) {
+      // Redirect user to the dashboard after successful login
+      router.push("/dashboard");
     } else {
-      const data = await res.json();
-      alert(data.message); // Error message
+      // Show error message if login fails
+      setError(res?.error || "Invalid email or password");
     }
   };
 
@@ -68,6 +69,8 @@ export default function LoginPage() {
               required
             />
           </div>
+
+          {error && <p className="error-message">{error}</p>}
 
           <button type="submit" className="login-button">
             Login
