@@ -1,7 +1,7 @@
 import clientPromise from "../../../db/database";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route.js"; // adjust if your path is different
+import { authOptions } from "../auth/[...nextauth]/route.js"; // Adjust if your path is different
 
 export async function POST(req) {
   try {
@@ -12,7 +12,7 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { flatId, address, message } = body;
+    const { flatId, address, message, refereeName, refereePhone } = body;
 
     if (!ObjectId.isValid(flatId)) {
       return new Response(JSON.stringify({ error: "Invalid flat ID" }), { status: 400 });
@@ -33,8 +33,11 @@ export async function POST(req) {
       status: "pending",
       dateApplied: new Date(),
       message,
+      refereeName,  // Add refereeName to the application object
+      refereePhone, // Add refereePhone to the application object
     };
 
+    // Add the application to the user's applications array
     await db.collection("users").updateOne(
       { _id: user._id },
       { $push: { applications: application } }

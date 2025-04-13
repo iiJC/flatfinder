@@ -3,18 +3,45 @@
 import { useState } from "react";
 import "../../css/applyform.scss";
 
-export default function FlatDetailsClient({ flat }) {
+export default function FlatDetailsClient({ flat, userId }) {  // Pass `userId` as a prop
   const [showForm, setShowForm] = useState(false);
   const [refereeName, setRefereeName] = useState("");
   const [refereePhone, setRefereePhone] = useState("");
   const [aboutYou, setAboutYou] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ refereeName, refereePhone, aboutYou });
-    alert("Application submitted!");
-    setShowForm(false);
+  
+    const applicationData = {
+      flatId: flat._id,  // Assuming `flat._id` contains the flat ID.
+      address: flat.address,  // Adding the flat address
+      message: aboutYou,  // Adding your message about the flat
+      refereeName,  // Adding the referee's name
+      refereePhone,  // Adding the referee's phone number
+    };
+  
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(applicationData),  // Sending the application data
+      });
+  
+      if (response.ok) {
+        alert("Application submitted!");
+        setShowForm(false);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Failed to submit application.");
+      }
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      alert("Error submitting application.");
+    }
   };
+  
 
   return (
     <div className="flat-details-container">
