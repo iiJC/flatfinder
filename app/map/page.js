@@ -19,6 +19,7 @@ export default function MapPage() {
   const [minRent, setMinRent] = useState(0);
   const [maxRent, setMaxRent] = useState(2000);
   const [minRooms, setMinRooms] = useState(0);
+  const [markers, setMarkers] = useState([]); // To store markers
 
   const allTags = [
     "Warm",
@@ -46,6 +47,64 @@ export default function MapPage() {
     }
   };
 
+  // Function to add markers to the map for the flats
+  const addFlatsToMap = (map, flatsData) => {
+    const newMarkers = [];
+    flatsData.forEach((flat) => {
+      if (
+        flat.coordinates?.coordinates?.length === 2 &&
+        flat.rent_per_week >= minRent &&
+        flat.rent_per_week <= maxRent &&
+        parseInt(flat.rooms) >= minRooms &&
+        (tagFilters.length === 0 ||
+          tagFilters.every((tag) => flat.tags?.includes(tag)))
+      ) {
+        const [lng, lat] = flat.coordinates.coordinates;
+
+        const popupHtml = `
+          <h3>${flat.flat_name || "Unnamed Flat"}</h3>
+          <p><strong>Address:</strong> ${flat.address}</p>
+          <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
+          <p><strong>Bond:</strong> $${flat.bond}</p>
+          <p><strong>Rooms:</strong> ${flat.rooms}</p>
+          <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
+          <p><strong>Distance from Uni:</strong> ${flat.distance_from_uni}</p>
+          <p>${flat.description || ""}</p>
+        `;
+
+        const marker = new mapboxgl.Marker({ color: "#314ccd" })
+          .setLngLat([lng, lat])
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
+          .addTo(map);
+
+        newMarkers.push(marker);
+      }
+    });
+    return newMarkers;
+  };
+
+  // Function to add POI markers to the map
+  const addPOIsToMap = (map, pois) => {
+    Object.entries(pois).forEach(([category, poiList]) => {
+      if (visiblePOIs[category]) {
+        poiList.forEach((poi) => {
+          const el = document.createElement("div");
+          el.className = "custom-marker";
+          el.textContent = getPoiIcon(category);
+          el.style.fontSize = "24px";
+          el.style.lineHeight = "1";
+          el.style.cursor = "pointer";
+
+          new mapboxgl.Marker(el)
+            .setLngLat(poi.coordinates)
+            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
+            .addTo(map);
+        });
+      }
+    });
+  };
+
+  // Initial map setup
   useEffect(() => {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
@@ -60,60 +119,36 @@ export default function MapPage() {
     setMap(map);
 
     map.on("load", async () => {
+      // Fetch flats from API
       const res = await fetch("/api/getFlats");
       const data = await res.json();
       setFlats(data);
 
-      data.forEach((flat) => {
-        if (
-          flat.coordinates?.coordinates?.length === 2 &&
-          flat.rent_per_week >= minRent &&
-          flat.rent_per_week <= maxRent &&
-          parseInt(flat.rooms) >= minRooms &&
-          (tagFilters.length === 0 ||
-            tagFilters.every((tag) => flat.tags?.includes(tag)))
-        ) {
-          const [lng, lat] = flat.coordinates.coordinates;
+      // Add flat markers to map
+      const newMarkers = addFlatsToMap(map, data);
+      setMarkers(newMarkers);
 
-          const popupHtml = `
-            <h3>${flat.flat_name || "Unnamed Flat"}</h3>
-            <p><strong>Address:</strong> ${flat.address}</p>
-            <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
-            <p><strong>Bond:</strong> $${flat.bond}</p>
-            <p><strong>Rooms:</strong> ${flat.rooms}</p>
-            <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
-            <p><strong>Distance from Uni:</strong> ${flat.distance_from_uni}</p>
-            <p>${flat.description || ""}</p>
-          `;
-
-          new mapboxgl.Marker({ color: "#314ccd" })
-            .setLngLat([lng, lat])
-            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
-            .addTo(map);
-        }
-      });
-
-      Object.entries(POIS).forEach(([category, pois]) => {
-        if (visiblePOIs[category]) {
-          pois.forEach((poi) => {
-            const el = document.createElement("div");
-            el.className = "custom-marker";
-            el.textContent = getPoiIcon(category);
-            el.style.fontSize = "24px";
-            el.style.lineHeight = "1";
-            el.style.cursor = "pointer";
-
-            new mapboxgl.Marker(el)
-              .setLngLat(poi.coordinates)
-              .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
-              .addTo(map);
-          });
-        }
-      });
+      // Add POI markers to map
+      addPOIsToMap(map, POIS);
     });
 
+    // Cleanup on unmount
     return () => map.remove();
-  }, [visiblePOIs, tagFilters, minRent, maxRent, minRooms]);
+  }, []);
+
+  // Update map whenever filters change
+  useEffect(() => {
+    if (!map) return;
+
+    // Remove old markers
+    markers.forEach((marker) => marker.remove());
+
+    // Add updated flats and POIs to map
+    const newMarkers = addFlatsToMap(map, flats);
+    setMarkers(newMarkers);
+
+    addPOIsToMap(map, POIS);
+  }, [visiblePOIs, tagFilters, minRent, maxRent, minRooms, flats, map]);
 
   return (
     <div className="map-page" style={{ display: "flex" }}>
