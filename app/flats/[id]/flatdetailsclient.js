@@ -12,15 +12,6 @@ export default function FlatDetailsClient({ flat, userId }) {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { data: session } = useSession();
 
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
-    address: flat.address || "",
-    description: flat.description || "",
-    rent_per_week: flat.rent_per_week || "",
-    features: flat.features || "",
-    tags: flat.tags?.join(", ") || ""
-  });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -35,9 +26,7 @@ export default function FlatDetailsClient({ flat, userId }) {
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(applicationData)
       });
 
@@ -54,30 +43,6 @@ export default function FlatDetailsClient({ flat, userId }) {
     }
   };
 
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-
-    const response = await fetch("/api/editFlat", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        id: flat._id,
-        ...formData,
-        tags: formData.tags.split(",").map((tag) => tag.trim())
-      })
-    });
-
-    if (response.ok) {
-      alert("Flat updated successfully.");
-      setEditMode(false);
-      location.reload();
-    } else {
-      alert("Failed to update flat.");
-    }
-  };
-
   const handleApplyClick = () => {
     if (!session?.user?.email) {
       setShowLoginPrompt(true);
@@ -88,6 +53,31 @@ export default function FlatDetailsClient({ flat, userId }) {
 
   const handleLoginRedirect = () => {
     signIn();
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this flat?"
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/deleteFlat/${flat._id}`, {
+        method: "DELETE"
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Flat deleted successfully.");
+        window.location.href = "/flats";
+      } else {
+        alert(data.message || "Failed to delete flat.");
+      }
+    } catch (error) {
+      console.error("Error deleting flat:", error);
+      alert("Something went wrong.");
+    }
   };
 
   return (
@@ -104,70 +94,6 @@ export default function FlatDetailsClient({ flat, userId }) {
           </h1>
           <p className="flat-hero-subtitle">{flat.address}</p>
         </div>
-      </div>
-
-      <div style={{ padding: "1rem" }}>
-        {!editMode ? (
-          <button
-            className="flat-contact-button"
-            onClick={() => setEditMode(true)}
-          >
-            ✏️ Edit Flat
-          </button>
-        ) : (
-          <form className="edit-flat-form" onSubmit={handleEditSubmit}>
-            <label>
-              Address:
-              <input
-                value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Description:
-              <input
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Rent per week:
-              <input
-                type="number"
-                value={formData.rent_per_week}
-                onChange={(e) =>
-                  setFormData({ ...formData, rent_per_week: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Features:
-              <input
-                value={formData.features}
-                onChange={(e) =>
-                  setFormData({ ...formData, features: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Tags (comma-separated):
-              <input
-                value={formData.tags}
-                onChange={(e) =>
-                  setFormData({ ...formData, tags: e.target.value })
-                }
-              />
-            </label>
-            <button type="submit">Save Changes</button>
-            <button type="button" onClick={() => setEditMode(false)}>
-              Cancel
-            </button>
-          </form>
-        )}
       </div>
 
       <div className="flat-content">
@@ -196,8 +122,14 @@ export default function FlatDetailsClient({ flat, userId }) {
               {flat.utilities_included || "Bills info not provided"}
             </p>
           </div>
+
           <button className="flat-contact-button" onClick={handleApplyClick}>
             Apply Here
+          </button>
+
+          {/* 🔴 Delete button */}
+          <button className="flat-delete-button" onClick={handleDelete}>
+            Delete Listing
           </button>
         </aside>
       </div>
