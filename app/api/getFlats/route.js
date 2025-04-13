@@ -11,6 +11,9 @@ export async function GET() {
     return NextResponse.json(flats);
   } catch (err) {
     console.error("Error fetching flats:", err);
-    return NextResponse.json({ error: "Failed to fetch flats" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch flats" },
+      { status: 500 }
+    );
   }
 }

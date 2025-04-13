@@ -2,7 +2,7 @@
 
 Find a flat!  
 For students, by students.  
-Visit the website here: https://flatfinder-c2o2eqy3b-iijcs-projects.vercel.app/
+Visit the website here: https://flatfindervercel.vercel.app/
 
 ---
 
