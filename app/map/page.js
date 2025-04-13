@@ -40,8 +40,6 @@ export default function MapPage() {
         return "🛒";
       case "university":
         return "🎓";
-      case "bus stops":
-        return "#aaa";
       default:
         return "#aaa";
     }
