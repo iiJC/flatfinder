@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import "../../css/applyform.scss";
 
@@ -11,6 +11,34 @@ export default function FlatDetailsClient({ flat, userId }) {
   const [aboutYou, setAboutYou] = useState("");
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { data: session } = useSession();
+  const [imageStyle, setImageStyle] = useState({
+    width: "80%",
+    maxHeight: "400px",
+    objectFit: "cover",
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setImageStyle({
+          width: "100%",
+          maxHeight: "300px",
+          objectFit: "cover",
+        });
+      } else {
+        setImageStyle({
+          width: "80%",
+          maxHeight: "400px",
+          objectFit: "cover",
+        });
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,14 +48,14 @@ export default function FlatDetailsClient({ flat, userId }) {
       address: flat.address,
       message: aboutYou,
       refereeName,
-      refereePhone
+      refereePhone,
     };
 
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(applicationData)
+        body: JSON.stringify(applicationData),
       });
 
       if (response.ok) {
@@ -63,7 +91,7 @@ export default function FlatDetailsClient({ flat, userId }) {
 
     try {
       const res = await fetch(`/api/deleteFlat/${flat._id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
 
       const data = await res.json();
@@ -81,122 +109,187 @@ export default function FlatDetailsClient({ flat, userId }) {
   };
 
   return (
-    <div className="flat-details-container">
-      <div className="flat-hero">
-      <img
-                src={
-                  flat.images?.[0]
-                    ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-                    : "/thumbnailpic.webp"
-                }
-                className="flat-main-image"
-                alt="Flat Image"
-              />
-        <div className="flat-hero-overlay">
-          <h1 className="flat-hero-title">
-            {flat.description || "Flat Listing"}
-          </h1>
-          <p className="flat-hero-subtitle">{flat.address}</p>
-        </div>
+    <div
+      className="flat-details-container"
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        marginTop: "100px",
+        textAlign: "center",
+        flexDirection: "column",
+      }}
+    >
+      <div
+        className="flat-hero"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          marginBottom: "20px",
+          marginTop: "20px",
+          flexDirection: "column",
+          zIndex: 1,
+        }}
+      >
+        <img
+          src={
+            flat.images?.[0]
+              ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+              : "/thumbnailpic.webp"
+          }
+          alt="Flat Image"
+          className="flat-main-image"
+          style={imageStyle}
+        />
       </div>
 
-      <div className="flat-content">
-        <div className="flat-main-column">
-          <section className="flat-section">
-            <h2>About this place</h2>
-            <p>{flat.features || "No description provided."}</p>
+      <div
+        className="flat-content"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          width: "100%",
+        }}
+      >
+        <div
+          className="flat-main-column"
+          style={{
+            padding: "1rem",
+            textAlign: "center",
+            width: "100%",
+            maxWidth: "900px",
+          }}
+        >
+          <section className="flat-section" style={{ marginBottom: "20px" }}>
+            <h2 style={{ fontSize: "1.25rem" }}>Address</h2>
+            <p style={{ fontSize: "1rem", color: "#777" }}>
+              {flat.address || "Address not provided."}
+            </p>
           </section>
 
-          {flat.tags?.length > 0 && (
-            <section className="flat-section">
-              <h2>Tags</h2>
-              <ul className="flat-tags">
-                {flat.tags.map((tag) => (
-                  <li key={tag}>{tag}</li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <section className="flat-section" style={{ marginBottom: "20px" }}>
+            <h2 style={{ fontSize: "1.25rem" }}>Rooms</h2>
+            <p style={{ fontSize: "1rem" }}>
+              {flat.rooms || "No room numbers provided."}
+            </p>
+          </section>
+
+          <section className="flat-section" style={{ marginBottom: "20px" }}>
+            <h2 style={{ fontSize: "1.25rem" }}>About The Flat</h2>
+            <p style={{ fontSize: "1rem" }}>
+              {flat.description || "No description provided."}
+            </p>
+          </section>
+
+          <section className="flat-section" style={{ marginBottom: "20px" }}>
+            <h2 style={{ fontSize: "1.25rem" }}>Features</h2>
+            <p style={{ fontSize: "1rem", color: "#777" }}>
+              <strong>Utilities Included: </strong>
+              {flat.utilities_included || "No utilities info provided."}
+            </p>
+          </section>
+
+          <section className="flat-section" style={{ marginBottom: "20px" }}>
+            <h2 style={{ fontSize: "1.25rem" }}>Tags</h2>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "10px",
+              }}
+            >
+              {flat.tags?.length > 0 ? (
+                flat.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    style={{
+                      backgroundColor: "#007BFF",
+                      color: "white",
+                      padding: "5px 10px",
+                      borderRadius: "15px",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))
+              ) : (
+                <p>No tags provided.</p>
+              )}
+            </div>
+          </section>
         </div>
 
-        <aside className="flat-sidebar">
-          <div className="flat-price-box">
-            <p className="flat-price">${flat.rent_per_week}/week</p>
-            <p className="flat-bills">
-              {flat.utilities_included || "Bills info not provided"}
+        <aside
+          className="flat-sidebar"
+          style={{
+            textAlign: "center",
+            marginTop: "20px",
+            width: "100%",
+            maxWidth: "500px",
+          }}
+        >
+          <div className="flat-price-box" style={{ marginBottom: "20px", padding: "10px", borderRadius: "8px", border: "1px solid #ddd", backgroundColor: "#f9f9f9" }}>
+            <p className="flat-price" style={{ fontSize: "1.75rem", fontWeight: "bold", color: "#007BFF" }}>
+              ${flat.rent_per_week}/week
             </p>
           </div>
 
-          <button className="flat-contact-button" onClick={handleApplyClick}>
+          <button
+            className="flat-contact-button"
+            onClick={handleApplyClick}
+            style={{
+              padding: "10px 20px",
+              fontSize: "1rem",
+              backgroundColor: "#007BFF",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              marginBottom: "10px",
+            }}
+          >
             Apply Here
           </button>
 
           <button
             className="flat-edit-button"
             onClick={() => (window.location.href = `/editFlat/${flat._id}`)}
+            style={{
+              padding: "10px 20px",
+              fontSize: "1rem",
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              marginBottom: "10px",
+            }}
           >
             Edit Listing
           </button>
 
-          {/* 🔴 Delete button */}
-          <button className="flat-delete-button" onClick={handleDelete}>
+          <button
+            className="flat-delete-button"
+            onClick={handleDelete}
+            style={{
+              padding: "10px 20px",
+              fontSize: "1rem",
+              backgroundColor: "#dc3545",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+            }}
+          >
             Delete Listing
           </button>
         </aside>
       </div>
-
-      {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Apply for this flat</h2>
-            <form onSubmit={handleSubmit} className="apply-form">
-              <label>
-                Referee Name:
-                <input
-                  type="text"
-                  value={refereeName}
-                  onChange={(e) => setRefereeName(e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Referee Phone Number:
-                <input
-                  type="tel"
-                  value={refereePhone}
-                  onChange={(e) => setRefereePhone(e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Tell us more about you:
-                <textarea
-                  value={aboutYou}
-                  onChange={(e) => setAboutYou(e.target.value)}
-                  required
-                />
-              </label>
-              <div className="form-actions">
-                <button type="submit">Submit</button>
-                <button type="button" onClick={() => setShowForm(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showLoginPrompt && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Please log in to apply</h2>
-            <p>You need to be logged in to apply for this flat.</p>
-            <button onClick={handleLoginRedirect}>Log In</button>
-            <button onClick={() => setShowLoginPrompt(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
