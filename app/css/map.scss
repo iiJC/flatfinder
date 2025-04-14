@@ -1,82 +1,85 @@
+.map-page {
+  display: flex;
+  font-family: Arial, sans-serif;
+}
+
 .map-container {
-    position: relative;
-    // padding-top: 5rem;
-  
-    // .map-title {
-    //   font-size: 1.5rem;
-    //   font-weight: bold;
-    //   text-align: center;
-    //   display: flex;
-    //   justify-content: center;
-    //   align-items: center;
-    //   margin-bottom: 20px;
-    // }
-  
-    .menu-button {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background-color: #333;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-  
-      &:hover {
-        background-color: #555;
-      }
-    }
-  
-    .menu {
-      position: absolute;
-      top: 60px;
-      left: 20px;
-      z-index: 10;
-      background: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin: auto;
-  
-      .menu-item {
-        display: block;
-        padding: 8px 12px;
-        margin: 5px 0;
-        font-size: 14px;
-        text-align: left;
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
-        background: none;
-  
-        &:hover {
-          background-color: #f0f0f0;
-        }
-      }
-    }
-  
-    .map {
-      top: 0;
-      left: 0;
-      padding-top: 5rem;
-      width: 100%;
-      height: 700px;
-      border-radius: 8px;
-    }
+  position: relative;
+  flex: 1;
+  height: 90vh;
+  border-radius: 8px;
+  overflow: hidden;
 
-    .mapboxgl-popup {
-      max-width: 200px;
-    }
-    
-    .mapboxgl-popup-content {
-      text-align: center;
-      font-family: 'Open Sans', sans-serif;
-    }
+  .menu-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #333;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 1000;
 
+    &:hover {
+      background-color: #555;
+    }
   }
-  
+
+  .menu {
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    z-index: 999;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+.flat-popup {
+  max-width: 300px;
+  font-size: 14px;
+
+  h3 {
+    margin-top: 0;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  p {
+    margin: 4px 0;
+  }
+
+  .flat-image {
+    width: 100%;
+    height: auto;
+    margin-top: 8px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .flat-details-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: #314ccd;
+    text-decoration: underline;
+  }
+}

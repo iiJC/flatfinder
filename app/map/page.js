@@ -6,6 +6,7 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { POIS } from "@/lib/pois";
 import "../css/popUp.scss";
+import "../css/globals.scss";
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);

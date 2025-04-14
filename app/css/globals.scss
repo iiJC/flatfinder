@@ -25,6 +25,7 @@
   // two basic boxshadows to keep the style the same
   --box-shadow-sm: 0 2px 4px var(--color-shadow);
   --box-shadow-md: 0 4px 8px var(--color-shadow);
+
 }
 
 // root styles
@@ -32,18 +33,6 @@
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text);
-}
-
-// style for the header
-// this is the top bar of the app
-// it contains the logo, search bar and navigation links
-.header {
-  background-color: var(--color-black);
-  padding: var(--spacing-sm);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: var(--box-shadow-sm);
 }
 
 // the styles for the logo
@@ -177,6 +166,7 @@
   padding: var(--spacing-md);
 }
 
+// style for the header
 .header {
   display: flex;
   justify-content: space-between;
@@ -191,136 +181,114 @@
 .home-page {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  // background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+  min-height: 90vh;
+  text-align: center;
+  background: linear-gradient(135deg, #3b82f6, #14b8a6);
   color: var(--color-white);
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius-lg);
-}
+  animation: fadeIn 1s ease-out;
 
-// for any titles withing the website
-.title {
-  font-size: 2rem;
-  color: var(--color-text);
-  font-weight: 600;
-  margin-bottom: var(--spacing-md);
-  text-align: center;
-}
-
-// anything that has a description
-.description {
-  font-size: 1.125rem;
-  margin-bottom: var(--spacing-lg);
-  text-align: center;
-}
-
-// normal body styles
-body {
-  font-family: sans-serif;
-  background: var(--color-background);
-  color: var(--color-text);
-  margin: 0;
-  padding: 0;
-}
-
-// Button Styles
-.buttons-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--spacing-lg);
-  margin-top: var(--spacing-lg);
-}
-
-.button {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-lg);
-  font-size: 1.125rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: var(--box-shadow-md);
-  border: none;
-  cursor: pointer;
-
-  &-flat {
-    background-color: var(--color-white);
-    color: var(--color-primary);
-
-    &:hover {
-      background-color: #e0f2fe;
-    }
+  .title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-white);
+    animation: floatText 3s ease-in-out infinite alternate;
   }
 
-  &-flatmate {
-    background-color: var(--color-white);
-    color: var(--color-secondary);
-
-    &:hover {
-      background-color: #ccf2f4;
-    }
-  }
-}
-
-.looking-flat {
-  flex: 1;
-  max-width: 17%;
-}
-.looking-flatmate {
-  flex: 1;
-  max-width: 30%;
-}
-
-// for the home page cards
-.card {
-  position: relative;
-  overflow: hidden;
-  flex-direction: row;
-  justify-content: space-evenly;
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-sm);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  img {
+  .buttons-container {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    justify-content: center;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: var(--border-radius-lg);
-  }
+    max-width: 800px;
 
-  .overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.4);
-    color: white;
-    width: 100%;
-    text-align: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-    backdrop-filter: blur(4px);
-    transition: background 0.3s ease;
-  }
+    .card {
+      background: var(--color-white);
+      color: var(--color-text);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 300px;
+      height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--box-shadow-md);
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+      }
 
-    .overlay {
-      background: rgba(0, 0, 0, 0.6);
+      .overlay {
+        font-size: 1.3rem;
+        font-weight: 600;
+        z-index: 2;
+        text-align: center;
+
+        a {
+          display: inline-block;
+          padding: 1rem 2rem;
+          background: linear-gradient(to right, #3b82f6, #14b8a6);
+          color: white;
+          border-radius: var(--border-radius-lg);
+          text-decoration: none;
+          font-weight: bold;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          }
+        }
+      }
     }
   }
 }
 
-/* Remove overly tight max-width constraints */
-.looking-flat,
-.looking-flatmate {
-  max-width: none;
-  flex: none;
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+  .home-page {
+    .buttons-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card {
+      width: 90%;
+      height: 180px;
+    }
+  }
+}
+
 
 /* Responsive layout for small screens */
 @media (max-width: 768px) {

@@ -7,6 +7,7 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { POIS } from "@/lib/pois";
 import "mapbox-gl/dist/mapbox-gl.css";
+import "../css/globals.scss"
 
 function haversineDistance(coord1, coord2) {
   const R = 6371e3;

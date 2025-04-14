@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import "../css/globals.scss";
 
 export default function EditFlatPage({ params }) {
   const router = useRouter();

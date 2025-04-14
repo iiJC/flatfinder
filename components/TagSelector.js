@@ -1,5 +1,6 @@
 "use client";
 
+import "../css/globals.scss";
 import { useState } from "react";
 import { CATEGORIZED_TAGS } from "@/lib/tags";
 
