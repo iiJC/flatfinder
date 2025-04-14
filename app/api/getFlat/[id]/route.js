@@ -1,14 +1,12 @@
-// app/api/getFlat/[id]/route.js
-
 import clientPromise from "@/db/database";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(req, { params }) {
-  const { id } = params;
+export async function GET(_, { params }) {
+  const id = await params.id;
 
   if (!ObjectId.isValid(id)) {
-    return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid flat ID" }, { status: 400 });
   }
 
   try {
@@ -25,7 +23,10 @@ export async function GET(req, { params }) {
 
     return NextResponse.json(flat);
   } catch (err) {
-    console.error("Failed to fetch flat:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error("Error fetching flat:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

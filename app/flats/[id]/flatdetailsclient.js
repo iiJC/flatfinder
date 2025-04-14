@@ -14,7 +14,7 @@ export default function FlatDetailsClient({ flat, userId }) {
   const [imageStyle, setImageStyle] = useState({
     width: "80%",
     maxHeight: "400px",
-    objectFit: "cover",
+    objectFit: "cover"
   });
 
   useEffect(() => {
@@ -23,13 +23,13 @@ export default function FlatDetailsClient({ flat, userId }) {
         setImageStyle({
           width: "100%",
           maxHeight: "300px",
-          objectFit: "cover",
+          objectFit: "cover"
         });
       } else {
         setImageStyle({
           width: "80%",
           maxHeight: "400px",
-          objectFit: "cover",
+          objectFit: "cover"
         });
       }
     };
@@ -48,14 +48,14 @@ export default function FlatDetailsClient({ flat, userId }) {
       address: flat.address,
       message: aboutYou,
       refereeName,
-      refereePhone,
+      refereePhone
     };
 
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(applicationData),
+        body: JSON.stringify(applicationData)
       });
 
       if (response.ok) {
@@ -91,7 +91,7 @@ export default function FlatDetailsClient({ flat, userId }) {
 
     try {
       const res = await fetch(`/api/deleteFlat/${flat._id}`, {
-        method: "DELETE",
+        method: "DELETE"
       });
 
       const data = await res.json();
@@ -118,7 +118,7 @@ export default function FlatDetailsClient({ flat, userId }) {
         height: "100vh",
         marginTop: "100px",
         textAlign: "center",
-        flexDirection: "column",
+        flexDirection: "column"
       }}
     >
       <div
@@ -131,7 +131,7 @@ export default function FlatDetailsClient({ flat, userId }) {
           marginBottom: "20px",
           marginTop: "20px",
           flexDirection: "column",
-          zIndex: 1,
+          zIndex: 1
         }}
       >
         <img
@@ -153,7 +153,7 @@ export default function FlatDetailsClient({ flat, userId }) {
           justifyContent: "center",
           alignItems: "center",
           flexDirection: "column",
-          width: "100%",
+          width: "100%"
         }}
       >
         <div
@@ -162,7 +162,7 @@ export default function FlatDetailsClient({ flat, userId }) {
             padding: "1rem",
             textAlign: "center",
             width: "100%",
-            maxWidth: "900px",
+            maxWidth: "900px"
           }}
         >
           <section className="flat-section" style={{ marginBottom: "20px" }}>
@@ -202,7 +202,7 @@ export default function FlatDetailsClient({ flat, userId }) {
                 flexWrap: "wrap",
                 justifyContent: "center",
                 gap: "10px",
-                marginTop: "10px",
+                marginTop: "10px"
               }}
             >
               {flat.tags?.length > 0 ? (
@@ -214,7 +214,7 @@ export default function FlatDetailsClient({ flat, userId }) {
                       color: "white",
                       padding: "5px 10px",
                       borderRadius: "15px",
-                      fontSize: "0.9rem",
+                      fontSize: "0.9rem"
                     }}
                   >
                     {tag}
@@ -233,11 +233,27 @@ export default function FlatDetailsClient({ flat, userId }) {
             textAlign: "center",
             marginTop: "20px",
             width: "100%",
-            maxWidth: "500px",
+            maxWidth: "500px"
           }}
         >
-          <div className="flat-price-box" style={{ marginBottom: "20px", padding: "10px", borderRadius: "8px", border: "1px solid #ddd", backgroundColor: "#f9f9f9" }}>
-            <p className="flat-price" style={{ fontSize: "1.75rem", fontWeight: "bold", color: "#007BFF" }}>
+          <div
+            className="flat-price-box"
+            style={{
+              marginBottom: "20px",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              backgroundColor: "#f9f9f9"
+            }}
+          >
+            <p
+              className="flat-price"
+              style={{
+                fontSize: "1.75rem",
+                fontWeight: "bold",
+                color: "#007BFF"
+              }}
+            >
               ${flat.rent_per_week}/week
             </p>
           </div>
@@ -252,7 +268,7 @@ export default function FlatDetailsClient({ flat, userId }) {
               color: "white",
               border: "none",
               borderRadius: "5px",
-              marginBottom: "10px",
+              marginBottom: "10px"
             }}
           >
             Apply Here
@@ -260,7 +276,7 @@ export default function FlatDetailsClient({ flat, userId }) {
 
           <button
             className="flat-edit-button"
-            onClick={() => (window.location.href = `/editFlat/${flat._id}`)}
+            onClick={() => (window.location.href = `/editflat/${flat._id}`)}
             style={{
               padding: "10px 20px",
               fontSize: "1rem",
@@ -268,7 +284,7 @@ export default function FlatDetailsClient({ flat, userId }) {
               color: "white",
               border: "none",
               borderRadius: "5px",
-              marginBottom: "10px",
+              marginBottom: "10px"
             }}
           >
             Edit Listing
@@ -283,7 +299,7 @@ export default function FlatDetailsClient({ flat, userId }) {
               backgroundColor: "#dc3545",
               color: "white",
               border: "none",
-              borderRadius: "5px",
+              borderRadius: "5px"
             }}
           >
             Delete Listing
