@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 export async function GET(_, { params }) {
-  const id = await params.id;
+  const id = params.id;
 
   if (!ObjectId.isValid(id)) {
     return NextResponse.json({ error: "Invalid flat ID" }, { status: 400 });
