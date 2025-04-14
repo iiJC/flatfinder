@@ -83,11 +83,15 @@ export default function FlatDetailsClient({ flat, userId }) {
   return (
     <div className="flat-details-container">
       <div className="flat-hero">
-        <img
-          src={flat.images || "/thumbnailpic.webp"}
-          alt={flat.address}
-          className="flat-main-image"
-        />
+      <img
+                src={
+                  flat.images?.[0]
+                    ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+                    : "/thumbnailpic.webp"
+                }
+                className="flat-main-image"
+                alt="Flat Image"
+              />
         <div className="flat-hero-overlay">
           <h1 className="flat-hero-title">
             {flat.description || "Flat Listing"}
