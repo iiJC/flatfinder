@@ -1,31 +1,22 @@
-// app/api/getFlat/[id]/route.js
-
 import clientPromise from "@/db/database";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(req, { params }) {
-  const { id } = params;
+export async function PATCH(req, context) {
+  const { id } = await context.params;
+  const body = await req.json();
+  delete body._id;
 
-  if (!ObjectId.isValid(id)) {
-    return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+  const client = await clientPromise;
+  const db = client.db("flatfinderdb");
+
+  const result = await db
+    .collection("flats")
+    .updateOne({ _id: new ObjectId(id) }, { $set: body });
+
+  if (result.modifiedCount === 0) {
+    return NextResponse.json({ message: "No update" }, { status: 400 });
   }
 
-  try {
-    const client = await clientPromise;
-    const db = client.db("flatfinderdb");
-
-    const flat = await db
-      .collection("flats")
-      .findOne({ _id: new ObjectId(id) });
-
-    if (!flat) {
-      return NextResponse.json({ error: "Flat not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(flat);
-  } catch (err) {
-    console.error("Failed to fetch flat:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  return NextResponse.json({ message: "Success" }, { status: 200 });
 }

@@ -73,6 +73,8 @@ export default function EditFlatPage() {
 
   if (!flat) return <p>Loading...</p>;
 
+  console.log("Flat data:", flat);
+
   return (
     <div
       className="flat-details-container"
@@ -135,8 +137,8 @@ export default function EditFlatPage() {
           <h2>Flat Name</h2>
           <input
             type="text"
-            value={flat.flat_name || ""}
-            onChange={(e) => setFlat({ ...flat, flat_name: e.target.value })}
+            value={flat.name || ""}
+            onChange={(e) => setFlat({ ...flat, name: e.target.value })}
           />
         </div>
 
