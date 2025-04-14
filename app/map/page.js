@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -21,7 +20,9 @@ export default function MapPage() {
   const [minRent, setMinRent] = useState(0);
   const [maxRent, setMaxRent] = useState(2000);
   const [minRooms, setMinRooms] = useState(0);
-  const [markers, setMarkers] = useState([]); // To store markers
+  const [markers, setMarkers] = useState([]);
+
+  const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12"); 
 
   const allTags = [
     "Warm",
@@ -47,7 +48,6 @@ export default function MapPage() {
     }
   };
 
-  // Function to add markers to the map for the flats
   const addFlatsToMap = (map, flatsData) => {
     const newMarkers = [];
     flatsData.forEach((flat) => {
@@ -62,23 +62,23 @@ export default function MapPage() {
         const [lng, lat] = flat.coordinates.coordinates;
 
         const popupHtml = `
-  <div class="flat-popup">
-    <h3>${flat.flat_name || "Unnamed Flat"}</h3>
-    <p><strong>Address:</strong> ${flat.address}</p>
-    <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
-    <p><strong>Bond:</strong> $${flat.bond}</p>
-    <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
-    <img 
-      src="${
-        flat.images?.[0]
-          ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-          : "/thumbnailpic.webp"
-      }" 
-      class="flat-image" 
-      alt="Flat Image"
-    />
-  </div>
-`;
+        <div class="flat-popup">
+          <h3>${flat.flat_name || "Unnamed Flat"}</h3>
+          <p><strong>Address:</strong> ${flat.address}</p>
+          <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
+          <p><strong>Bond:</strong> $${flat.bond}</p>
+          <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
+          <img 
+            src="${
+              flat.images?.[0]
+                ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+                : "/thumbnailpic.webp"
+            }" 
+            class="flat-image" 
+            alt="Flat Image"
+          />
+        </div>
+      `;
 
         const marker = new mapboxgl.Marker({ color: "#314ccd" })
           .setLngLat([lng, lat])
@@ -96,7 +96,6 @@ export default function MapPage() {
     return newMarkers;
   };
 
-  // Function to add POI markers to the map
   const addPOIsToMap = (map, pois) => {
     Object.entries(pois).forEach(([category, poiList]) => {
       if (visiblePOIs[category]) {
@@ -123,41 +122,42 @@ export default function MapPage() {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
 
-    const map = new mapboxgl.Map({
+    const newMap = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: mapStyle,
       center: [170.5028, -45.8788],
       zoom: 13
     });
 
-    setMap(map);
+    setMap(newMap);
 
-    map.on("load", async () => {
-      // Fetch flats from API
+    newMap.on("load", async () => {
       const res = await fetch("/api/getFlats");
       const data = await res.json();
       setFlats(data);
 
-      // Add flat markers to map
-      const newMarkers = addFlatsToMap(map, data);
+      const newMarkers = addFlatsToMap(newMap, data);
       setMarkers(newMarkers);
 
-      // Add POI markers to map
-      addPOIsToMap(map, POIS);
+      addPOIsToMap(newMap, POIS);
     });
 
-    // Cleanup on unmount
-    return () => map.remove();
+    return () => newMap.remove();
   }, []);
 
-  // Update map whenever filters change
+  // Change map style dynamically
+  useEffect(() => {
+    if (map) {
+      map.setStyle(mapStyle);
+    }
+  }, [mapStyle]);
+
+  // Update markers when filters or POIs change
   useEffect(() => {
     if (!map) return;
 
-    // Remove old markers
     markers.forEach((marker) => marker.remove());
 
-    // Add updated flats and POIs to map
     const newMarkers = addFlatsToMap(map, flats);
     setMarkers(newMarkers);
 
@@ -168,6 +168,22 @@ export default function MapPage() {
     <div className="map-page" style={{ display: "flex" }}>
       <div style={{ minWidth: "240px", padding: "1rem" }}>
         <h2>Filter Flats</h2>
+
+        
+        <div style={{ marginBottom: "1rem" }}>
+          <label><strong>Map Style:</strong></label>
+          <select
+            value={mapStyle}
+            onChange={(e) => setMapStyle(e.target.value)}
+            style={{ marginTop: "0.25rem", padding: "0.25rem", width: "100%" }}
+          >
+            <option value="mapbox://styles/mapbox/streets-v12">Streets</option>
+            <option value="mapbox://styles/mapbox/satellite-streets-v12">Satellite</option>
+            <option value="mapbox://styles/mapbox/dark-v11">Dark</option>
+          </select>
+        </div>
+
+        {/* Tag Filters */}
         <div>
           <label>Tags:</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
@@ -196,6 +212,8 @@ export default function MapPage() {
             ))}
           </div>
         </div>
+
+        {/* Rent Filter */}
         <div style={{ marginTop: "1rem" }}>
           <label>
             Rent: ${minRent} - ${maxRent}
@@ -217,6 +235,8 @@ export default function MapPage() {
             onChange={(e) => setMaxRent(Number(e.target.value))}
           />
         </div>
+
+        {/* Rooms Filter */}
         <div style={{ marginTop: "1rem" }}>
           <label>Minimum Rooms: {minRooms}</label>
           <input
@@ -226,6 +246,8 @@ export default function MapPage() {
             onChange={(e) => setMinRooms(Number(e.target.value))}
           />
         </div>
+
+        {/* POI Toggles */}
         <div style={{ marginTop: "1rem" }}>
           <strong>Toggle POI Categories:</strong>
           {Object.keys(visiblePOIs).map((category) => (
@@ -245,6 +267,8 @@ export default function MapPage() {
           ))}
         </div>
       </div>
+
+      {/* Map Container */}
       <div
         ref={mapContainerRef}
         style={{ height: "90vh", flex: 1, borderRadius: "8px" }}
