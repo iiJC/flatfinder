@@ -22,7 +22,7 @@ export default function MapPage() {
   const [minRooms, setMinRooms] = useState(0);
   const [markers, setMarkers] = useState([]);
 
-  const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12"); 
+  const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9"); 
 
   const allTags = [
     "Warm",
@@ -77,6 +77,10 @@ export default function MapPage() {
             class="flat-image" 
             alt="Flat Image"
           />
+          <br />
+          <a href="/flats/${flat._id}" class="flat-details-link" style="color: #314ccd; text-decoration: underline;">
+            View Details
+          </a>
         </div>
       `;
 
@@ -178,7 +182,7 @@ export default function MapPage() {
             style={{ marginTop: "0.25rem", padding: "0.25rem", width: "100%" }}
           >
             <option value="mapbox://styles/mapbox/streets-v12">Streets</option>
-            <option value="mapbox://styles/mapbox/satellite-streets-v12">Satellite</option>
+            <option value="mapbox://styles/mapbox/satellite-v9">Satellite</option>
             <option value="mapbox://styles/mapbox/dark-v11">Dark</option>
           </select>
         </div>

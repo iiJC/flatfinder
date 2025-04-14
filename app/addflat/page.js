@@ -92,7 +92,7 @@ export default function AddFlat() {
 
     const map = new mapboxgl.Map({
       container: mapRef.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/mapbox/satellite-v9",
       center: [170.5028, -45.8788],
       zoom: 13
     });
