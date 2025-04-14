@@ -15,15 +15,27 @@ export default function EditFlatPage() {
   });
 
   useEffect(() => {
-    if (!params?.id) return;
-
     const fetchFlat = async () => {
-      const res = await fetch(`/api/getFlat/${params.id}`);
-      const data = await res.json();
-      setFlat(data);
+      try {
+        const res = await fetch(`/api/getFlat/${params.id}`);
+
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({})); // fallback if JSON fails
+          console.error("Error loading flat:", error);
+          alert(error?.error || "Could not load flat.");
+          return;
+        }
+
+        const data = await res.json();
+        setFlat(data);
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        alert("Something went wrong loading the flat.");
+      }
     };
+
     fetchFlat();
-  }, [params?.id]);
+  }, [params.id]);
 
   useEffect(() => {
     const handleResize = () => {
