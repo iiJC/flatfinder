@@ -88,7 +88,7 @@ export default function AddFlat() {
 
   useEffect(() => {
     mapboxgl.accessToken =
-      "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY204cGQ3MTBzMGEyeTJpcTB4ZWJodHdpNSJ9.Y3jD8AYlV8fY3TKp3RHccg";
+      "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
     const map = new mapboxgl.Map({
       container: mapRef.current,
