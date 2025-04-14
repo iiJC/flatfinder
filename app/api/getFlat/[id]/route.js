@@ -2,8 +2,8 @@ import clientPromise from "@/db/database";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(_, { params }) {
-  const id = params.id;
+export async function GET(_, context) {
+  const { id } = context.params;
 
   if (!ObjectId.isValid(id)) {
     return NextResponse.json({ error: "Invalid flat ID" }, { status: 400 });

@@ -2,10 +2,11 @@
 
 import React from "react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
-export default function EditFlatPage({ params }) {
+export default function EditFlatPage() {
   const router = useRouter();
+  const params = useParams();
   const [flat, setFlat] = useState(null);
   const [imageStyle, setImageStyle] = useState({
     width: "80%",
@@ -14,13 +15,15 @@ export default function EditFlatPage({ params }) {
   });
 
   useEffect(() => {
+    if (!params?.id) return;
+
     const fetchFlat = async () => {
       const res = await fetch(`/api/getFlat/${params.id}`);
       const data = await res.json();
       setFlat(data);
     };
     fetchFlat();
-  }, [params.id]);
+  }, [params?.id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -72,24 +75,41 @@ export default function EditFlatPage({ params }) {
 
   return (
     <div
-      className="edit-flat-container"
+      className="flat-details-container"
       style={{
         display: "flex",
-        flexDirection: "column",
+        justifyContent: "center",
         alignItems: "center",
-        paddingTop: "100px",
-        textAlign: "center"
+        height: "100vh",
+        marginTop: "100px",
+        textAlign: "center",
+        flexDirection: "column"
       }}
     >
-      <img
-        src={
-          flat.images?.[0]
-            ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-            : "/thumbnailpic.webp"
-        }
-        alt="Flat Image"
-        style={imageStyle}
-      />
+      <div
+        className="flat-hero"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          marginBottom: "20px",
+          marginTop: "20px",
+          flexDirection: "column",
+          zIndex: 1
+        }}
+      >
+        <img
+          src={
+            flat.images?.[0]
+              ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+              : "/thumbnailpic.webp"
+          }
+          alt="Flat Image"
+          className="flat-main-image"
+          style={imageStyle}
+        />
+      </div>
 
       <form
         onSubmit={handleSubmit}
@@ -102,63 +122,26 @@ export default function EditFlatPage({ params }) {
           gap: "1rem"
         }}
       >
-        <label>
-          Address:
+        <div className="flat-section">
+          <h2>Address</h2>
           <input
             type="text"
             value={flat.address || ""}
             onChange={(e) => setFlat({ ...flat, address: e.target.value })}
           />
-        </label>
+        </div>
 
-        <label>
-          Flat Name:
+        <div className="flat-section">
+          <h2>Flat Name</h2>
           <input
             type="text"
             value={flat.flat_name || ""}
             onChange={(e) => setFlat({ ...flat, flat_name: e.target.value })}
           />
-        </label>
+        </div>
 
-        <label>
-          Description:
-          <textarea
-            value={flat.description || ""}
-            onChange={(e) => setFlat({ ...flat, description: e.target.value })}
-          />
-        </label>
-
-        <label>
-          Features:
-          <input
-            type="text"
-            value={flat.features || ""}
-            onChange={(e) => setFlat({ ...flat, features: e.target.value })}
-          />
-        </label>
-
-        <label>
-          Rent Per Week:
-          <input
-            type="number"
-            value={flat.rent_per_week || ""}
-            onChange={(e) =>
-              setFlat({ ...flat, rent_per_week: Number(e.target.value) })
-            }
-          />
-        </label>
-
-        <label>
-          Bond:
-          <input
-            type="number"
-            value={flat.bond || ""}
-            onChange={(e) => setFlat({ ...flat, bond: Number(e.target.value) })}
-          />
-        </label>
-
-        <label>
-          Available Rooms:
+        <div className="flat-section">
+          <h2>Available Rooms</h2>
           <input
             type="number"
             value={flat.available_rooms || ""}
@@ -166,16 +149,53 @@ export default function EditFlatPage({ params }) {
               setFlat({ ...flat, available_rooms: Number(e.target.value) })
             }
           />
-        </label>
+        </div>
 
-        <label>
-          Tags (comma separated):
+        <div className="flat-section">
+          <h2>Description</h2>
+          <textarea
+            value={flat.description || ""}
+            onChange={(e) => setFlat({ ...flat, description: e.target.value })}
+          />
+        </div>
+
+        <div className="flat-section">
+          <h2>Features</h2>
+          <input
+            type="text"
+            value={flat.features || ""}
+            onChange={(e) => setFlat({ ...flat, features: e.target.value })}
+          />
+        </div>
+
+        <div className="flat-section">
+          <h2>Rent Per Week</h2>
+          <input
+            type="number"
+            value={flat.rent_per_week || ""}
+            onChange={(e) =>
+              setFlat({ ...flat, rent_per_week: Number(e.target.value) })
+            }
+          />
+        </div>
+
+        <div className="flat-section">
+          <h2>Bond</h2>
+          <input
+            type="number"
+            value={flat.bond || ""}
+            onChange={(e) => setFlat({ ...flat, bond: Number(e.target.value) })}
+          />
+        </div>
+
+        <div className="flat-section">
+          <h2>Tags (comma separated)</h2>
           <input
             type="text"
             value={Array.isArray(flat.tags) ? flat.tags.join(", ") : flat.tags}
             onChange={(e) => setFlat({ ...flat, tags: e.target.value })}
           />
-        </label>
+        </div>
 
         <button
           type="submit"
