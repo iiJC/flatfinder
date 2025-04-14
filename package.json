@@ -21,7 +21,7 @@
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "express": "^5.1.0",
-    "mapbox-gl": "^3.10.0",
+    "mapbox-gl": "^3.11.0",
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.1",
     "next": "^15.2.4",

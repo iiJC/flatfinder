@@ -127,6 +127,13 @@ export default function FlatDetailsClient({ flat, userId }) {
             Apply Here
           </button>
 
+          <button
+            className="flat-edit-button"
+            onClick={() => (window.location.href = `/editFlat/${flat._id}`)}
+          >
+            Edit Listing
+          </button>
+
           {/* 🔴 Delete button */}
           <button className="flat-delete-button" onClick={handleDelete}>
             Delete Listing
