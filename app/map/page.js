@@ -107,10 +107,16 @@ export default function MapPage() {
           const el = document.createElement("div");
           el.className = "custom-marker";
           el.textContent = getPoiIcon(category);
-          el.style.fontSize = "24px";
-          el.style.lineHeight = "1";
+          el.style.fontSize = "20px";
+          el.style.width = "36px";
+          el.style.height = "36px";
+          el.style.background = "#fff"; 
+          el.style.display = "flex";
+          el.style.alignItems = "center";
+          el.style.justifyContent = "center";
+          el.style.borderRadius = "50%";
+          el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
           el.style.cursor = "pointer";
-          el.style.borderRadius = "8px";
 
           new mapboxgl.Marker(el)
             .setLngLat(poi.coordinates)

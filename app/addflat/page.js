@@ -76,14 +76,41 @@ export default function AddFlat() {
   const getPoiColor = (category) => {
     switch (category) {
       case "gyms":
-        return "#1e90ff";
+        return "🏋️";
       case "supermarkets":
-        return "#ff7f50";
+        return "🛒";
       case "university":
-        return "#32cd32";
+        return "🎓";
       default:
         return "#aaa";
     }
+  };
+
+  const addPOIsToMap = (map, pois) => {
+    Object.entries(pois).forEach(([category, poiList]) => {
+      if (poiVisibility[category]) {
+        poiList.forEach((poi) => {
+          const el = document.createElement("div");
+          el.className = "custom-marker";
+          el.textContent = getPoiColor(category);
+          el.style.fontSize = "20px";
+          el.style.width = "36px";
+          el.style.height = "36px";
+          el.style.background = "#fff";
+          el.style.display = "flex";
+          el.style.alignItems = "center";
+          el.style.justifyContent = "center";
+          el.style.borderRadius = "50%";
+          el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
+          el.style.cursor = "pointer";
+  
+          new mapboxgl.Marker(el)
+            .setLngLat(poi.coordinates)
+            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
+            .addTo(map);
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -93,7 +120,7 @@ export default function AddFlat() {
     const map = new mapboxgl.Map({
       container: mapRef.current,
       style: "mapbox://styles/mapbox/satellite-v9",
-      center: [170.5028, -45.8788],
+      center: [170.510085, -45.869802],
       zoom: 13
     });
 
@@ -158,16 +185,7 @@ export default function AddFlat() {
     }
 
     map.on("load", () => {
-      Object.entries(POIS).forEach(([category, pois]) => {
-        if (poiVisibility[category]) {
-          pois.forEach((poi) => {
-            new mapboxgl.Marker({ color: getPoiColor(category) })
-              .setLngLat(poi.coordinates)
-              .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
-              .addTo(map);
-          });
-        }
-      });
+      addPOIsToMap(map, POIS);
     });
   }, [poiVisibility]);
 
