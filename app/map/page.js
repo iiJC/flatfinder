@@ -22,7 +22,7 @@ export default function MapPage() {
   const [minRooms, setMinRooms] = useState(0);
   const [markers, setMarkers] = useState([]);
 
-  const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9"); 
+  const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9");
 
   const allTags = [
     "Warm",
@@ -50,6 +50,7 @@ export default function MapPage() {
 
   const addFlatsToMap = (map, flatsData) => {
     const newMarkers = [];
+
     flatsData.forEach((flat) => {
       if (
         flat.coordinates?.coordinates?.length === 2 &&
@@ -62,29 +63,43 @@ export default function MapPage() {
         const [lng, lat] = flat.coordinates.coordinates;
 
         const popupHtml = `
-        <div class="flat-popup">
-          <h3>${flat.name || "Unnamed Flat"}</h3>
-          <p><strong>Address:</strong> ${flat.address}</p>
-          <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
-          <p><strong>Bond:</strong> $${flat.bond}</p>
-          <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
-          <img 
-            src="${
-              flat.images?.[0]
-                ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-                : "/thumbnailpic.webp"
-            }" 
-            class="flat-image" 
-            alt="Flat Image"
-          />
-          <br />
-          <a href="/flats/${flat._id}" class="flat-details-link" style="color: #314ccd; text-decoration: underline;">
-            View Details
-          </a>
-        </div>
-      `;
+          <div class="flat-popup">
+            <h3>${flat.name || "Unnamed Flat"}</h3>
+            <p><strong>Address:</strong> ${flat.address}</p>
+            <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
+            <p><strong>Bond:</strong> $${flat.bond}</p>
+            <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
+            <img 
+              src="${
+                flat.images?.[0]
+                  ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+                  : "/thumbnailpic.webp"
+              }" 
+              class="flat-image" 
+              alt="Flat Image"
+            />
+            <br />
+            <a href="/flats/${flat._id}" class="flat-details-link" style="color: #314ccd; text-decoration: underline;">
+              View Details
+            </a>
+          </div>
+        `;
 
-        const marker = new mapboxgl.Marker({ color: "#314ccd" })
+        const el = document.createElement("div");
+        el.className = "custom-marker";
+        el.textContent = "🏠";
+        el.style.fontSize = "24px";
+        el.style.width = "48px";
+        el.style.height = "48px";
+        el.style.background = "#79b6fc";
+        el.style.color = "#222";
+        el.style.display = "flex";
+        el.style.alignItems = "center";
+        el.style.justifyContent = "center";
+        el.style.borderRadius = "50%";
+        el.style.cursor = "pointer";
+
+        const marker = new mapboxgl.Marker(el)
           .setLngLat([lng, lat])
           .setPopup(
             new mapboxgl.Popup({
@@ -97,6 +112,7 @@ export default function MapPage() {
         newMarkers.push(marker);
       }
     });
+
     return newMarkers;
   };
 
@@ -110,12 +126,11 @@ export default function MapPage() {
           el.style.fontSize = "20px";
           el.style.width = "36px";
           el.style.height = "36px";
-          el.style.background = "#fff"; 
+          el.style.background = "#fff";
           el.style.display = "flex";
           el.style.alignItems = "center";
           el.style.justifyContent = "center";
           el.style.borderRadius = "50%";
-          el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
           el.style.cursor = "pointer";
 
           new mapboxgl.Marker(el)
@@ -127,7 +142,6 @@ export default function MapPage() {
     });
   };
 
-  // Initial map setup
   useEffect(() => {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
@@ -155,14 +169,12 @@ export default function MapPage() {
     return () => newMap.remove();
   }, []);
 
-  // Change map style dynamically
   useEffect(() => {
     if (map) {
       map.setStyle(mapStyle);
     }
   }, [mapStyle]);
 
-  // Update markers when filters or POIs change
   useEffect(() => {
     if (!map) return;
 
@@ -179,7 +191,6 @@ export default function MapPage() {
       <div style={{ minWidth: "240px", padding: "1rem" }}>
         <h2>Filter Flats</h2>
 
-        
         <div style={{ marginBottom: "1rem" }}>
           <label><strong>Map Style:</strong></label>
           <select
@@ -193,7 +204,6 @@ export default function MapPage() {
           </select>
         </div>
 
-        {/* Tag Filters */}
         <div>
           <label>Tags:</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
@@ -223,7 +233,6 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Rent Filter */}
         <div style={{ marginTop: "1rem" }}>
           <label>
             Rent: ${minRent} - ${maxRent}
@@ -246,7 +255,6 @@ export default function MapPage() {
           />
         </div>
 
-        {/* Rooms Filter */}
         <div style={{ marginTop: "1rem" }}>
           <label>Minimum Rooms: {minRooms}</label>
           <input
@@ -257,7 +265,6 @@ export default function MapPage() {
           />
         </div>
 
-        {/* POI Toggles */}
         <div style={{ marginTop: "1rem" }}>
           <strong>Toggle POI Categories:</strong>
           {Object.keys(visiblePOIs).map((category) => (
@@ -278,7 +285,6 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* Map Container */}
       <div
         ref={mapContainerRef}
         style={{ height: "90vh", flex: 1, borderRadius: "8px" }}
