@@ -63,7 +63,7 @@ export default function Header() {
             {session ? (
               <>
                 <Link href="/dashboard">Dashboard</Link>
-                <button onClick={handleLogout} className="logout-button">
+                <button onClick={handleLogout} className="dropbtn">
                   Logout
                 </button>
               </>
