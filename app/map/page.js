@@ -63,7 +63,7 @@ export default function MapPage() {
 
         const popupHtml = `
         <div class="flat-popup">
-          <h3>${flat.flat_name || "Unnamed Flat"}</h3>
+          <h3>${flat.name || "Unnamed Flat"}</h3>
           <p><strong>Address:</strong> ${flat.address}</p>
           <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
           <p><strong>Bond:</strong> $${flat.bond}</p>
