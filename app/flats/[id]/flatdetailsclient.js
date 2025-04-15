@@ -19,6 +19,7 @@ export default function FlatDetailsClient({ flat, userId }) {
     borderRadius: "12px"
   });
 
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleNextImage = () => {
@@ -252,7 +253,8 @@ export default function FlatDetailsClient({ flat, userId }) {
               }}
             >
               <button
-                onClick={handleApplyClick}
+                className="flat-contact-button"
+                onClick={() => setShowForm(true)}
                 style={{
                   padding: "10px 20px",
                   fontSize: "1rem",
@@ -265,6 +267,47 @@ export default function FlatDetailsClient({ flat, userId }) {
               >
                 Apply Here
               </button>
+              {showForm && ( 
+                <div className="modal-overlay">
+                  <div className="modal-content">
+                    <h2>Apply for this flat</h2>
+                    <form onSubmit={handleSubmit} className="apply-form">
+                      <label>
+                        Referee Name:
+                        <input
+                          type="text"
+                          value={refereeName}
+                          onChange={(e) => setRefereeName(e.target.value)}
+                          required
+                        />
+                      </label>
+                      <label>
+                        Referee Phone Number:
+                        <input
+                          type="tel"
+                          value={refereePhone}
+                          onChange={(e) => setRefereePhone(e.target.value)}
+                          required
+                        />
+                      </label>
+                      <label>
+                        Tell us more about you:
+                        <textarea
+                          value={aboutYou}
+                          onChange={(e) => setAboutYou(e.target.value)}
+                          required
+                        />
+                      </label>
+                      <div className="form-actions">
+                        <button type="submit">Submit</button>
+                        <button type="button" onClick={() => setShowForm(false)}>
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
               <button
                 onClick={() => (window.location.href = `/editflat/${flat._id}`)}
                 style={{
