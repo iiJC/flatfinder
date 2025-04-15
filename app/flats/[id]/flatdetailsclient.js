@@ -19,6 +19,20 @@ export default function FlatDetailsClient({ flat, userId }) {
     borderRadius: "12px"
   });
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleNextImage = () => {
+    if (!flat.images || flat.images.length <= 1) return;
+    setCurrentImageIndex((prev) => (prev + 1) % flat.images.length);
+  };
+
+  const handlePrevImage = () => {
+    if (!flat.images || flat.images.length <= 1) return;
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? flat.images.length - 1 : prev - 1
+    );
+  };
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -99,6 +113,63 @@ export default function FlatDetailsClient({ flat, userId }) {
     }
   };
 
+  const renderImage = () => {
+    if (flat.images?.length > 0) {
+      const image = flat.images[currentImageIndex];
+      return (
+        <div style={{ position: "relative", textAlign: "center" }}>
+          <img
+            src={`data:${image.imageType};base64,${image.image}`}
+            alt={`Flat Image ${currentImageIndex + 1}`}
+            style={imageStyle}
+          />
+          {flat.images.length > 1 && (
+            <>
+              <button
+                onClick={handlePrevImage}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "10px",
+                  transform: "translateY(-50%)",
+                  backgroundColor: "rgba(0,0,0,0.5)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  cursor: "pointer"
+                }}
+              >
+                ◀
+              </button>
+              <button
+                onClick={handleNextImage}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "10px",
+                  transform: "translateY(-50%)",
+                  backgroundColor: "rgba(0,0,0,0.5)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  cursor: "pointer"
+                }}
+              >
+                ▶
+              </button>
+            </>
+          )}
+        </div>
+      );
+    } else {
+      return (
+        <img src="/thumbnailpic.webp" alt="Flat Image" style={imageStyle} />
+      );
+    }
+  };
+
   return (
     <>
       <link
@@ -125,30 +196,21 @@ export default function FlatDetailsClient({ flat, userId }) {
             boxShadow: "0 4px 20px rgba(0,0,0,0.06)"
           }}
         >
-          <img
-            src={
-              flat.images?.[0]
-                ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-                : "/thumbnailpic.webp"
-            }
-            alt="Flat Image"
-            style={imageStyle}
-          />
+          {renderImage()}
 
           <div style={{ marginTop: "24px" }}>
             <h1 style={{ fontSize: "1.5rem", marginBottom: "8px" }}>{flat.address}</h1>
             <p style={{ color: "#555" }}>{flat.description || "No description provided."}</p>
 
             <div style={{ marginTop: "24px", display: "grid", gap: "16px" }}>
-              <div>
-                <strong>Rooms:</strong> {flat.rooms || "No room numbers provided."}
-              </div>
-              <div>
-                <strong>Rent:</strong> ${flat.rent_per_week}/week
-              </div>
-              <div>
-                <strong>Utilities Included:</strong> {flat.utilities_included || "No info"}
-              </div>
+              <div><strong>Rooms:</strong> {flat.rooms || "No room numbers provided."}</div>
+              <div><strong>Available Rooms:</strong> {flat.available_rooms || "N/A"}</div>
+              <div><strong>Bond:</strong> {flat.bond ? `$${flat.bond}` : "Not specified"}</div>
+              <div><strong>Rent:</strong> ${flat.rent_per_week}/week</div>
+              <div><strong>Utilities Included:</strong> {flat.utilities_included || "No info"}</div>
+              <div><strong>Distance from University:</strong> {flat.distance_from_uni ? `${flat.distance_from_uni} walk` : "Not listed"}</div>
+              <div><strong>Distance from Supermarket:</strong> {flat.distance_from_supermarket ? `${flat.distance_from_supermarket} walk` : "Not listed"}</div>
+              <div><strong>Distance from Gym:</strong> {flat.distance_from_gym ? `${flat.distance_from_gym} walk` : "Not listed"}</div>
               <div
                 style={{
                   display: "flex",
