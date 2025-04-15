@@ -51,7 +51,7 @@ export default function MapPage() {
 
   const addFlatsToMap = (map, flatsData) => {
     const newMarkers = [];
-
+  
     flatsData.forEach((flat) => {
       if (
         flat.coordinates?.coordinates?.length === 2 &&
@@ -62,60 +62,103 @@ export default function MapPage() {
           tagFilters.every((tag) => flat.tags?.includes(tag)))
       ) {
         const [lng, lat] = flat.coordinates.coordinates;
-
+  
+        const images = flat.images || [];
+        const imageElements = images.map((img, index) => `
+          <img 
+            src="data:${img.imageType};base64,${img.image}" 
+            class="popup-image" 
+            style="display: ${index === 0 ? 'block' : 'none'}; width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px;" 
+            data-index="${index}" 
+          />
+        `).join("");
+  
+        const carouselControls = images.length > 1 ? `
+          <button class="carousel-btn prev" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">‹</button>
+          <button class="carousel-btn next" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">›</button>
+        ` : "";
+  
         const popupHtml = `
-          <div class="flat-popup">
+          <div class="flat-popup" style="font-size: 14px;">
             <h3>${flat.name || "Unnamed Flat"}</h3>
             <p><strong>Address:</strong> ${flat.address}</p>
             <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
             <p><strong>Bond:</strong> $${flat.bond}</p>
             <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
-            <img 
-              src="${
-                flat.images?.[0]
-                  ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-                  : "/thumbnailpic.webp"
-              }" 
-              class="flat-image" 
-              alt="Flat Image"
-            />
-            <br />
-            <a href="/flats/${flat._id}" class="flat-details-link" style="color: #314ccd; text-decoration: underline;">
+            <div class="image-carousel" style="position: relative; margin-top: 10px;">
+              ${imageElements}
+              ${carouselControls}
+            </div>
+            <a href="/flats/${flat._id}" class="flat-details-link" style="color: #314ccd; text-decoration: underline; display: inline-block; margin-top: 10px;">
               View Details
             </a>
           </div>
         `;
-
+  
         const el = document.createElement("div");
         el.className = "custom-marker";
         el.textContent = "🏠";
-        el.style.fontSize = "24px";
-        el.style.width = "48px";
-        el.style.height = "48px";
-        el.style.background = "#79b6fc";
-        el.style.color = "#222";
-        el.style.display = "flex";
-        el.style.alignItems = "center";
-        el.style.justifyContent = "center";
-        el.style.borderRadius = "50%";
-        el.style.cursor = "pointer";
-
+        el.style.cssText = `
+          font-size: 24px;
+          width: 48px;
+          height: 48px;
+          background: #79b6fc;
+          color: #222;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          cursor: pointer;
+        `;
+  
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          className: "custom-popup"
+        }).setHTML(popupHtml);
+  
         const marker = new mapboxgl.Marker(el)
           .setLngLat([lng, lat])
-          .setPopup(
-            new mapboxgl.Popup({
-              offset: 25,
-              className: "custom-popup"
-            }).setHTML(popupHtml)
-          )
+          .setPopup(popup)
           .addTo(map);
-
+  
+        popup.on("open", () => {
+          const popupEl = document.querySelector(".mapboxgl-popup .flat-popup");
+          if (!popupEl) return;
+  
+          const images = popupEl.querySelectorAll(".popup-image");
+          let currentIndex = 0;
+  
+          const updateCarousel = (index) => {
+            images.forEach((img, i) => {
+              img.style.display = i === index ? "block" : "none";
+            });
+          };
+  
+          const nextBtn = popupEl.querySelector(".carousel-btn.next");
+          const prevBtn = popupEl.querySelector(".carousel-btn.prev");
+  
+          if (nextBtn) {
+            nextBtn.addEventListener("click", () => {
+              currentIndex = (currentIndex + 1) % images.length;
+              updateCarousel(currentIndex);
+            });
+          }
+  
+          if (prevBtn) {
+            prevBtn.addEventListener("click", () => {
+              currentIndex = (currentIndex - 1 + images.length) % images.length;
+              updateCarousel(currentIndex);
+            });
+          }
+        });
+  
         newMarkers.push(marker);
       }
     });
-
+  
     return newMarkers;
   };
+  
 
   const addPOIsToMap = (map, pois) => {
     Object.entries(pois).forEach(([category, poiList]) => {
