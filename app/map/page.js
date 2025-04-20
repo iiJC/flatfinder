@@ -21,6 +21,7 @@ export default function MapPage() {
   const [minRent, setMinRent] = useState(0);
   const [maxRent, setMaxRent] = useState(2000);
   const [minRooms, setMinRooms] = useState(0);
+  const [maxDistanceFromUni, setMaxDistanceFromUni] = useState(2000);
   const [markers, setMarkers] = useState([]);
 
   const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9");
@@ -51,18 +52,21 @@ export default function MapPage() {
 
   const addFlatsToMap = (map, flatsData) => {
     const newMarkers = [];
-  
+
     flatsData.forEach((flat) => {
+      const distance = parseFloat(flat.distance_from_uni);
+    
       if (
         flat.coordinates?.coordinates?.length === 2 &&
         flat.rent_per_week >= minRent &&
         flat.rent_per_week <= maxRent &&
         parseInt(flat.rooms) >= minRooms &&
         (tagFilters.length === 0 ||
-          tagFilters.every((tag) => flat.tags?.includes(tag)))
+          tagFilters.every((tag) => flat.tags?.includes(tag))) &&
+        (isNaN(distance) || distance <= maxDistanceFromUni)
       ) {
         const [lng, lat] = flat.coordinates.coordinates;
-  
+
         const images = flat.images || [];
         const imageElements = images.map((img, index) => `
           <img 
@@ -72,12 +76,12 @@ export default function MapPage() {
             data-index="${index}" 
           />
         `).join("");
-  
+
         const carouselControls = images.length > 1 ? `
           <button class="carousel-btn prev" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">‹</button>
           <button class="carousel-btn next" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">›</button>
         ` : "";
-  
+
         const popupHtml = `
           <div class="flat-popup" style="font-size: 14px;">
             <h3>${flat.name || "Unnamed Flat"}</h3>
@@ -94,7 +98,7 @@ export default function MapPage() {
             </a>
           </div>
         `;
-  
+
         const el = document.createElement("div");
         el.className = "custom-marker";
         el.textContent = "🏠";
@@ -110,40 +114,40 @@ export default function MapPage() {
           border-radius: 50%;
           cursor: pointer;
         `;
-  
+
         const popup = new mapboxgl.Popup({
           offset: 25,
           className: "custom-popup"
         }).setHTML(popupHtml);
-  
+
         const marker = new mapboxgl.Marker(el)
           .setLngLat([lng, lat])
           .setPopup(popup)
           .addTo(map);
-  
+
         popup.on("open", () => {
           const popupEl = document.querySelector(".mapboxgl-popup .flat-popup");
           if (!popupEl) return;
-  
+
           const images = popupEl.querySelectorAll(".popup-image");
           let currentIndex = 0;
-  
+
           const updateCarousel = (index) => {
             images.forEach((img, i) => {
               img.style.display = i === index ? "block" : "none";
             });
           };
-  
+
           const nextBtn = popupEl.querySelector(".carousel-btn.next");
           const prevBtn = popupEl.querySelector(".carousel-btn.prev");
-  
+
           if (nextBtn) {
             nextBtn.addEventListener("click", () => {
               currentIndex = (currentIndex + 1) % images.length;
               updateCarousel(currentIndex);
             });
           }
-  
+
           if (prevBtn) {
             prevBtn.addEventListener("click", () => {
               currentIndex = (currentIndex - 1 + images.length) % images.length;
@@ -151,14 +155,13 @@ export default function MapPage() {
             });
           }
         });
-  
+
         newMarkers.push(marker);
       }
     });
-  
+
     return newMarkers;
   };
-  
 
   const addPOIsToMap = (map, pois) => {
     Object.entries(pois).forEach(([category, poiList]) => {
@@ -228,7 +231,7 @@ export default function MapPage() {
     setMarkers(newMarkers);
 
     addPOIsToMap(map, POIS);
-  }, [visiblePOIs, tagFilters, minRent, maxRent, minRooms, flats, map]);
+  }, [visiblePOIs, tagFilters, minRent, maxRent, minRooms, maxDistanceFromUni, flats, map]);
 
   return (
     <div className="map-page" style={{ display: "flex" }}>
@@ -306,6 +309,18 @@ export default function MapPage() {
             min="0"
             value={minRooms}
             onChange={(e) => setMinRooms(Number(e.target.value))}
+          />
+        </div>
+
+        <div style={{ marginTop: "1rem" }}>
+          <label>Max Distance to Uni (m): {maxDistanceFromUni}</label>
+          <input
+            type="range"
+            min="100"
+            max="5000"
+            step="100"
+            value={maxDistanceFromUni}
+            onChange={(e) => setMaxDistanceFromUni(Number(e.target.value))}
           />
         </div>
 
