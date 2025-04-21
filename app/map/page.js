@@ -20,7 +20,7 @@ export default function MapPage() {
   const [tagFilters, setTagFilters] = useState([]);
   const [minRent, setMinRent] = useState(0);
   const [maxRent, setMaxRent] = useState(2000);
-  const [minRooms, setMinRooms] = useState(0);
+  const [minRooms, setMinRooms] = useState(0); 
   const [maxDistanceFromUni, setMaxDistanceFromUni] = useState(2000);
   const [markers, setMarkers] = useState([]);
 
@@ -303,7 +303,7 @@ export default function MapPage() {
         </div>
 
         <div style={{ marginTop: "1rem" }}>
-          <label>Minimum Rooms: {minRooms}</label>
+          <label>Minimum Rooms:</label>
           <input
             type="number"
             min="0"
