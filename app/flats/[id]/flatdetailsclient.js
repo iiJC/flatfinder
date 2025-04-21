@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { signIn, useSession } from "next-auth/react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "../../css/applyform.scss";
+
+mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
 export default function FlatDetailsClient({ flat, userId }) {
   const [showForm, setShowForm] = useState(false);
@@ -11,6 +15,8 @@ export default function FlatDetailsClient({ flat, userId }) {
   const [aboutYou, setAboutYou] = useState("");
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { data: session } = useSession();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const mapRef = useRef(null);
 
   const [imageStyle, setImageStyle] = useState({
     width: "100%",
@@ -18,21 +24,6 @@ export default function FlatDetailsClient({ flat, userId }) {
     objectFit: "cover",
     borderRadius: "12px"
   });
-
-
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const handleNextImage = () => {
-    if (!flat.images || flat.images.length <= 1) return;
-    setCurrentImageIndex((prev) => (prev + 1) % flat.images.length);
-  };
-
-  const handlePrevImage = () => {
-    if (!flat.images || flat.images.length <= 1) return;
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? flat.images.length - 1 : prev - 1
-    );
-  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -48,6 +39,33 @@ export default function FlatDetailsClient({ flat, userId }) {
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (flat?.coordinates?.coordinates?.length === 2 && mapRef.current) {
+      const map = new mapboxgl.Map({
+        container: mapRef.current,
+        style: "mapbox://styles/mapbox/satellite-v9",
+        center: flat.coordinates.coordinates,
+        zoom: 14
+      });
+
+      new mapboxgl.Marker({ color: "#007bff" })
+        .setLngLat(flat.coordinates.coordinates)
+        .addTo(map);
+    }
+  }, [flat]);
+
+  const handleNextImage = () => {
+    if (!flat.images || flat.images.length <= 1) return;
+    setCurrentImageIndex((prev) => (prev + 1) % flat.images.length);
+  };
+
+  const handlePrevImage = () => {
+    if (!flat.images || flat.images.length <= 1) return;
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? flat.images.length - 1 : prev - 1
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -194,10 +212,26 @@ export default function FlatDetailsClient({ flat, userId }) {
             background: "#fff",
             borderRadius: "16px",
             padding: "24px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.06)"
+            boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+            position: "relative"
           }}
         >
           {renderImage()}
+
+          <div
+            ref={mapRef}
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              width: "300px",
+              height: "300px",
+              border: "2px solid #ccc",
+              borderRadius: "12px",
+              zIndex: 10
+            }}
+          />
+
 
           <div style={{ marginTop: "24px" }}>
             <h1 style={{ fontSize: "1.5rem", marginBottom: "8px" }}>{flat.address}</h1>
