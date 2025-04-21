@@ -26,7 +26,13 @@ export default function FlatsPage() {
     return addressMatch || tagMatch;
   });
 
-  if (loading) return <p className="p-6">Loading flats...</p>;
+  if (loading)
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading flats...</p>
+      </div>
+    );  
 
   return (
     <div className="flats-container">
