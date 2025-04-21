@@ -20,10 +20,10 @@ export default function MapPage() {
   const [tagFilters, setTagFilters] = useState([]);
   const [minRent, setMinRent] = useState(0);
   const [maxRent, setMaxRent] = useState(2000);
-  const [minRooms, setMinRooms] = useState(0); 
+  const [minRooms, setMinRooms] = useState(0);
   const [maxDistanceFromUni, setMaxDistanceFromUni] = useState(2000);
   const [markers, setMarkers] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9");
 
   const allTags = [
@@ -50,12 +50,50 @@ export default function MapPage() {
     }
   };
 
+  const createFlatPopup = (flat) => {
+    const images = flat.images || [];
+    const imageElements = images
+      .map((img, index) => `
+        <img 
+          src="data:${img.imageType};base64,${img.image}" 
+          class="popup-image" 
+          style="display: ${index === 0 ? 'block' : 'none'}; width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px;" 
+          data-index="${index}" 
+        />
+      `)
+      .join("");
+
+    const carouselControls = images.length > 1
+      ? `
+        <button class="carousel-btn prev" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">‹</button>
+        <button class="carousel-btn next" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">›</button>
+      `
+      : "";
+
+    return `
+      <div class="flat-popup" style="font-size: 14px;">
+        <h3>${flat.name || "Unnamed Flat"}</h3>
+        <p><strong>Address:</strong> ${flat.address}</p>
+        <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
+        <p><strong>Bond:</strong> $${flat.bond}</p>
+        <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
+        <div class="image-carousel" style="position: relative; margin-top: 10px;">
+          ${imageElements}
+          ${carouselControls}
+        </div>
+        <a href="/flats/${flat._id}" class="flat-details-link" style="color: #314ccd; text-decoration: underline; display: inline-block; margin-top: 10px;">
+          View Details
+        </a>
+      </div>
+    `;
+  };
+
   const addFlatsToMap = (map, flatsData) => {
     const newMarkers = [];
 
     flatsData.forEach((flat) => {
       const distance = parseFloat(flat.distance_from_uni);
-    
+
       if (
         flat.coordinates?.coordinates?.length === 2 &&
         flat.rent_per_week >= minRent &&
@@ -66,38 +104,6 @@ export default function MapPage() {
         (isNaN(distance) || distance <= maxDistanceFromUni)
       ) {
         const [lng, lat] = flat.coordinates.coordinates;
-
-        const images = flat.images || [];
-        const imageElements = images.map((img, index) => `
-          <img 
-            src="data:${img.imageType};base64,${img.image}" 
-            class="popup-image" 
-            style="display: ${index === 0 ? 'block' : 'none'}; width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px;" 
-            data-index="${index}" 
-          />
-        `).join("");
-
-        const carouselControls = images.length > 1 ? `
-          <button class="carousel-btn prev" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">‹</button>
-          <button class="carousel-btn next" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">›</button>
-        ` : "";
-
-        const popupHtml = `
-          <div class="flat-popup" style="font-size: 14px;">
-            <h3>${flat.name || "Unnamed Flat"}</h3>
-            <p><strong>Address:</strong> ${flat.address}</p>
-            <p><strong>Rent:</strong> $${flat.rent_per_week} / week</p>
-            <p><strong>Bond:</strong> $${flat.bond}</p>
-            <p><strong>Available Rooms:</strong> ${flat.available_rooms}</p>
-            <div class="image-carousel" style="position: relative; margin-top: 10px;">
-              ${imageElements}
-              ${carouselControls}
-            </div>
-            <a href="/flats/${flat._id}" class="flat-details-link" style="color: #314ccd; text-decoration: underline; display: inline-block; margin-top: 10px;">
-              View Details
-            </a>
-          </div>
-        `;
 
         const el = document.createElement("div");
         el.className = "custom-marker";
@@ -118,7 +124,7 @@ export default function MapPage() {
         const popup = new mapboxgl.Popup({
           offset: 25,
           className: "custom-popup"
-        }).setHTML(popupHtml);
+        }).setHTML(createFlatPopup(flat));
 
         const marker = new mapboxgl.Marker(el)
           .setLngLat([lng, lat])
@@ -203,6 +209,8 @@ export default function MapPage() {
     setMap(newMap);
 
     newMap.on("load", async () => {
+      setLoading(true);
+
       const res = await fetch("/api/getFlats");
       const data = await res.json();
       setFlats(data);
@@ -211,6 +219,8 @@ export default function MapPage() {
       setMarkers(newMarkers);
 
       addPOIsToMap(newMap, POIS);
+
+      setLoading(false);
     });
 
     return () => newMap.remove();
@@ -259,16 +269,12 @@ export default function MapPage() {
                 key={tag}
                 onClick={() =>
                   setTagFilters((prev) =>
-                    prev.includes(tag)
-                      ? prev.filter((t) => t !== tag)
-                      : [...prev, tag]
+                    prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
                   )
                 }
                 style={{
                   padding: "0.25rem 0.5rem",
-                  backgroundColor: tagFilters.includes(tag)
-                    ? "#4caf50"
-                    : "#ccc",
+                  backgroundColor: tagFilters.includes(tag) ? "#4caf50" : "#ccc",
                   border: "none",
                   borderRadius: "4px",
                   cursor: "pointer"
@@ -281,47 +287,19 @@ export default function MapPage() {
         </div>
 
         <div style={{ marginTop: "1rem" }}>
-          <label>
-            Rent: ${minRent} - ${maxRent}
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="2000"
-            step="50"
-            value={minRent}
-            onChange={(e) => setMinRent(Number(e.target.value))}
-          />
-          <input
-            type="range"
-            min="0"
-            max="2000"
-            step="50"
-            value={maxRent}
-            onChange={(e) => setMaxRent(Number(e.target.value))}
-          />
+          <label>Rent: ${minRent} - ${maxRent}</label>
+          <input type="range" min="0" max="2000" step="50" value={minRent} onChange={(e) => setMinRent(Number(e.target.value))} />
+          <input type="range" min="0" max="2000" step="50" value={maxRent} onChange={(e) => setMaxRent(Number(e.target.value))} />
         </div>
 
         <div style={{ marginTop: "1rem" }}>
           <label>Minimum Rooms:</label>
-          <input
-            type="number"
-            min="0"
-            value={minRooms}
-            onChange={(e) => setMinRooms(Number(e.target.value))}
-          />
+          <input type="number" min="0" value={minRooms} onChange={(e) => setMinRooms(Number(e.target.value))} />
         </div>
 
         <div style={{ marginTop: "1rem" }}>
           <label>Max Distance to Uni (m): {maxDistanceFromUni}</label>
-          <input
-            type="range"
-            min="100"
-            max="5000"
-            step="100"
-            value={maxDistanceFromUni}
-            onChange={(e) => setMaxDistanceFromUni(Number(e.target.value))}
-          />
+          <input type="range" min="100" max="5000" step="100" value={maxDistanceFromUni} onChange={(e) => setMaxDistanceFromUni(Number(e.target.value))} />
         </div>
 
         <div style={{ marginTop: "1rem" }}>
@@ -344,10 +322,14 @@ export default function MapPage() {
         </div>
       </div>
 
-      <div
-        ref={mapContainerRef}
-        style={{ height: "90vh", flex: 1, borderRadius: "8px" }}
-      />
+      <div style={{ position: "relative", flex: 1 }}>
+        <div ref={mapContainerRef} style={{ height: "90vh", borderRadius: "8px" }} />
+        {loading && (
+          <div className="map-loading-spinner">
+            <div className="spinner" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
