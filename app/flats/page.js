@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import "../css/flats.scss";
 import "../css/globals.scss";
@@ -9,6 +8,7 @@ import "../css/globals.scss";
 export default function FlatsPage() {
   const [flats, setFlats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchFlats = async () => {
@@ -20,14 +20,29 @@ export default function FlatsPage() {
     fetchFlats();
   }, []);
 
+  const filteredFlats = flats.filter((flat) => {
+    const addressMatch = flat.address?.toLowerCase().includes(searchTerm.toLowerCase());
+    const tagMatch = flat.tags?.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    return addressMatch || tagMatch;
+  });
+
   if (loading) return <p className="p-6">Loading flats...</p>;
 
   return (
     <div className="flats-container">
       <div className="flats-box">
         <h2 className="title">Browse Available Flats</h2>
+
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by address or tag..."
+          style={{ marginBottom: "1rem", padding: "0.5rem", width: "100%", fontSize: "1rem" }}
+        />
+
         <ul className="flats-list">
-          {flats.map((flat) => (
+          {filteredFlats.map((flat) => (
             <li key={flat._id} className="flat-item">
               <img
                 src={
