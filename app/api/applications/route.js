@@ -1,7 +1,7 @@
 import clientPromise from "../../../db/database";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route.js"; // Adjust if your path is different
+import { authOptions } from "../auth/[...nextauth]/route.js";
 
 export async function POST(req) {
   try {
@@ -21,7 +21,10 @@ export async function POST(req) {
     const client = await clientPromise;
     const db = client.db("flatfinderdb");
 
-    const user = await db.collection("users").findOne({ email: session.user.email });
+    const users = db.collection("users");
+    const flats = db.collection("flats");
+
+    const user = await users.findOne({ email: session.user.email });
 
     if (!user) {
       return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
@@ -33,14 +36,18 @@ export async function POST(req) {
       status: "pending",
       dateApplied: new Date(),
       message,
-      refereeName,  // Add refereeName to the application object
-      refereePhone, // Add refereePhone to the application object
+      refereeName,
+      refereePhone,
     };
 
-    // Add the application to the user's applications array
-    await db.collection("users").updateOne(
+    await users.updateOne(
       { _id: user._id },
       { $push: { applications: application } }
+    );
+
+    await flats.updateOne(
+      { _id: new ObjectId(flatId) },
+      { $addToSet: { applicants: user._id } }
     );
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
