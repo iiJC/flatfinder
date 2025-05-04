@@ -5,6 +5,7 @@ import React from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route.js";
 import clientPromise from "../../db/database.js";
+import { ObjectId } from "mongodb";
 
 export default async function ApplicantsDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -22,36 +23,79 @@ export default async function ApplicantsDashboardPage() {
   const client = await clientPromise;
   const db = client.db("flatfinderdb");
 
-  // Get flats owned by the current user
-  const flats = await db
-    .collection("flats")
-    .find({ ownerEmail: session.user.email }) // assumes `ownerEmail` exists
-    .toArray();
+  // Find the logged-in user based on their email
+  const user = await db.collection("users").findOne({ email: session.user.email });
 
-  const applicants = flats.flatMap(flat =>
-    (flat.applicants || []).map(app => ({
-      flatAddress: flat.address,
-      applicantEmail: app.email,
-      applicantName: app.name,
-      status: app.status,
-    }))
+  if (!user) {
+    return (
+      <div className="dashboard-container">
+        <h2 className="dashboard-title">
+          User not found.
+        </h2>
+      </div>
+    );
+  }
+
+  // Assuming the user is interested in the first application (adjust if necessary)
+  const flatId = user.listing; // The flatId is stored in the 'listing' field
+
+  if (!flatId) {
+    return (
+      <div className="dashboard-container">
+        <h2 className="dashboard-title">
+          No flat associated with your application.
+        </h2>
+      </div>
+    );
+  }
+
+  // Fetch the flat details using the flatId from the listing field
+  const flat = await db
+    .collection("flats")
+    .findOne({ _id: new ObjectId(flatId) });
+
+  if (!flat) {
+    return (
+      <div className="dashboard-container">
+        <h2 className="dashboard-title">
+          Flat not found.
+        </h2>
+      </div>
+    );
+  }
+
+  // Retrieve applicants' details based on their _id in the flat document
+  const applicants = flat.applicants || [];
+
+  // Fetch user details for each applicant
+  const applicantDetails = await Promise.all(
+    applicants.map(async (applicantId) => {
+      const applicant = await db
+        .collection("users")
+        .findOne({ _id: new ObjectId(applicantId) });
+
+      return {
+        name: applicant?.name,
+        email: applicant?.email,
+        status: "pending", // You can modify this based on your logic for tracking status
+      };
+    })
   );
 
   return (
     <div className="dashboard-container">
-      <h2 className="dashboard-title">Your Applicants</h2>
+      <h2 className="dashboard-title">Applicants for {flat.address}</h2>
 
       <div className="application-box">
-        <h3 className="application-heading">Flat Applicants</h3>
+        <h3 className="application-heading">Current Applicants</h3>
 
-        {applicants.length > 0 ? (
+        {applicantDetails.length > 0 ? (
           <ul className="application-list">
-            {applicants.map((app, index) => (
+            {applicantDetails.map((app, index) => (
               <li key={index} className="application-item">
                 <p className="application-name">
-                  Flat Address: {app.flatAddress}
+                  Applicant: {app.name} ({app.email})
                 </p>
-                <p className="application-name">Applicant: {app.applicantName} ({app.applicantEmail})</p>
                 <p className={`application-status ${app.status.toLowerCase()}`}>
                   Status:{" "}
                   {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
@@ -60,7 +104,7 @@ export default async function ApplicantsDashboardPage() {
             ))}
           </ul>
         ) : (
-          <p>No applicants found for your flats.</p>
+          <p>No applicants found for this flat.</p>
         )}
       </div>
     </div>
