@@ -56,24 +56,25 @@ export default function Header() {
 
         {/* Auth button */}
         <div className="dropdown">
-          <button className="dropbtn">
-            {session ? `Hi ${username}!` : "Personal"} ▾
-          </button>
-          <div className="dropdown-content">
-            {session ? (
-              <>
-                <Link href="/dashboard">Dashboard</Link>
-                <button onClick={handleLogout} className="dropbtn">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login">Login</Link>
-              </>
-            )}
-          </div>
-        </div>
+  <button className="dropbtn">
+    {session ? `Hi ${username}!` : "Personal"} ▾
+  </button>
+  <div className="dropdown-content">
+    {session ? (
+      <>
+        <Link href="/dashboard">Dashboard</Link>
+        <Link href="/applicantsDashboard">Flat Listing</Link> {/* New link */}
+        <button onClick={handleLogout} className="dropbtn">
+          Logout
+        </button>
+      </>
+    ) : (
+      <>
+        <Link href="/login">Login</Link>
+      </>
+    )}
+  </div>
+</div>
       </div>
     </header>
   );
