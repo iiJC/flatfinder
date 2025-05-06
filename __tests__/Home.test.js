@@ -9,7 +9,7 @@ describe("HomePage", () => {
 
   it("renders buttons to find flats and flatmates", () => {
     render(<HomePage />);
-    expect(screen.getByText(/Looking for a flat!/i)).toBeInTheDocument();
-    expect(screen.getByText(/Looking for a flatmate!/i)).toBeInTheDocument();
+    expect(screen.getByText(/Find a flat!/i)).toBeInTheDocument();
+    expect(screen.getByText(/Find a flatmate!/i)).toBeInTheDocument();
   });
 });
