@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import "../.s3./css/editFlat.scss";
+import "../../css/editFlat.scss";
 
 export default function EditFlatPage() {
   const router = useRouter();
@@ -71,20 +71,8 @@ export default function EditFlatPage() {
 
   return (
     <div className="edit-flat-page">
-      <div className="flat-hero">
-        <img
-          src={
-            flat.images?.[0]
-              ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-              : "/thumbnailpic.webp"
-          }
-          alt="Flat Image"
-          className="flat-main-image"
-          style={imageStyle}
-        />
-      </div>
-
       <form className="flat-form" onSubmit={handleSubmit}>
+        <h2>Edit your flat listing</h2>
         {[
           { label: "Address", key: "address" },
           { label: "Flat Name", key: "name" },
@@ -103,17 +91,17 @@ export default function EditFlatPage() {
             <h2>{label}</h2>
             {isTextarea ? (
               <textarea
-                value={flat[key] || ""}
-                onChange={(e) => setFlat({ ...flat, [key]: e.target.value })}
+              value={flat[key] || ""}
+              onChange={(e) => setFlat({ ...flat, [key]: e.target.value })}
               />
             ) : (
               <input
-                type={type}
-                value={transform ? transform(flat[key]) : flat[key] || ""}
-                onChange={(e) =>
-                  setFlat({
-                    ...flat,
-                    [key]: type === "number" ? Number(e.target.value) : e.target.value
+              type={type}
+              value={transform ? transform(flat[key]) : flat[key] || ""}
+              onChange={(e) =>
+                setFlat({
+                  ...flat,
+                  [key]: type === "number" ? Number(e.target.value) : e.target.value
                   })
                 }
               />
@@ -125,6 +113,18 @@ export default function EditFlatPage() {
           Update Flat
         </button>
       </form>
+      <div className="flat-hero">
+        <img
+          src={
+            flat.images?.[0]
+              ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
+              : "/thumbnailpic.webp"
+          }
+          alt="Flat Image"
+          className="flat-main-image"
+          style={imageStyle}
+        />
+      </div>
     </div>
   );
 }

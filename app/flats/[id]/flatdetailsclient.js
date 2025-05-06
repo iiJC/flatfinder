@@ -138,12 +138,10 @@ export default function FlatDetailsClient({ flat, userId }) {
           <img src={`data:${image.imageType};base64,${image.image}`} alt={`Flat Image ${currentImageIndex + 1}`} style={imageStyle} />
           {flat.images.length > 1 && (
             <>
-              <button className="prev"
-                onClick={handlePrevImage}>
+              <button className="prev" onClick={handlePrevImage}>
                 ◀
               </button>
-              <button className="next"
-                onClick={handleNextImage}>
+              <button className="next" onClick={handleNextImage}>
                 ▶
               </button>
             </>
@@ -162,10 +160,7 @@ export default function FlatDetailsClient({ flat, userId }) {
       <div className="flat-details-wrapper">
         <div className="flat-card">
           {renderImage()}
-          <div className="mapbox-container"
-            ref={mapRef}
-          />
-          <div className="info" >
+          <div className="info">
             <h1>{flat.address}</h1>
             <p>{flat.description || "No description provided."}</p>
 
@@ -198,8 +193,7 @@ export default function FlatDetailsClient({ flat, userId }) {
                 <strong>Tags:</strong>
                 {flat.tags?.length > 0 ? (
                   flat.tags.map((tag, index) => (
-                    <span className="tag"
-                      key={index}>
+                    <span className="tag" key={index}>
                       {tag}
                     </span>
                   ))
@@ -207,28 +201,11 @@ export default function FlatDetailsClient({ flat, userId }) {
                   <span className="no-tags">No tags provided.</span>
                 )}
               </div>
+              <div className="mapbox-container" ref={mapRef} />
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "12px",
-                flexWrap: "wrap",
-                marginTop: "32px",
-                justifyContent: "flex-start",
-              }}>
-              <button
-                className="flat-contact-button"
-                onClick={() => setShowForm(true)}
-                style={{
-                  padding: "10px 20px",
-                  fontSize: "1rem",
-                  backgroundColor: "#007BFF",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}>
+            <div className="buttons-container">
+              <button className="flat-contact-button" onClick={() => setShowForm(true)}>
                 Apply Here
               </button>
               {showForm && (
@@ -258,30 +235,10 @@ export default function FlatDetailsClient({ flat, userId }) {
                   </div>
                 </div>
               )}
-              <button
-                onClick={() => (window.location.href = `/editflat/${flat._id}`)}
-                style={{
-                  padding: "10px 20px",
-                  fontSize: "1rem",
-                  backgroundColor: "#28a745",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}>
+              <button className="edit-listing" onClick={() => (window.location.href = `/editflat/${flat._id}`)}>
                 Edit Listing
               </button>
-              <button
-                onClick={handleDelete}
-                style={{
-                  padding: "10px 20px",
-                  fontSize: "1rem",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}>
+              <button className="delete-listing" onClick={handleDelete}>
                 Delete Listing
               </button>
             </div>

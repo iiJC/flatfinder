@@ -30,8 +30,10 @@
 }
 
 .flat-details-wrapper{
-  padding: 40px 20px;
-  background-color: #f4f6f8;
+  padding: var(--spacing-sm);
+  background-color: var(--color-primary);
+  margin: var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
 
   .flat-card{
     max-width: 50rem;
@@ -42,8 +44,8 @@
     position: relative;
 
     .mapbox-container{
+      justify-self: flex-end;
       position: absolute;
-      margin: 1rem;
       width: 300px;
       height: 300px;
       border-radius: var(--border-radius-lg);
@@ -84,6 +86,45 @@
           .no-tag{
             color: #777;
           }
+        }
+      }
+      .buttons-container{
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        justify-content: flex-start;
+
+        .flat-contact-button{
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          background-color: blue; // what color do we want this button to be
+          color: white;
+          border: none;
+          border-radius: var(--border-radius-lg);
+          cursor: pointer;
+        }
+
+        //dont need modal stuff as in different file
+        
+        .edit-listing{
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          background-color: green; // what color do we want this button to be
+          color: white;
+          border: none;
+          border-radius: var(--border-radius-lg);
+          cursor: pointer;
+        }
+
+        .delete-listing{
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          background-color: red; // make red?
+          color: white;
+          border: none;
+          border-radius: var(--border-radius-lg);
+          cursor: pointer;
         }
       }
     }
