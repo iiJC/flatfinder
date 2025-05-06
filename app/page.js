@@ -2,6 +2,7 @@
 
 import React from "react";
 import "./css/globals.scss";
+import "./css/homePage.scss";
 import Link from "next/link";
 
 // TODO images are on icloud, upload and save them to the repo...

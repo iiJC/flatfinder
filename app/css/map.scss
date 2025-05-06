@@ -20,31 +20,51 @@
     .type {
       margin-bottom: 1rem;
 
+      label {
+        margin-bottom: 1rem;
+      }
+
       select {
         padding: 0.5rem;
         border-radius: 4px;
         border: 1px solid #ccc;
         font-size: 16px;
         width: 100%;
+        margin: 1rem 0;
       }
     }
 
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.25rem;
+    .tag {
+      label{
+        margin: 0.5rem;
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
 
-      .tag-button {
-        padding: 0.25rem 0.5rem;
-        border: none;
-        border-radius: var(--border-radius-sm);
-        cursor: pointer;
-        // background-color: tagFilters.includes(tag) ? "#4caf50" : "#ccc"
+        .tag-button {
+          padding: 0.5rem 0.75rem;
+          border: none;
+          border-radius: var(--border-radius-sm);
+          cursor: pointer;
+          // background-color: tagFilters.includes(tag) ? "#4caf50" : "#ccc"
+        }
       }
     }
 
     .info {
       margin: 1rem;
+
+      label{
+        display: block;
+      }
+      input{
+        border: none;
+        border-radius: var(--border-radius-sm);
+        padding: 0.25rem;
+      }
     }
   }
 
@@ -89,14 +109,14 @@
     }
   }
 
-  .map{
+  .map {
     position: relative;
     flex: 1;
     // margin: var(--spacing-lg);
     max-width: 80%;
     overflow: none;
 
-    .mapRef{
+    .mapRef {
       height: 100vh;
       border-radius: var(--border-radius-sm)
     }

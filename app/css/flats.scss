@@ -21,6 +21,8 @@
     input{
       max-width: 95%;
       overflow: hidden;
+      border: none;
+      border-radius: var(--border-radius-sm);
       margin-left: var(--spacing-sm);
     }
 
@@ -83,7 +85,7 @@
             transition: background-color 0.2s;
 
             &:hover {
-              background-color: #1d4ed8;
+              background-color: var(--color-secondary);
             }
           }
         }

@@ -249,7 +249,7 @@ export default function MapPage() {
           </select>
         </div>
 
-        <div>
+        <div className="tag">
           <label>Tags:</label>
           <div className="tags">
             {allTags.map((tag) => (
@@ -286,7 +286,7 @@ export default function MapPage() {
         <div className="info">
           <strong>Toggle POI Categories:</strong>
           {Object.keys(visiblePOIs).map((category) => (
-            <label key={category} style={{ display: "block" }}>
+            <label key={category}>
               <input
                 type="checkbox"
                 checked={visiblePOIs[category]}

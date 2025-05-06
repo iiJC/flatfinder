@@ -26,11 +26,10 @@
     .application-list {
       list-style: none;
       padding: 0;
-
+      
       .application-item {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 1rem;
-        margin-bottom: 1rem;
+        background-color: var(--color-white);
+        border-radius: var(--border-radius-lg);
 
         &:last-child {
           border-bottom: none;
@@ -43,7 +42,7 @@
 
         .application-status {
           font-size: 0.875rem;
-          color: #4b5563; // Tailwind text-gray-600
+          color: #4b5563; 
 
           &.pending {
             color: #f59e0b; // Orange for pending
