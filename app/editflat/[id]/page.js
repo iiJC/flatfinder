@@ -36,7 +36,7 @@ export default function EditFlatPage() {
       setImageStyle({
         width: window.innerWidth < 768 ? "100%" : "80%",
         maxHeight: window.innerWidth < 768 ? "300px" : "400px",
-        objectFit: "cover"
+        objectFit: "cover",
       });
     };
     window.addEventListener("resize", handleResize);
@@ -48,15 +48,13 @@ export default function EditFlatPage() {
     e.preventDefault();
     const updatedFlat = {
       ...flat,
-      tags: typeof flat.tags === "string"
-        ? flat.tags.split(",").map((tag) => tag.trim())
-        : flat.tags
+      tags: typeof flat.tags === "string" ? flat.tags.split(",").map((tag) => tag.trim()) : flat.tags,
     };
 
     const res = await fetch(`/api/editFlat/${params.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedFlat)
+      body: JSON.stringify(updatedFlat),
     });
 
     if (res.ok) {
@@ -84,24 +82,21 @@ export default function EditFlatPage() {
           {
             label: "Tags (comma separated)",
             key: "tags",
-            transform: (val) => Array.isArray(val) ? val.join(", ") : val
-          }
+            transform: (val) => (Array.isArray(val) ? val.join(", ") : val),
+          },
         ].map(({ label, key, type = "text", isTextarea, transform }) => (
           <div key={key} className="flat-section">
             <h2>{label}</h2>
             {isTextarea ? (
-              <textarea
-              value={flat[key] || ""}
-              onChange={(e) => setFlat({ ...flat, [key]: e.target.value })}
-              />
+              <textarea value={flat[key] || ""} onChange={(e) => setFlat({ ...flat, [key]: e.target.value })} />
             ) : (
               <input
-              type={type}
-              value={transform ? transform(flat[key]) : flat[key] || ""}
-              onChange={(e) =>
-                setFlat({
-                  ...flat,
-                  [key]: type === "number" ? Number(e.target.value) : e.target.value
+                type={type}
+                value={transform ? transform(flat[key]) : flat[key] || ""}
+                onChange={(e) =>
+                  setFlat({
+                    ...flat,
+                    [key]: type === "number" ? Number(e.target.value) : e.target.value,
                   })
                 }
               />
@@ -114,16 +109,28 @@ export default function EditFlatPage() {
         </button>
       </form>
       <div className="flat-hero">
-        <img
-          src={
-            flat.images?.[0]
-              ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}`
-              : "/thumbnailpic.webp"
-          }
-          alt="Flat Image"
-          className="flat-main-image"
-          style={imageStyle}
-        />
+        <div>
+          <img
+            src={flat.images?.[0] ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}` : "/thumbnailpic.webp"}
+            alt="Flat Image"
+            className="flat-main-image"
+            style={imageStyle}
+          />
+        </div>
+        <div>
+          <input
+            className="file-input"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              setFormData({ ...formData, images: e.target.files });
+            }}
+          />
+        </div>
+        <div className="image-preview">
+          {/* {formData.images && Array.from(formData.images).map((file, index) => <img key={index} src={URL.createObjectURL(file)} alt={`Preview ${index}`} />)} */}
+        </div>
       </div>
     </div>
   );
