@@ -2,6 +2,7 @@ import React from "react";
 import "./css/globals.scss";
 import Providers from "./provider";
 import Header from "../components/header";
+import Footer from "@/components/footer";
 
 export const metadata = {
   title: "FlatMate Finder",
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
         <Providers>
           <Header />
           <main className="main-content">{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

@@ -7,7 +7,8 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { POIS } from "@/lib/pois";
 import "mapbox-gl/dist/mapbox-gl.css";
-import "../css/globals.scss"
+import "../css/globals.scss";
+import "../css/addFlat.scss";
 
 function haversineDistance(coord1, coord2) {
   const R = 6371e3;
@@ -17,9 +18,7 @@ function haversineDistance(coord1, coord2) {
   const dLat = toRad(coord2.lat - coord1.lat);
   const dLng = toRad(coord2.lng - coord1.lng);
 
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -42,14 +41,14 @@ export default function AddFlat() {
     distance_from_supermarket: "",
     utilities_included: "",
     images: "",
-    coordinates: null
+    coordinates: null,
   });
 
   const [selectedTags, setSelectedTags] = useState([]);
   const [poiVisibility, setPoiVisibility] = useState({
     gyms: true,
     supermarkets: true,
-    university: true
+    university: true,
   });
 
   const geocoderRef = useRef(null);
@@ -57,21 +56,10 @@ export default function AddFlat() {
   const geocoderControlRef = useRef(null);
   const userMarkerRef = useRef(null);
 
-  const tagOptions = [
-    "Warm",
-    "Sunny",
-    "Modern",
-    "Quiet",
-    "Party",
-    "Social",
-    "Close to Uni",
-    "Furnished"
-  ];
+  const tagOptions = ["Warm", "Sunny", "Modern", "Quiet", "Party", "Social", "Close to Uni", "Furnished"];
 
   const handleTagToggle = (tag) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
+    setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   };
 
   const getPoiColor = (category) => {
@@ -104,7 +92,7 @@ export default function AddFlat() {
           el.style.borderRadius = "50%";
           el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
           el.style.cursor = "pointer";
-  
+
           new mapboxgl.Marker(el)
             .setLngLat(poi.coordinates)
             .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
@@ -115,14 +103,13 @@ export default function AddFlat() {
   };
 
   useEffect(() => {
-    mapboxgl.accessToken =
-      "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
+    mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
     const map = new mapboxgl.Map({
       container: mapRef.current,
       style: "mapbox://styles/mapbox/satellite-v9",
       center: [170.510085, -45.869802],
-      zoom: 13
+      zoom: 13,
     });
 
     if (!geocoderControlRef.current) {
@@ -131,7 +118,7 @@ export default function AddFlat() {
         placeholder: "Search for an address...",
         marker: false,
         countries: "nz",
-        proximity: { longitude: 170.5028, latitude: -45.8788 }
+        proximity: { longitude: 170.5028, latitude: -45.8788 },
       });
 
       geocoder.addTo(geocoderRef.current);
@@ -145,11 +132,9 @@ export default function AddFlat() {
           POIS[category].reduce((closest, poi) => {
             const dist = haversineDistance(userCoords, {
               lat: poi.coordinates[1],
-              lng: poi.coordinates[0]
+              lng: poi.coordinates[0],
             });
-            return !closest || dist < closest.distance
-              ? { ...poi, distance: dist }
-              : closest;
+            return !closest || dist < closest.distance ? { ...poi, distance: dist } : closest;
           }, null);
 
         const closestGym = closest("gyms");
@@ -166,22 +151,18 @@ export default function AddFlat() {
           location: region?.text || "Dunedin", // default to Dunedin if not found
           coordinates: {
             type: "Point",
-            coordinates: [lng, lat]
+            coordinates: [lng, lat],
           },
           distance_from_uni: `${Math.round(closestUni.distance)} m`,
           distance_from_gym: `${Math.round(closestGym.distance)} m`,
-          distance_from_supermarket: `${Math.round(
-            closestSupermarket.distance
-          )} m`
+          distance_from_supermarket: `${Math.round(closestSupermarket.distance)} m`,
         }));
 
         if (userMarkerRef.current) {
           userMarkerRef.current.remove();
         }
 
-        userMarkerRef.current = new mapboxgl.Marker({ color: "#111" })
-          .setLngLat([lng, lat])
-          .addTo(map);
+        userMarkerRef.current = new mapboxgl.Marker({ color: "#111" }).setLngLat([lng, lat]).addTo(map);
       });
     }
 
@@ -221,7 +202,7 @@ export default function AddFlat() {
     try {
       const response = await fetch("/api/addFlat", {
         method: "POST",
-        body: form
+        body: form,
       });
 
       if (response.ok) {
@@ -242,7 +223,7 @@ export default function AddFlat() {
           distance_from_supermarket: "",
           utilities_included: "",
           images: "",
-          coordinates: null
+          coordinates: null,
         });
         setSelectedTags([]);
       } else {
@@ -255,19 +236,19 @@ export default function AddFlat() {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div className="add-flat-container">
       <h1>Add Flat</h1>
-      <div>
+      <div className="POI">
         <strong>Toggle POI Categories:</strong>
         {Object.keys(poiVisibility).map((category) => (
-          <label key={category} style={{ marginLeft: "1rem" }}>
+          <label key={category}>
             <input
               type="checkbox"
               checked={poiVisibility[category]}
               onChange={(e) =>
                 setPoiVisibility((prev) => ({
                   ...prev,
-                  [category]: e.target.checked
+                  [category]: e.target.checked,
                 }))
               }
             />
@@ -275,130 +256,47 @@ export default function AddFlat() {
           </label>
         ))}
       </div>
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-          maxWidth: "500px"
-        }}
-      >
-        <input
-          type="text"
-          name="flat_name"
-          placeholder="Flat Name"
-          value={formData.flat_name}
-          onChange={(e) =>
-            setFormData({ ...formData, flat_name: e.target.value })
-          }
-          required
-        />
-        <div>
-          <label>Address (Search):</label>
-          <div
-            ref={geocoderRef}
-            style={{ minHeight: "48px", border: "1px solid #ccc" }}
-          />
+      <form className="add-flat-form" onSubmit={handleSubmit}>
+        <input type="text" name="flat_name" placeholder="Flat Name" value={formData.flat_name} onChange={(e) => setFormData({ ...formData, flat_name: e.target.value })} required />
+        <div className="address">
+          <div>
+            <label>Address (Search):</label>
+            <div ref={geocoderRef} />
+          </div>
+          <div className="map" ref={mapRef} />
         </div>
-        <div
-          ref={mapRef}
-          style={{ height: "300px", marginBottom: "1rem", borderRadius: "8px" }}
-        />
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          value={formData.location}
-          onChange={(e) =>
-            setFormData({ ...formData, location: e.target.value })
-          }
-          required
-        />
+        <input type="text" name="location" placeholder="Location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} required />
         <input
           type="text"
           name="rent_per_week"
           placeholder="Rent per Week"
           value={formData.rent_per_week}
-          onChange={(e) =>
-            setFormData({ ...formData, rent_per_week: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, rent_per_week: e.target.value })}
           required
         />
-        <input
-          type="text"
-          name="bond"
-          placeholder="Bond"
-          value={formData.bond}
-          onChange={(e) => setFormData({ ...formData, bond: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          name="rooms"
-          placeholder="Total Rooms"
-          value={formData.rooms}
-          onChange={(e) => setFormData({ ...formData, rooms: e.target.value })}
-          required
-        />
+        <input type="text" name="bond" placeholder="Bond" value={formData.bond} onChange={(e) => setFormData({ ...formData, bond: e.target.value })} required />
+        <input type="text" name="rooms" placeholder="Total Rooms" value={formData.rooms} onChange={(e) => setFormData({ ...formData, rooms: e.target.value })} required />
         <input
           type="text"
           name="available_rooms"
           placeholder="Available Rooms"
           value={formData.available_rooms}
-          onChange={(e) =>
-            setFormData({ ...formData, available_rooms: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, available_rooms: e.target.value })}
           required
         />
-        <input
-          type="text"
-          name="features"
-          placeholder="Features"
-          value={formData.features}
-          onChange={(e) =>
-            setFormData({ ...formData, features: e.target.value })
-          }
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-        />
-        <input
-          type="text"
-          value={formData.distance_from_uni}
-          placeholder="Distance from University"
-          name="distance_from_uni"
-          readOnly
-        />
-        <input
-          type="text"
-          value={formData.distance_from_gym}
-          placeholder="Distance from Gym"
-          name="distance_from_gym"
-          readOnly
-        />
-        <input
-          type="text"
-          value={formData.distance_from_supermarket}
-          placeholder="Distance from Supermarket"
-          name="distance_from_supermarket"
-          readOnly
-        />
+        <input type="text" name="features" placeholder="Features" value={formData.features} onChange={(e) => setFormData({ ...formData, features: e.target.value })} />
+        <textarea name="description" placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+        <input type="text" value={formData.distance_from_uni} placeholder="Distance from University" name="distance_from_uni" readOnly />
+        <input type="text" value={formData.distance_from_gym} placeholder="Distance from Gym" name="distance_from_gym" readOnly />
+        <input type="text" value={formData.distance_from_supermarket} placeholder="Distance from Supermarket" name="distance_from_supermarket" readOnly />
         <input
           type="text"
           name="utilities_included"
           placeholder="Utilities Included?"
           value={formData.utilities_included}
-          onChange={(e) =>
-            setFormData({ ...formData, utilities_included: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, utilities_included: e.target.value })}
         />
-        <input
+        <input className="file-input"
           type="file"
           accept="image/*"
           multiple
@@ -407,55 +305,28 @@ export default function AddFlat() {
           }}
         />
 
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "10px",
-            marginTop: "10px"
-          }}
-        >
-          {formData.images &&
-            Array.from(formData.images).map((file, index) => (
-              <img
-                key={index}
-                src={URL.createObjectURL(file)}
-                alt={`Preview ${index}`}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  borderRadius: "8px"
-                }}
-              />
-            ))}
+        <div className="image-preview">
+          {formData.images && Array.from(formData.images).map((file, index) => <img key={index} src={URL.createObjectURL(file)} alt={`Preview ${index}`} />)}
         </div>
 
         <div>
           <label>Tags:</label>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+          <div className="tags">
             {tagOptions.map((tag) => (
               <button
                 type="button"
                 key={tag}
                 onClick={() => handleTagToggle(tag)}
                 style={{
-                  padding: "0.5rem",
-                  backgroundColor: selectedTags.includes(tag)
-                    ? "#4caf50"
-                    : "#e0e0e0",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer"
-                }}
-              >
+                  backgroundColor: selectedTags.includes(tag) ? "#4caf50" : "#e0e0e0",
+                }}>
                 {tag}
               </button>
             ))}
           </div>
         </div>
 
-        <button type="submit" style={{ padding: "1rem", marginTop: "1rem" }}>
+        <button type="submit" className="submit-button">
           Submit Flat
         </button>
       </form>

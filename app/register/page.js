@@ -7,17 +7,13 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
   });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.type === "email"
-        ? "email"
-        : e.target.type === "password"
-        ? "password"
-        : "username"]: e.target.value
+      [e.target.type === "email" ? "email" : e.target.type === "password" ? "password" : "username"]: e.target.value,
     });
   };
 
@@ -27,7 +23,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(formData),
     });
 
     if (res.ok) {
@@ -45,32 +41,17 @@ export default function RegisterPage() {
         <form className="register-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Username</label>
-            <input
-              name="username"
-              type="text"
-              placeholder="Enter your username"
-              onChange={handleChange}
-            />
+            <input name="username" type="text" placeholder="Enter your username" onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Email</label>
-            <input
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              onChange={handleChange}
-            />
+            <input name="email" type="email" placeholder="Enter your email" onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Password</label>
-            <input
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              onChange={handleChange}
-            />
+            <input name="password" type="password" placeholder="Enter your password" onChange={handleChange} />
           </div>
 
           <button type="submit" className="register-button">

@@ -10,7 +10,7 @@ import "../css/globals.scss";
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const [error, setError] = useState("");
@@ -27,7 +27,7 @@ export default function LoginPage() {
     const res = await signIn("credentials", {
       redirect: false,
       email: formData.email,
-      password: formData.password
+      password: formData.password,
     });
 
     if (res?.ok) {
@@ -47,36 +47,20 @@ export default function LoginPage() {
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Email</label>
-            <input
-              type="email"
-              name="email"
-              className="form-input"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+            <input type="email" name="email" className="form-input" placeholder="Enter your email" value={formData.email} onChange={handleChange} required />
           </div>
 
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-input"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <input type="password" name="password" className="form-input" placeholder="Enter your password" value={formData.password} onChange={handleChange} required />
           </div>
 
           {error && <p className="error-message">{error}</p>}
-
-          <button type="submit" className="login-button">
-            Login
-          </button>
         </form>
+        
+        <button type="submit" className="login-button">
+          Login
+        </button>
 
         <p className="signup-link">
           Don't have an account? <a href="/register">Sign up</a>

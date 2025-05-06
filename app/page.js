@@ -8,35 +8,37 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div className="home-page">
-      <h2 className="title">Welcome to FlatMate Finder, are you...</h2>
 
       {/* Link these to the correct pages */}
       <div className="buttons-container">
+      <h2 className="title">Welcome to FlatMate Finder, are you...</h2>
+        <div className="cards">
         <div className="card looking-flat">
-          {/* <img
-            className="flat-image"
-            src="./LookingForFlat.png"
-            alt="Flatmate"
-          /> */}
+          <p>Looking for a flat?</p>
           <div className="overlay">
             <Link href="/flats" className="button button-flat">
-              Looking for a flat!
+              Find a flat!
             </Link>
           </div>
         </div>
 
         <div className="card looking-flatmate">
-          {/* <img
-            className="flatmate-image"
-            src="./LookingForFlatmate.png"
-            alt="Flat"
-          /> */}
+          <p>Looking for a flat mate?</p>
           <div className="overlay">
             <Link href="/addflat" className="role-button flatmate">
-              Looking for a flatmate!
+              Find a flatmate!
             </Link>
           </div>
         </div>
+        </div>
+      </div>
+
+      <div className="details">
+        <div className="info students">Perfect for students (inclusive)</div>
+        <div className="info pos-flats">Some Possible Flats</div>
+        <div className="info check-map">Check the Map</div>
+        <div className="info customer">Satisfied Customers</div>
+        <div className="info admin">Admin Made easy</div>
       </div>
     </div>
   );

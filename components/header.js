@@ -24,11 +24,7 @@ export default function Header() {
 
       {/* Search Bar */}
       <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search for flats or flatmates..."
-          aria-label="Search"
-        />
+        <input type="text" placeholder="Search for flats or flatmates..." aria-label="Search" />
         <FontAwesomeIcon icon={faSearch} className="search-icon" />
       </div>
 
@@ -56,25 +52,23 @@ export default function Header() {
 
         {/* Auth button */}
         <div className="dropdown">
-  <button className="dropbtn">
-    {session ? `Hi ${username}!` : "Personal"} ▾
-  </button>
-  <div className="dropdown-content">
-    {session ? (
-      <>
-        <Link href="/dashboard">Dashboard</Link>
-        <Link href="/applicantsDashboard">Flat Listing</Link> {/* New link */}
-        <button onClick={handleLogout} className="dropbtn">
-          Logout
-        </button>
-      </>
-    ) : (
-      <>
-        <Link href="/login">Login</Link>
-      </>
-    )}
-  </div>
-</div>
+          <button className="dropbtn">{session ? `Hi ${username}!` : "Personal"} ▾</button>
+          <div className="dropdown-content">
+            {session ? (
+              <>
+                <Link href="/dashboard">Dashboard</Link>
+                <Link href="/applicantsDashboard">Flat Listing</Link> {/* New link */}
+                <button onClick={handleLogout} className="dropbtn">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">Login</Link>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </header>
   );

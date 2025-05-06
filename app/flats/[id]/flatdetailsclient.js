@@ -5,6 +5,8 @@ import { signIn, useSession } from "next-auth/react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../../css/applyform.scss";
+import "../../css/globals.scss";
+import "../../css/flatDetails.scss";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
@@ -22,7 +24,7 @@ export default function FlatDetailsClient({ flat, userId }) {
     width: "100%",
     maxHeight: "400px",
     objectFit: "cover",
-    borderRadius: "12px"
+    borderRadius: "12px",
   });
 
   useEffect(() => {
@@ -46,12 +48,10 @@ export default function FlatDetailsClient({ flat, userId }) {
         container: mapRef.current,
         style: "mapbox://styles/mapbox/satellite-v9",
         center: flat.coordinates.coordinates,
-        zoom: 14
+        zoom: 14,
       });
 
-      new mapboxgl.Marker({ color: "#007bff" })
-        .setLngLat(flat.coordinates.coordinates)
-        .addTo(map);
+      new mapboxgl.Marker({ color: "#007bff" }).setLngLat(flat.coordinates.coordinates).addTo(map);
     }
   }, [flat]);
 
@@ -62,9 +62,7 @@ export default function FlatDetailsClient({ flat, userId }) {
 
   const handlePrevImage = () => {
     if (!flat.images || flat.images.length <= 1) return;
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? flat.images.length - 1 : prev - 1
-    );
+    setCurrentImageIndex((prev) => (prev === 0 ? flat.images.length - 1 : prev - 1));
   };
 
   const handleSubmit = async (e) => {
@@ -74,14 +72,14 @@ export default function FlatDetailsClient({ flat, userId }) {
       address: flat.address,
       message: aboutYou,
       refereeName,
-      refereePhone
+      refereePhone,
     };
 
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(applicationData)
+        body: JSON.stringify(applicationData),
       });
 
       if (response.ok) {
@@ -115,7 +113,7 @@ export default function FlatDetailsClient({ flat, userId }) {
 
     try {
       const res = await fetch(`/api/deleteFlat/${flat._id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
 
       const data = await res.json();
@@ -136,46 +134,16 @@ export default function FlatDetailsClient({ flat, userId }) {
     if (flat.images?.length > 0) {
       const image = flat.images[currentImageIndex];
       return (
-        <div style={{ position: "relative", textAlign: "center" }}>
-          <img
-            src={`data:${image.imageType};base64,${image.image}`}
-            alt={`Flat Image ${currentImageIndex + 1}`}
-            style={imageStyle}
-          />
+        <div className="image-slides">
+          <img src={`data:${image.imageType};base64,${image.image}`} alt={`Flat Image ${currentImageIndex + 1}`} style={imageStyle} />
           {flat.images.length > 1 && (
             <>
-              <button
-                onClick={handlePrevImage}
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "10px",
-                  transform: "translateY(-50%)",
-                  backgroundColor: "rgba(0,0,0,0.5)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "50%",
-                  padding: "10px",
-                  cursor: "pointer"
-                }}
-              >
+              <button className="prev"
+                onClick={handlePrevImage}>
                 ◀
               </button>
-              <button
-                onClick={handleNextImage}
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  right: "10px",
-                  transform: "translateY(-50%)",
-                  backgroundColor: "rgba(0,0,0,0.5)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "50%",
-                  padding: "10px",
-                  cursor: "pointer"
-                }}
-              >
+              <button className="next"
+                onClick={handleNextImage}>
                 ▶
               </button>
             </>
@@ -183,96 +151,60 @@ export default function FlatDetailsClient({ flat, userId }) {
         </div>
       );
     } else {
-      return (
-        <img src="/thumbnailpic.webp" alt="Flat Image" style={imageStyle} />
-      );
+      return <img src="/thumbnailpic.webp" alt="Flat Image" style={imageStyle} />;
     }
   };
 
   return (
     <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
-        rel="stylesheet"
-      />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 
-      <div
-        className="flat-details-wrapper"
-        style={{
-          padding: "40px 20px",
-          backgroundColor: "#f4f6f8",
-          fontFamily: "'Inter', sans-serif"
-        }}
-      >
-        <div
-          className="flat-card"
-          style={{
-            maxWidth: "960px",
-            margin: "0 auto",
-            background: "#fff",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-            position: "relative"
-          }}
-        >
+      <div className="flat-details-wrapper">
+        <div className="flat-card">
           {renderImage()}
-
-          <div
+          <div className="mapbox-container"
             ref={mapRef}
-            style={{
-              position: "absolute",
-              bottom: "20px",
-              right: "20px",
-              width: "300px",
-              height: "300px",
-              border: "2px solid #ccc",
-              borderRadius: "12px",
-              zIndex: 10
-            }}
           />
+          <div className="info" >
+            <h1>{flat.address}</h1>
+            <p>{flat.description || "No description provided."}</p>
 
-
-          <div style={{ marginTop: "24px" }}>
-            <h1 style={{ fontSize: "1.5rem", marginBottom: "8px" }}>{flat.address}</h1>
-            <p style={{ color: "#555" }}>{flat.description || "No description provided."}</p>
-
-            <div style={{ marginTop: "24px", display: "grid", gap: "16px" }}>
-              <div><strong>Rooms:</strong> {flat.rooms || "No room numbers provided."}</div>
-              <div><strong>Available Rooms:</strong> {flat.available_rooms || "N/A"}</div>
-              <div><strong>Bond:</strong> {flat.bond ? `$${flat.bond}` : "Not specified"}</div>
-              <div><strong>Rent:</strong> ${flat.rent_per_week}/week</div>
-              <div><strong>Utilities Included:</strong> {flat.utilities_included || "No info"}</div>
-              <div><strong>Distance from University:</strong> {flat.distance_from_uni ? `${flat.distance_from_uni} walk` : "Not listed"}</div>
-              <div><strong>Distance from Supermarket:</strong> {flat.distance_from_supermarket ? `${flat.distance_from_supermarket} walk` : "Not listed"}</div>
-              <div><strong>Distance from Gym:</strong> {flat.distance_from_gym ? `${flat.distance_from_gym} walk` : "Not listed"}</div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "10px",
-                  marginTop: "10px"
-                }}
-              >
-                <strong style={{ marginRight: "8px" }}>Tags:</strong>
+            <div className="info-grid">
+              <div>
+                <strong>Rooms:</strong> {flat.rooms || "No room numbers provided."}
+              </div>
+              <div>
+                <strong>Available Rooms:</strong> {flat.available_rooms || "N/A"}
+              </div>
+              <div>
+                <strong>Bond:</strong> {flat.bond ? `$${flat.bond}` : "Not specified"}
+              </div>
+              <div>
+                <strong>Rent:</strong> ${flat.rent_per_week}/week
+              </div>
+              <div>
+                <strong>Utilities Included:</strong> {flat.utilities_included || "No info"}
+              </div>
+              <div>
+                <strong>Distance from University:</strong> {flat.distance_from_uni ? `${flat.distance_from_uni} walk` : "Not listed"}
+              </div>
+              <div>
+                <strong>Distance from Supermarket:</strong> {flat.distance_from_supermarket ? `${flat.distance_from_supermarket} walk` : "Not listed"}
+              </div>
+              <div>
+                <strong>Distance from Gym:</strong> {flat.distance_from_gym ? `${flat.distance_from_gym} walk` : "Not listed"}
+              </div>
+              <div className="tags">
+                <strong>Tags:</strong>
                 {flat.tags?.length > 0 ? (
                   flat.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      style={{
-                        backgroundColor: "#007BFF",
-                        color: "white",
-                        padding: "5px 10px",
-                        borderRadius: "15px",
-                        fontSize: "0.9rem"
-                      }}
-                    >
+                    <span className="tag"
+                      key={index}>
                       {tag}
                     </span>
                   ))
                 ) : (
-                  <span style={{ color: "#777" }}>No tags provided.</span>
+                  <span className="no-tags">No tags provided.</span>
                 )}
               </div>
             </div>
@@ -283,9 +215,8 @@ export default function FlatDetailsClient({ flat, userId }) {
                 gap: "12px",
                 flexWrap: "wrap",
                 marginTop: "32px",
-                justifyContent: "flex-start"
-              }}
-            >
+                justifyContent: "flex-start",
+              }}>
               <button
                 className="flat-contact-button"
                 onClick={() => setShowForm(true)}
@@ -296,41 +227,26 @@ export default function FlatDetailsClient({ flat, userId }) {
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
-                  cursor: "pointer"
-                }}
-              >
+                  cursor: "pointer",
+                }}>
                 Apply Here
               </button>
-              {showForm && ( 
+              {showForm && (
                 <div className="modal-overlay">
                   <div className="modal-content">
                     <h2>Apply for this flat</h2>
                     <form onSubmit={handleSubmit} className="apply-form">
                       <label>
                         Referee Name:
-                        <input
-                          type="text"
-                          value={refereeName}
-                          onChange={(e) => setRefereeName(e.target.value)}
-                          required
-                        />
+                        <input type="text" value={refereeName} onChange={(e) => setRefereeName(e.target.value)} required />
                       </label>
                       <label>
                         Referee Phone Number:
-                        <input
-                          type="tel"
-                          value={refereePhone}
-                          onChange={(e) => setRefereePhone(e.target.value)}
-                          required
-                        />
+                        <input type="tel" value={refereePhone} onChange={(e) => setRefereePhone(e.target.value)} required />
                       </label>
                       <label>
                         Tell us more about you:
-                        <textarea
-                          value={aboutYou}
-                          onChange={(e) => setAboutYou(e.target.value)}
-                          required
-                        />
+                        <textarea value={aboutYou} onChange={(e) => setAboutYou(e.target.value)} required />
                       </label>
                       <div className="form-actions">
                         <button type="submit">Submit</button>
@@ -351,9 +267,8 @@ export default function FlatDetailsClient({ flat, userId }) {
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
-                  cursor: "pointer"
-                }}
-              >
+                  cursor: "pointer",
+                }}>
                 Edit Listing
               </button>
               <button
@@ -365,9 +280,8 @@ export default function FlatDetailsClient({ flat, userId }) {
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
-                  cursor: "pointer"
-                }}
-              >
+                  cursor: "pointer",
+                }}>
                 Delete Listing
               </button>
             </div>
