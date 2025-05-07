@@ -211,6 +211,16 @@ export default function FlatDetailsClient({ flat, userId }) {
           {renderImage()}
           <div className="info">
             <h1>{flat.address}</h1>
+            {flat?.coordinates?.coordinates?.length === 2 && (
+              <a
+                href={`https://www.google.com/maps?q=${flat.coordinates.coordinates[1]},${flat.coordinates.coordinates[0]}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="google-maps-link"
+              >
+                View on Google Maps
+              </a>
+            )}
             <p>{flat.description || "No description provided."}</p>
 
             <div className="info-grid">
