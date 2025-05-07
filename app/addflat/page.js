@@ -102,6 +102,19 @@ export default function AddFlat() {
     });
   };
 
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setModalMessage("");
+  };
+
   useEffect(() => {
     mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
@@ -174,7 +187,7 @@ export default function AddFlat() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.coordinates) {
-      alert("Please select a valid address from suggestions.");
+      showModal("Please select a valid address from suggestions.");
       return;
     }
 
@@ -206,7 +219,7 @@ export default function AddFlat() {
       });
 
       if (response.ok) {
-        alert("Flat added successfully!");
+        showModal("Flat added successfully!");
         setFormData({
           flat_name: "",
           address: "",
@@ -227,11 +240,11 @@ export default function AddFlat() {
         });
         setSelectedTags([]);
       } else {
-        alert("Failed to add flat.");
+        showModal("Failed to add flat.");
       }
     } catch (err) {
       console.error("Error submitting form:", err);
-      alert("An error occurred.");
+      showModal("An error occurred.");
     }
   };
 
@@ -296,7 +309,8 @@ export default function AddFlat() {
           value={formData.utilities_included}
           onChange={(e) => setFormData({ ...formData, utilities_included: e.target.value })}
         />
-        <input className="file-input"
+        <input
+          className="file-input"
           type="file"
           accept="image/*"
           multiple
@@ -330,6 +344,14 @@ export default function AddFlat() {
           Submit Flat
         </button>
       </form>
+      {isModalVisible && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal">
+            <p>{modalMessage}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

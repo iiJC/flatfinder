@@ -17,6 +17,19 @@ export default function RegisterPage() {
     });
   };
 
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setModalMessage("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -27,9 +40,9 @@ export default function RegisterPage() {
     });
 
     if (res.ok) {
-      alert("User registered successfully!");
+      showModal("User registered successfully!");
     } else {
-      alert("Failed to register user.");
+      showModal("Failed to register user.");
     }
   };
 
@@ -66,6 +79,14 @@ export default function RegisterPage() {
           </a>
         </p>
       </div>
+      {isModalVisible && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal">
+            <p>{modalMessage}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

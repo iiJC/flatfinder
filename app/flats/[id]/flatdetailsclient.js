@@ -21,6 +21,19 @@ export default function FlatDetailsClient({ flat, userId }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const mapRef = useRef(null);
 
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setModalMessage("");
+  };
+
   const getPoiIcon = (category) => {
     switch (category) {
       case "gyms":
@@ -128,15 +141,15 @@ export default function FlatDetailsClient({ flat, userId }) {
       });
 
       if (response.ok) {
-        alert("Application submitted!");
+        showModal("Application submitted!");
         setShowForm(false);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to submit application.");
+        showModal(errorData.error || "Failed to submit application.");
       }
     } catch (error) {
       console.error("Error submitting application:", error);
-      alert("Error submitting application.");
+      showModal("Error submitting application.");
     }
   };
 
@@ -164,14 +177,14 @@ export default function FlatDetailsClient({ flat, userId }) {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Flat deleted successfully.");
+        showModal("Flat deleted successfully.");
         window.location.href = "/flats";
       } else {
-        alert(data.message || "Failed to delete flat.");
+        showModal(data.message || "Failed to delete flat.");
       }
     } catch (error) {
       console.error("Error deleting flat:", error);
-      alert("Something went wrong.");
+      showModal("Something went wrong.");
     }
   };
 
@@ -212,8 +225,7 @@ export default function FlatDetailsClient({ flat, userId }) {
                 href={`https://www.google.com/maps?q=${flat.coordinates.coordinates[1]},${flat.coordinates.coordinates[0]}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="google-maps-link"
-              >
+                className="google-maps-link">
                 View on Google Maps
               </a>
             )}
@@ -307,6 +319,14 @@ export default function FlatDetailsClient({ flat, userId }) {
             <h2>Similar flats based on distance </h2>
           </div>
         </div>
+        {isModalVisible && (
+          <div className="custom-modal-overlay">
+            <div className="custom-modal">
+              <p>{modalMessage}</p>
+              <button onClick={closeModal}>Close</button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

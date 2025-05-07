@@ -3,12 +3,26 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import "../../css/editFlat.scss";
+import "../../css/globals.scss";
 
 export default function EditFlatPage() {
   const router = useRouter();
   const params = useParams();
   const [flat, setFlat] = useState(null);
   const [imageStyle, setImageStyle] = useState({});
+  
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setModalMessage("");
+  };
 
   useEffect(() => {
     const fetchFlat = async () => {
@@ -17,14 +31,14 @@ export default function EditFlatPage() {
         if (!res.ok) {
           const error = await res.json().catch(() => ({}));
           console.error("Error loading flat:", error);
-          alert(error?.error || "Could not load flat.");
+          showModal(error?.error || "Could not load flat.");
           return;
         }
         const data = await res.json();
         setFlat(data);
       } catch (err) {
         console.error("Unexpected error:", err);
-        alert("Something went wrong loading the flat.");
+        showModal("Something went wrong loading the flat.");
       }
     };
 
@@ -58,10 +72,10 @@ export default function EditFlatPage() {
     });
 
     if (res.ok) {
-      alert("Flat updated!");
+      showModal("Flat updated!");
       router.push(`/flats/${params.id}`);
     } else {
-      alert("Failed to update flat.");
+      showModal("Failed to update flat.");
     }
   };
 
@@ -132,6 +146,14 @@ export default function EditFlatPage() {
           {/* {formData.images && Array.from(formData.images).map((file, index) => <img key={index} src={URL.createObjectURL(file)} alt={`Preview ${index}`} />)} */}
         </div>
       </div>
+      {isModalVisible && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal">
+            <p>{modalMessage}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
