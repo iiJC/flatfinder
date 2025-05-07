@@ -3,11 +3,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import * as turf from "@turf/turf"; 
 import "mapbox-gl/dist/mapbox-gl.css";
 import { POIS } from "@/lib/pois";
 import "../css/popUp.scss";
 import "../css/globals.scss";
-import "../css/map.scss";
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
@@ -16,7 +16,7 @@ export default function MapPage() {
   const [visiblePOIs, setVisiblePOIs] = useState({
     gyms: true,
     supermarkets: true,
-    university: true,
+    university: true
   });
   const [tagFilters, setTagFilters] = useState([]);
   const [minRent, setMinRent] = useState(0);
@@ -27,7 +27,21 @@ export default function MapPage() {
   const [loading, setLoading] = useState(true);
   const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9");
 
-  const allTags = ["Warm", "Sunny", "Modern", "Quiet", "Party", "Social", "Close to Uni", "Furnished"];
+  // ✅ NEW STATE FOR DISTANCE SEARCH FEATURE
+  const [searchAddress, setSearchAddress] = useState("");
+  const [searchDistance, setSearchDistance] = useState(null);
+  const [searchError, setSearchError] = useState("");
+
+  const allTags = [
+    "Warm",
+    "Sunny",
+    "Modern",
+    "Quiet",
+    "Party",
+    "Social",
+    "Close to Uni",
+    "Furnished"
+  ];
 
   const getPoiIcon = (category) => {
     switch (category) {
@@ -45,25 +59,22 @@ export default function MapPage() {
   const createFlatPopup = (flat) => {
     const images = flat.images || [];
     const imageElements = images
-      .map(
-        (img, index) => `
+      .map((img, index) => `
         <img 
           src="data:${img.imageType};base64,${img.image}" 
           class="popup-image" 
-          style="display: ${index === 0 ? "block" : "none"}; width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px;" 
+          style="display: ${index === 0 ? 'block' : 'none'}; width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px;" 
           data-index="${index}" 
         />
-      `
-      )
+      `)
       .join("");
 
-    const carouselControls =
-      images.length > 1
-        ? `
+    const carouselControls = images.length > 1
+      ? `
         <button class="carousel-btn prev" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">‹</button>
         <button class="carousel-btn next" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 6px 10px; cursor: pointer;">›</button>
       `
-        : "";
+      : "";
 
     return `
       <div class="flat-popup" style="font-size: 14px;">
@@ -94,7 +105,8 @@ export default function MapPage() {
         flat.rent_per_week >= minRent &&
         flat.rent_per_week <= maxRent &&
         parseInt(flat.rooms) >= minRooms &&
-        (tagFilters.length === 0 || tagFilters.every((tag) => flat.tags?.includes(tag))) &&
+        (tagFilters.length === 0 ||
+          tagFilters.every((tag) => flat.tags?.includes(tag))) &&
         (isNaN(distance) || distance <= maxDistanceFromUni)
       ) {
         const [lng, lat] = flat.coordinates.coordinates;
@@ -117,10 +129,13 @@ export default function MapPage() {
 
         const popup = new mapboxgl.Popup({
           offset: 25,
-          className: "custom-popup",
+          className: "custom-popup"
         }).setHTML(createFlatPopup(flat));
 
-        const marker = new mapboxgl.Marker(el).setLngLat([lng, lat]).setPopup(popup).addTo(map);
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([lng, lat])
+          .setPopup(popup)
+          .addTo(map);
 
         popup.on("open", () => {
           const popupEl = document.querySelector(".mapboxgl-popup .flat-popup");
@@ -187,13 +202,14 @@ export default function MapPage() {
   };
 
   useEffect(() => {
-    mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
     const newMap = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: mapStyle,
       center: [170.5028, -45.8788],
-      zoom: 13,
+      zoom: 13
     });
 
     setMap(newMap);
@@ -233,67 +249,110 @@ export default function MapPage() {
     addPOIsToMap(map, POIS);
   }, [visiblePOIs, tagFilters, minRent, maxRent, minRooms, maxDistanceFromUni, flats, map]);
 
+  const handleAddressSearch = async () => {
+    setSearchError("");
+    setSearchDistance(null);
+
+    const query = searchAddress + ", Dunedin, New Zealand";
+    try {
+      const res = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}`
+      );
+      const data = await res.json();
+      const feature = data.features[0];
+
+      if (!feature || !feature.place_name.includes("Dunedin")) {
+        setSearchError("Address not found in Dunedin.");
+        return;
+      }
+
+      const searchedPoint = turf.point(feature.geometry.coordinates);
+      const distances = flats.map(flat => {
+        if (flat.coordinates?.coordinates?.length === 2) {
+          const flatPoint = turf.point(flat.coordinates.coordinates);
+          const distance = turf.distance(searchedPoint, flatPoint, { units: "kilometers" });
+          return { ...flat, distance };
+        }
+        return null;
+      }).filter(Boolean);
+
+      const closest = distances.reduce((a, b) => (a.distance < b.distance ? a : b));
+      setSearchDistance(`Closest flat: ${closest.name || "Unnamed"} is ${closest.distance.toFixed(2)} km away`);
+    } catch (err) {
+      setSearchError("Failed to fetch address.");
+    }
+  };
+
   return (
-    <div className="map-page">
-      <div className="map-container">
+    <div className="map-page" style={{ display: "flex" }}>
+      <div style={{ minWidth: "240px", padding: "1rem" }}>
         <h2>Filter Flats</h2>
 
-        <div className="type">
-          <label>
-            <strong>Map Style:</strong>
-          </label>
-          <select value={mapStyle} onChange={(e) => setMapStyle(e.target.value)}>
+        <div style={{ marginBottom: "1rem" }}>
+          <label><strong>Map Style:</strong></label>
+          <select
+            value={mapStyle}
+            onChange={(e) => setMapStyle(e.target.value)}
+            style={{ marginTop: "0.25rem", padding: "0.25rem", width: "100%" }}
+          >
             <option value="mapbox://styles/mapbox/streets-v12">Streets</option>
             <option value="mapbox://styles/mapbox/satellite-v9">Satellite</option>
             <option value="mapbox://styles/mapbox/dark-v11">Dark</option>
           </select>
         </div>
 
-        <div className="tag">
+        <div>
           <label>Tags:</label>
-          <div className="tags">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
             {allTags.map((tag) => (
-              <button className="tag-button"
+              <button
                 key={tag}
-                onClick={() => setTagFilters((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]))}
+                onClick={() =>
+                  setTagFilters((prev) =>
+                    prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+                  )
+                }
                 style={{
+                  padding: "0.25rem 0.5rem",
                   backgroundColor: tagFilters.includes(tag) ? "#4caf50" : "#ccc",
-                }}>
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer"
+                }}
+              >
                 {tag}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="info">
-          <label>
-            Rent: ${minRent} - ${maxRent}
-          </label>
+        <div style={{ marginTop: "1rem" }}>
+          <label>Rent: ${minRent} - ${maxRent}</label>
           <input type="range" min="0" max="2000" step="50" value={minRent} onChange={(e) => setMinRent(Number(e.target.value))} />
           <input type="range" min="0" max="2000" step="50" value={maxRent} onChange={(e) => setMaxRent(Number(e.target.value))} />
         </div>
 
-        <div className="info">
+        <div style={{ marginTop: "1rem" }}>
           <label>Minimum Rooms:</label>
           <input type="number" min="0" value={minRooms} onChange={(e) => setMinRooms(Number(e.target.value))} />
         </div>
 
-        <div className="info">
+        <div style={{ marginTop: "1rem" }}>
           <label>Max Distance to Uni (m): {maxDistanceFromUni}</label>
           <input type="range" min="100" max="5000" step="100" value={maxDistanceFromUni} onChange={(e) => setMaxDistanceFromUni(Number(e.target.value))} />
         </div>
 
-        <div className="info">
+        <div style={{ marginTop: "1rem" }}>
           <strong>Toggle POI Categories:</strong>
           {Object.keys(visiblePOIs).map((category) => (
-            <label key={category}>
+            <label key={category} style={{ display: "block" }}>
               <input
                 type="checkbox"
                 checked={visiblePOIs[category]}
                 onChange={(e) =>
                   setVisiblePOIs((prev) => ({
                     ...prev,
-                    [category]: e.target.checked,
+                    [category]: e.target.checked
                   }))
                 }
               />
@@ -301,10 +360,27 @@ export default function MapPage() {
             </label>
           ))}
         </div>
+
+        <div style={{ marginTop: "1rem" }}>
+          <h3>Find Distance to Custom Address</h3>
+          <input
+            type="text"
+            placeholder="Enter address in Dunedin"
+            value={searchAddress}
+            onChange={(e) => setSearchAddress(e.target.value)}
+            style={{ width: "100%", marginBottom: "0.5rem", padding: "0.25rem" }}
+          />
+          <button onClick={handleAddressSearch} style={{ padding: "0.5rem", width: "100%", cursor: "pointer" }}>
+            Check Distance
+          </button>
+          {searchDistance && <p style={{ marginTop: "0.5rem", color: "green" }}>{searchDistance}</p>}
+          {searchError && <p style={{ marginTop: "0.5rem", color: "red" }}>{searchError}</p>}
+        </div>
+
       </div>
 
-      <div className="map">
-        <div ref={mapContainerRef} className="mapRef" />
+      <div style={{ position: "relative", flex: 1 }}>
+        <div ref={mapContainerRef} style={{ height: "90vh", borderRadius: "8px" }} />
         {loading && (
           <div className="map-loading-spinner">
             <div className="spinner" />
