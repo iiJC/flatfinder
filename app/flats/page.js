@@ -60,6 +60,7 @@ export default function FlatsPage() {
                 alt="Flat Image"
               />
               <div className="flat-details">
+                <h3 className="flat-id">{flat.name}</h3>
                 <h3 className="flat-id">{flat.address}</h3>
                 <p className="flat-info">Location: {flat.location}</p>
                 <p className="flat-info">Price: ${flat.rent_per_week}/week</p>
