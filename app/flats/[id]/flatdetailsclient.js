@@ -33,7 +33,7 @@ export default function FlatDetailsClient({ flat, userId }) {
         return "📍";
     }
   };
-  
+
   const addPOIsToMap = (map) => {
     Object.entries(POIS).forEach(([category, poiList]) => {
       poiList.forEach((poi) => {
@@ -54,7 +54,7 @@ export default function FlatDetailsClient({ flat, userId }) {
           box-shadow: 0 0 4px rgba(0,0,0,0.2);
           cursor: pointer;
         `;
-  
+
         new mapboxgl.Marker(el)
           .setLngLat(poi.coordinates)
           .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
@@ -62,7 +62,6 @@ export default function FlatDetailsClient({ flat, userId }) {
       });
     });
   };
-  
 
   const [imageStyle, setImageStyle] = useState({
     width: "100%",
@@ -95,10 +94,7 @@ export default function FlatDetailsClient({ flat, userId }) {
         zoom: 14,
       });
 
-      new mapboxgl.Marker({ color: "#007bff" })
-        .setLngLat(flat.coordinates.coordinates)
-        .setPopup(new mapboxgl.Popup().setText("Flat Location"))
-        .addTo(map);
+      new mapboxgl.Marker({ color: "#007bff" }).setLngLat(flat.coordinates.coordinates).setPopup(new mapboxgl.Popup().setText("Flat Location")).addTo(map);
 
       addPOIsToMap(map);
     }
@@ -291,6 +287,14 @@ export default function FlatDetailsClient({ flat, userId }) {
                 Delete Listing
               </button>
             </div>
+          </div>
+        </div>
+        <div className="suggestions">
+          <div className="similar">
+            <h2>Similar flats based on distance </h2>
+          </div>
+          <div className="similar">
+            <h2>Similar flats based on distance </h2>
           </div>
         </div>
       </div>

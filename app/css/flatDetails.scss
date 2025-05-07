@@ -34,14 +34,16 @@
   background-color: var(--color-primary);
   margin: var(--spacing-lg);
   border-radius: var(--border-radius-lg);
+  display: flex;
+  flex-direction: row;
 
   .flat-card{
     max-width: 50rem;
-    margin: 0 auto;
     border-radius: var(--border-radius-lg);
     box-shadow: var(--box-shadow-lg);
-    padding: 2rem;
     position: relative;
+    padding: 1rem;
+    background-color: var(--color-white);
 
     .mapbox-container{
       justify-self: flex-end;
@@ -127,6 +129,17 @@
           cursor: pointer;
         }
       }
+    }
+  }
+  .suggestions{
+    display: flex;
+    flex-direction: column;
+    .similar{
+      background-color: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      min-width: 30%;
+      min-height: 30%;
+      margin: 1rem;
     }
   }
 }

@@ -17,57 +17,49 @@ export default function Header() {
 
   return (
     <header className="header">
+      <nav className="nav-links">
+        <Link href="/flats" className="dropbtn">
+          Flats
+        </Link>
+        <Link href="/map" className="dropbtn">
+          Map
+        </Link>
+      </nav>
       {/* Logo */}
       <h1 className="logo">
         <Link href="/">FlatMate Finder</Link>
       </h1>
 
-      {/* Search Bar */}
-      <div className="search-bar">
-        <input type="text" placeholder="Search for flats or flatmates..." aria-label="Search" />
-        <FontAwesomeIcon icon={faSearch} className="search-icon" />
-      </div>
-
       {/* Dropdown Menus */}
-      <div className="dropdown-container">
-        <nav className="nav-links">
-          <Link href="/flats" className="dropbtn">
-            Flats
-          </Link>
-          <Link href="/map" className="dropbtn">
-            Map
-          </Link>
-        </nav>
 
-        {/* Apply dropdown only if logged in */}
-        {session && (
-          <div className="dropdown">
-            <button className="dropbtn">Applying ▾</button>
-            <div className="dropdown-content">
-              <Link href="/apply">Apply to join a Flat</Link>
-              <Link href="/addflat">List your flat</Link>
-            </div>
-          </div>
-        )}
-
-        {/* Auth button */}
+      {/* Apply dropdown only if logged in */}
+      {session && (
         <div className="dropdown">
-          <button className="dropbtn">{session ? `Hi ${username}!` : "Personal"} ▾</button>
+          <button className="dropbtn">Applying ▾</button>
           <div className="dropdown-content">
-            {session ? (
-              <>
-                <Link href="/dashboard">Dashboard</Link>
-                <Link href="/applicantsDashboard">Flat Listing</Link> {/* New link */}
-                <button onClick={handleLogout} className="dropbtn">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login">Login</Link>
-              </>
-            )}
+            <Link href="/apply">Apply to join a Flat</Link>
+            <Link href="/addflat">List your flat</Link>
           </div>
+        </div>
+      )}
+
+      {/* Auth button */}
+      <div className="dropdown">
+        <button className="dropbtn">{session ? `Hi ${username}!` : "Personal"} ▾</button>
+        <div className="dropdown-content">
+          {session ? (
+            <>
+              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/applicantsDashboard">Flat Listing</Link> {/* New link */}
+              <button onClick={handleLogout} className="dropbtn">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">Login</Link>
+            </>
+          )}
         </div>
       </div>
     </header>
