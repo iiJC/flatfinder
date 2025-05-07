@@ -27,10 +27,10 @@ export default function MapPage() {
   const [loading, setLoading] = useState(true);
   const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9");
 
-  // ✅ NEW STATE FOR DISTANCE SEARCH FEATURE
   const [searchAddress, setSearchAddress] = useState("");
   const [searchDistance, setSearchDistance] = useState(null);
   const [searchError, setSearchError] = useState("");
+  const [searchMarker, setSearchMarker] = useState(null);
 
   const allTags = [
     "Warm",
@@ -252,21 +252,36 @@ export default function MapPage() {
   const handleAddressSearch = async () => {
     setSearchError("");
     setSearchDistance(null);
-
+  
     const query = searchAddress + ", Dunedin, New Zealand";
+  
     try {
       const res = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}`
       );
       const data = await res.json();
       const feature = data.features[0];
-
+  
       if (!feature || !feature.place_name.includes("Dunedin")) {
         setSearchError("Address not found in Dunedin.");
         return;
       }
-
-      const searchedPoint = turf.point(feature.geometry.coordinates);
+  
+      const coords = feature.geometry.coordinates;
+  
+      if (searchMarker) {
+        searchMarker.remove();
+      }
+  
+      const newMarker = new mapboxgl.Marker({ color: "#FF5733" }) 
+        .setLngLat(coords)
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`You searched: ${feature.place_name}`))
+        .addTo(map);
+  
+      setSearchMarker(newMarker);
+      map.flyTo({ center: coords, zoom: 14 });
+  
+      const searchedPoint = turf.point(coords);
       const distances = flats.map(flat => {
         if (flat.coordinates?.coordinates?.length === 2) {
           const flatPoint = turf.point(flat.coordinates.coordinates);
@@ -275,7 +290,7 @@ export default function MapPage() {
         }
         return null;
       }).filter(Boolean);
-
+  
       const closest = distances.reduce((a, b) => (a.distance < b.distance ? a : b));
       setSearchDistance(`Closest flat: ${closest.name || "Unnamed"} is ${closest.distance.toFixed(2)} km away`);
     } catch (err) {
