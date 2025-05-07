@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { signIn, useSession } from "next-auth/react";
+import { POIS } from "@/lib/pois";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../../css/applyform.scss";
@@ -19,6 +20,49 @@ export default function FlatDetailsClient({ flat, userId }) {
   const { data: session } = useSession();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const mapRef = useRef(null);
+
+  const getPoiIcon = (category) => {
+    switch (category) {
+      case "gyms":
+        return "🏋️";
+      case "supermarkets":
+        return "🛒";
+      case "university":
+        return "🎓";
+      default:
+        return "📍";
+    }
+  };
+  
+  const addPOIsToMap = (map) => {
+    Object.entries(POIS).forEach(([category, poiList]) => {
+      poiList.forEach((poi) => {
+        const el = document.createElement("div");
+        el.className = "custom-marker";
+        el.textContent = getPoiIcon(category);
+        el.style.cssText = `
+          font-size: 18px;
+          width: 32px;
+          height: 32px;
+          background: #fff;
+          color: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          border: 1px solid #ccc;
+          box-shadow: 0 0 4px rgba(0,0,0,0.2);
+          cursor: pointer;
+        `;
+  
+        new mapboxgl.Marker(el)
+          .setLngLat(poi.coordinates)
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(poi.name))
+          .addTo(map);
+      });
+    });
+  };
+  
 
   const [imageStyle, setImageStyle] = useState({
     width: "100%",
@@ -51,7 +95,12 @@ export default function FlatDetailsClient({ flat, userId }) {
         zoom: 14,
       });
 
-      new mapboxgl.Marker({ color: "#007bff" }).setLngLat(flat.coordinates.coordinates).addTo(map);
+      new mapboxgl.Marker({ color: "#007bff" })
+        .setLngLat(flat.coordinates.coordinates)
+        .setPopup(new mapboxgl.Popup().setText("Flat Location"))
+        .addTo(map);
+
+      addPOIsToMap(map);
     }
   }, [flat]);
 

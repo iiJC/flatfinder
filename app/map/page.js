@@ -22,7 +22,7 @@ export default function MapPage() {
   const [minRent, setMinRent] = useState(0);
   const [maxRent, setMaxRent] = useState(2000);
   const [minRooms, setMinRooms] = useState(0);
-  const [maxDistanceFromUni, setMaxDistanceFromUni] = useState(2000);
+  const [maxDistanceFromUni, setMaxDistanceFromUni] = useState(5000);
   const [markers, setMarkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-v9");
