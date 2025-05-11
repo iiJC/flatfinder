@@ -23,6 +23,7 @@ export async function POST(req) {
 
     const users = db.collection("users");
     const flats = db.collection("flats");
+    const applications = db.collection("applications");
 
     const user = await users.findOne({ email: session.user.email });
 
@@ -30,23 +31,24 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
     }
 
+    const flatObjectId = new ObjectId(flatId);
+
     const application = {
-      flatId: new ObjectId(flatId),
+      flatId: flatObjectId,
+      applicantId: user._id,
       address,
       status: "pending",
       dateApplied: new Date(),
       message,
       refereeName,
-      refereePhone,
+      refereePhone
     };
 
-    await users.updateOne(
-      { _id: user._id },
-      { $push: { applications: application } }
-    );
+    // Insert into applications collection
+    await applications.insertOne(application);
 
     await flats.updateOne(
-      { _id: new ObjectId(flatId) },
+      { _id: flatObjectId },
       { $addToSet: { applicants: user._id } }
     );
 

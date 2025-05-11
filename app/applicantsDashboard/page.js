@@ -32,18 +32,18 @@ export default async function ApplicantsDashboardPage() {
     );
   }
 
-  // Extract flat ID from listing field of the first application (adjust logic as needed)
+  // Get flat ID listed by this user (assuming it's stored as `listing`)
   const flatId = user.listing;
 
   if (!flatId) {
     return (
       <div className="dashboard-container">
-        <h2 className="dashboard-title">No flat associated with your application.</h2>
+        <h2 className="dashboard-title">You have not listed a flat.</h2>
       </div>
     );
   }
 
-  // Fetch the flat details
+  // Get the flat info
   const flat = await db.collection("flats").findOne({ _id: new ObjectId(flatId) });
 
   if (!flat) {
@@ -54,25 +54,20 @@ export default async function ApplicantsDashboardPage() {
     );
   }
 
-  const applicantIds = flat.applicants || [];
+  // Get all applications for this flat
+  const applications = await db.collection("applications").find({ flatId: new ObjectId(flatId) }).toArray();
 
-  // Fetch full details for each applicant and their application for this flat
+  // Get full user details for each applicant
   const applicantDetails = await Promise.all(
-    applicantIds.map(async (applicantId) => {
-      const applicant = await db.collection("users").findOne({ _id: new ObjectId(applicantId) });
-
-      if (!applicant) return null;
-
-      const theirApplication = applicant.applications.find(
-        (a) => a.listing?.toString() === flat._id.toString()
-      );
+    applications.map(async (app) => {
+      const applicant = await db.collection("users").findOne({ _id: new ObjectId(app.applicantId) });
 
       return {
-        name: applicant.name,
-        email: applicant.email,
-        message: theirApplication?.message || "No message provided",
-        refereeName: theirApplication?.refereeName || "N/A",
-        refereeNumber: theirApplication?.refereeNumber || "N/A",
+        name: applicant?.name || "Unknown",
+        email: applicant?.email || "Unknown",
+        message: app.message || "No message provided",
+        refereeName: app.refereeName || "N/A",
+        refereeNumber: app.refereePhone || "N/A",
       };
     })
   );
@@ -84,9 +79,9 @@ export default async function ApplicantsDashboardPage() {
       <div className="application-box">
         <h3 className="application-heading">Current Applicants</h3>
 
-        {applicantDetails.filter(Boolean).length > 0 ? (
+        {applicantDetails.length > 0 ? (
           <ul className="application-list">
-            {applicantDetails.filter(Boolean).map((app, index) => (
+            {applicantDetails.map((app, index) => (
               <li key={index} className="application-item">
                 <p className="application-name">
                   <strong>Name:</strong> {app.name} ({app.email})

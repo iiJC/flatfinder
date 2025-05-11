@@ -56,12 +56,11 @@ export default function LoginPage() {
           </div>
 
           {error && <p className="error-message">{error}</p>}
-        </form>
-        
-        <button type="submit" className="login-button">
+          <button type="submit" className="login-button">
           Login
         </button>
-
+        </form>
+    
         <p className="signup-link">
           Don't have an account? <a href="/register">Sign up</a>
         </p>
