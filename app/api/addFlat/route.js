@@ -1,7 +1,8 @@
 import clientPromise from "../../../db/database";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route"; // Adjust if needed
+import { authOptions } from "../auth/[...nextauth]/route";
+import { ObjectId } from "mongodb"; // <-- Needed for user ID
 
 export async function POST(req) {
   try {
@@ -14,10 +15,22 @@ export async function POST(req) {
       );
     }
 
-    // Get form data
     const formData = await req.formData();
 
-    // Extract flat details from form
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db("flatfinderdb");
+
+    // Get the user from DB to access _id
+    const user = await db.collection("users").findOne({ email: session.user.email });
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
+
     const flat = {
       name: formData.get("flat_name"),
       address: formData.get("address"),
@@ -34,6 +47,7 @@ export async function POST(req) {
       distance_from_supermarket: formData.get("distance_from_supermarket"),
       utilities_included: formData.get("utilities_included"),
       coordinates: JSON.parse(formData.get("coordinates")),
+      ownerId: user._id, // ✅ Store user ID as owner
     };
 
     // Handle multiple images
@@ -52,17 +66,12 @@ export async function POST(req) {
 
     flat.images = imageBuffers;
 
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db("flatfinderdb");
-
-    // Insert flat
     const flatResult = await db.collection("flats").insertOne(flat);
     const flatId = flatResult.insertedId;
 
-    // Add flatId to user document
+    // Optionally save the flat ID to the user doc
     await db.collection("users").updateOne(
-      { email: session.user.email },
+      { _id: user._id },
       { $set: { listing: flatId } }
     );
 

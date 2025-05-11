@@ -11,7 +11,7 @@ import "../../css/flatDetails.scss";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
-export default function FlatDetailsClient({ flat, userId }) {
+export default function FlatDetailsClient({ flat }) {
   const [showForm, setShowForm] = useState(false);
   const [refereeName, setRefereeName] = useState("");
   const [refereePhone, setRefereePhone] = useState("");
@@ -20,9 +20,9 @@ export default function FlatDetailsClient({ flat, userId }) {
   const { data: session } = useSession();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const mapRef = useRef(null);
-
   const [modalMessage, setModalMessage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   const showModal = (message) => {
     setModalMessage(message);
@@ -98,6 +98,8 @@ export default function FlatDetailsClient({ flat, userId }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+
+  
   useEffect(() => {
     if (flat?.coordinates?.coordinates?.length === 2 && mapRef.current) {
       const map = new mapboxgl.Map({
@@ -112,6 +114,23 @@ export default function FlatDetailsClient({ flat, userId }) {
       addPOIsToMap(map);
     }
   }, [flat]);
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      const fetchUserId = async () => {
+        try {
+          const res = await fetch(`/api/getUserId/${encodeURIComponent(session.user.email)}`);
+          if (!res.ok) throw new Error("Failed to fetch user ID");
+          const data = await res.json();
+          setUserId(data.userId);
+        } catch (error) {
+          console.error("Error fetching user ID:", error);
+        }
+      };
+  
+      fetchUserId();
+    }
+  }, [session]);
 
   const handleNextImage = () => {
     if (!flat.images || flat.images.length <= 1) return;
@@ -211,6 +230,9 @@ export default function FlatDetailsClient({ flat, userId }) {
     }
   };
 
+  const isOwner = userId && flat?.ownerId && userId.toString() === flat.ownerId.toString();
+  console.log("isOwner", isOwner, userId, flat?.ownerId);
+
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
@@ -302,12 +324,20 @@ export default function FlatDetailsClient({ flat, userId }) {
                   </div>
                 </div>
               )}
-              <button className="edit-listing" onClick={() => (window.location.href = `/editflat/${flat._id}`)}>
-                Edit Listing
-              </button>
-              <button className="delete-listing" onClick={handleDelete}>
-                Delete Listing
-              </button>
+              {isOwner && (
+                <>
+                  <button
+                    className="edit-listing"
+                    onClick={() => (window.location.href = `/editflat/${flat._id}`)}
+                  >
+                    Edit Listing
+                  </button>
+                  <button className="delete-listing" onClick={handleDelete}>
+                    Delete Listing
+                  </button>
+                </>
+              )}
+
             </div>
           </div>
         </div>
