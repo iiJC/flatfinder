@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs"; // For password hashing
 import clientPromise from "../../../db/database"; // Make sure this path is correct for your db connection file
+import { sendEmail } from "../../../lib/email";
 
 export async function POST(req) {
   try {
@@ -35,10 +36,18 @@ export async function POST(req) {
       username,
       email,
       password: hashedPassword,
-      createdAt: new Date(),
+      createdAt: new Date()
     };
 
     await usersCollection.insertOne(newUser);
+
+    // send confirmation email
+    await sendEmail({
+      to: email,
+      subject: "Welcome to FlatFinder!",
+      text: `Hi ${username}, thanks for registering at FlatFinder.`,
+      html: `<p>Hi ${username},</p><p>Thanks for signing up to <strong>FlatFinder</strong> 🏡</p><p>You're now ready to browse and apply for flats!</p>`
+    });
 
     return NextResponse.json(
       { success: true, message: "User registered successfully!" },

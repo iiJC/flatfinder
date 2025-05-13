@@ -7,11 +7,23 @@ export async function POST(req) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new Response(JSON.stringify({ message: "Not authenticated" }), { status: 401 });
+    return new Response(JSON.stringify({ message: "Not authenticated" }), {
+      status: 401
+    });
   }
 
   const body = await req.json();
-  const { flatId, fullName, email, phone, location, budget, rooms, about, type } = body;
+  const {
+    flatId,
+    fullName,
+    email,
+    phone,
+    location,
+    budget,
+    rooms,
+    about,
+    type
+  } = body;
 
   const client = await clientPromise;
   const db = client.db("flatfinderdb");
@@ -21,7 +33,9 @@ export async function POST(req) {
   const user = await users.findOne({ email: session.user.email });
 
   if (!user) {
-    return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
+    return new Response(JSON.stringify({ message: "User not found" }), {
+      status: 404
+    });
   }
 
   const application = {
@@ -35,7 +49,7 @@ export async function POST(req) {
     about,
     type,
     dateApplied: new Date(),
-    status: "pending",
+    status: "pending"
   };
 
   await users.updateOne(
@@ -45,8 +59,10 @@ export async function POST(req) {
 
   await flats.updateOne(
     { _id: new ObjectId(flatId) },
-    { $addToSet: { applicants: user._id } } 
+    { $addToSet: { applicants: user._id } }
   );
 
-  return new Response(JSON.stringify({ message: "Application submitted" }), { status: 200 });
+  return new Response(JSON.stringify({ message: "Application submitted" }), {
+    status: 200
+  });
 }
