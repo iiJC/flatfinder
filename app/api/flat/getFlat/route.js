@@ -1,28 +1,31 @@
-import { getServerSession } from "next-auth";
-import clientPromise from "@/db/database";
 import { NextResponse } from "next/server";
+import clientPromise from "@/db/database";
+import { ObjectId } from "mongodb";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
+export async function POST(req) {
+  const { email } = await req.json();
 
-  if (!session || !session.user?.email) {
-    return NextResponse.json({ flat: null }, { status: 401 });
+  if (!email) {
+    return NextResponse.json({ flat: null }, { status: 400 });
   }
 
   try {
     const client = await clientPromise;
     const db = client.db("flatfinderdb");
 
+    const user = await db.collection("users").findOne({ email });
+
+    if (!user?.listing) {
+      return NextResponse.json({ flat: null });
+    }
+
     const flat = await db
       .collection("flats")
-      .findOne({ userEmail: session.user.email });
+      .findOne({ _id: new ObjectId(user.listing) });
 
-    return NextResponse.json({ flat });
+    return NextResponse.json({ flat: flat || null });
   } catch (err) {
     console.error("Error fetching user flat:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ flat: null }, { status: 500 });
   }
 }
