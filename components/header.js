@@ -5,33 +5,31 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 
 export default function Header() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [hasFlat, setHasFlat] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkFlat = async () => {
-      if (session?.user?.email) {
-        const email = session.user.email.toLowerCase();
+      if (!session?.user?.email) return;
+      const email = session.user.email.toLowerCase();
 
-        try {
-          const res = await fetch(`/api/getUserByEmail?email=${email}`);
-          const data = await res.json();
+      try {
+        const res = await fetch("/api/user/flat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
 
-          const user = data?.user;
-          if (user?.listing) {
-            const flatRes = await fetch(`/api/flat/getFlat?id=${user.listing}`);
-            const flatData = await flatRes.json();
+        const data = await res.json();
+        console.log("Flat info API result:", data);
 
-            setHasFlat(!!flatData.flat);
-          } else {
-            setHasFlat(false);
-          }
-        } catch (err) {
-          console.error("Error fetching user/flat:", err);
-          setHasFlat(false);
-        }
+        setHasFlat(!!data.flat);
+      } catch (err) {
+        console.error("Error fetching flat info:", err);
+        setHasFlat(false);
       }
+
       setLoading(false);
     };
 
@@ -64,9 +62,7 @@ export default function Header() {
           <button className="dropbtn">Applying ▾</button>
           <div className="dropdown-content">
             <Link href="/apply">Apply to join a Flat</Link>
-            {!hasFlat ? (
-              <Link href="/addflat">List your flat</Link>
-            ) : (
+            {hasFlat ? (
               <span
                 style={{
                   padding: "8px 16px",
@@ -76,6 +72,8 @@ export default function Header() {
               >
                 Already Listed
               </span>
+            ) : (
+              <Link href="/addflat">List your flat</Link>
             )}
           </div>
         </div>
