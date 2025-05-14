@@ -432,7 +432,7 @@ export default function MapPage() {
       </div>
 
       <div style={{ position: "relative", flex: 1 }}>
-        <div ref={mapContainerRef} style={{ height: "90vh", borderRadius: "8px" }} />
+      <div ref={mapContainerRef} data-testid="map" style={{ height: "90vh", borderRadius: "8px" }} />
         {loading && (
           <div className="map-loading-spinner">
             <div className="spinner" />
