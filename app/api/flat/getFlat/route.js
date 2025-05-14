@@ -1,5 +1,4 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // adjust path if different
 import clientPromise from "@/db/database";
 import { NextResponse } from "next/server";
 
