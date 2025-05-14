@@ -14,20 +14,21 @@ export default function Header() {
       if (session?.user?.email) {
         const email = session.user.email.toLowerCase();
 
-        const res = await fetch(`/api/getUserByEmail?email=${email}`);
-        const data = await res.json();
+        try {
+          const res = await fetch(`/api/getUserByEmail?email=${email}`);
+          const data = await res.json();
 
-        const user = data?.user;
-        if (user?.listing) {
-          const flatRes = await fetch(`/api/flat/getFlat?id=${user.listing}`);
-          const flatData = await flatRes.json();
+          const user = data?.user;
+          if (user?.listing) {
+            const flatRes = await fetch(`/api/flat/getFlat?id=${user.listing}`);
+            const flatData = await flatRes.json();
 
-          if (flatData.flat) {
-            setHasFlat(true);
+            setHasFlat(!!flatData.flat);
           } else {
             setHasFlat(false);
           }
-        } else {
+        } catch (err) {
+          console.error("Error fetching user/flat:", err);
           setHasFlat(false);
         }
       }
@@ -58,16 +59,21 @@ export default function Header() {
         <Link href="/">FlatMate Finder</Link>
       </h1>
 
-      {session && (
+      {session && !loading && (
         <div className="dropdown">
           <button className="dropbtn">Applying ▾</button>
           <div className="dropdown-content">
             <Link href="/apply">Apply to join a Flat</Link>
-            {!hasFlat && !loading && (
+            {!hasFlat ? (
               <Link href="/addflat">List your flat</Link>
-            )}
-            {hasFlat && !loading && (
-              <span style={{ padding: "8px 16px", color: "gray", cursor: "not-allowed" }}>
+            ) : (
+              <span
+                style={{
+                  padding: "8px 16px",
+                  color: "gray",
+                  cursor: "not-allowed",
+                }}
+              >
                 Already Listed
               </span>
             )}
@@ -76,7 +82,9 @@ export default function Header() {
       )}
 
       <div className="dropdown">
-        <button className="dropbtn">{session ? `Hi ${username}!` : "Personal"} ▾</button>
+        <button className="dropbtn">
+          {session ? `Hi ${username}!` : "Personal"} ▾
+        </button>
         <div className="dropdown-content">
           {session ? (
             <>
