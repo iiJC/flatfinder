@@ -27,7 +27,7 @@ export default function Header() {
 
         if (data.flat) {
           setHasFlat(true);
-          setFlatId(data.flat._id); // Adjust this based on your schema
+          setFlatId(data.flat._id); 
         } else {
           setHasFlat(false);
           setFlatId(null);
