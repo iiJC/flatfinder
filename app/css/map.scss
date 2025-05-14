@@ -122,3 +122,16 @@
     }
   }
 }
+
+@media screen and (max-width: 840px) and (orientation: portrait) {
+  .map-page{
+    background-color: var(--color-primary);
+    flex-direction: column;
+    margin: none !important;
+    border-radius: var(--border-radius-lg);
+
+    .container{
+      border-radius: var(--border-radius-lg) !important;
+    }
+  }
+}

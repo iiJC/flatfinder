@@ -25,7 +25,7 @@ export default function HomePage() {
           <div className="card looking-flatmate">
             <p>Looking for a flat mate?</p>
             <div className="overlay">
-              <Link href="/addflat" className="role-button flatmate">
+              <Link href="/addflat" className="button button-flatmate">
                 Find a flatmate!
               </Link>
             </div>

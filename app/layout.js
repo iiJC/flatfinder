@@ -6,7 +6,8 @@ import Footer from "@/components/footer";
 
 export const metadata = {
   title: "FlatMate Finder",
-  description: "Find flats, flatmates, or tenants in Dunedin"
+  description: "Find flats, flatmates, or tenants in Dunedin",
+  content: "width=device-width, initial-scale=1"
 };
 
 export default function RootLayout({ children }) {

@@ -21,9 +21,13 @@
     input{
       max-width: 95%;
       overflow: hidden;
+      padding: 0.5rem;
+      width: 100%;
       border: none;
       border-radius: var(--border-radius-sm);
       margin-left: var(--spacing-sm);
+      margin-bottom: 1rem;
+      font-size: 1rem;
     }
 
     .flats-list {
@@ -92,4 +96,22 @@
       }
     }
   }
+}
+
+@media screen and (max-width: 840px) and (orientation: portrait) {
+ 
+.flats-container{
+  .flats-box{
+    .title{
+      justify-content: center;
+      text-align: center;
+    }
+    .search{
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      max-width: 100%;
+      width: 85%;
+    }
+  }
+}
 }

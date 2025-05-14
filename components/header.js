@@ -9,6 +9,19 @@ export default function Header() {
   const [hasFlat, setHasFlat] = useState(false);
   const [flatId, setFlatId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setModalMessage("");
+  };
 
   useEffect(() => {
     const checkFlat = async () => {
@@ -27,7 +40,7 @@ export default function Header() {
 
         if (data.flat) {
           setHasFlat(true);
-          setFlatId(data.flat._id); 
+          setFlatId(data.flat._id);
         } else {
           setHasFlat(false);
           setFlatId(null);
@@ -50,31 +63,37 @@ export default function Header() {
 
   const username = session?.user?.name || session?.user?.email?.split("@")[0];
 
-  const handleListFlatClick = async () => {
+  const handleListFlatClick = () => {
     if (hasFlat && flatId) {
-      const confirmDelete = window.confirm(
-        "You have already listed a flat, would you like to delete the current one or cancel?"
+      setModalMessage(
+        "You have already listed a flat. Would you like to delete the current one?"
       );
-      if (confirmDelete) {
-        try {
-          const res = await fetch(`/api/deleteFlat/${flatId}`, {
-            method: "DELETE",
-          });
-          if (res.ok) {
-            alert("Flat deleted successfully.");
-            setHasFlat(false);
-            setFlatId(null);
-          } else {
-            alert("Failed to delete flat.");
-          }
-        } catch (err) {
-          console.error("Error deleting flat:", err);
-          alert("Error deleting flat.");
-        }
-      }
+      setIsConfirmVisible(true);
     } else {
       window.location.href = "/addflat";
     }
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const res = await fetch(`/api/deleteFlat/${flatId}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setModalMessage("Flat deleted successfully.");
+        setHasFlat(false);
+        setFlatId(null);
+      } else {
+        setModalMessage("Failed to delete flat.");
+      }
+    } catch (err) {
+      console.error("Error deleting flat:", err);
+      setModalMessage("Error deleting flat.");
+    }
+
+    setIsConfirmVisible(false); // Hide confirm modal
+    setIsModalVisible(true); // Show feedback modal
   };
 
   return (
@@ -122,6 +141,29 @@ export default function Header() {
           )}
         </div>
       </div>
+
+      {/* Info Modal */}
+      {isModalVisible && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal">
+            <p>{modalMessage}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {isConfirmVisible && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal">
+            <p>{modalMessage}</p>
+            <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
+              <button onClick={handleConfirmDelete}>Delete Flat</button>
+              <button onClick={() => setIsConfirmVisible(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
