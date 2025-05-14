@@ -15,7 +15,7 @@ export default function Header() {
       const email = session.user.email.toLowerCase();
 
       try {
-        const res = await fetch("/api/user/flat", {
+        const res = await fetch("/api/flat/getFlat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
