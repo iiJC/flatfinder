@@ -15,6 +15,26 @@ export default function Header() {
 
   const username = session?.user?.name || session?.user?.email?.split("@")[0]; // fallback if name is missing
 
+  const handleListFlat = () => {
+    if (session) {
+      const userHasFlat = false; 
+
+      if (userHasFlat) {
+        const confirmAction = window.confirm(
+          "You already have a flat listed. Would you like to delete your existing flat and list a new one?"
+        );
+
+        if (confirmAction) {
+
+          alert("Your flat has been deleted. Now you can list a new one.");
+          window.location.href = "/addflat"; 
+        }
+      } else {
+        window.location.href = "/addflat"; 
+      }
+    }
+  };
+
   return (
     <header className="header">
       <nav className="nav-links">
@@ -25,20 +45,19 @@ export default function Header() {
           Map
         </Link>
       </nav>
-      {/* Logo */}
       <h1 className="logo">
         <Link href="/">FlatMate Finder</Link>
       </h1>
 
-      {/* Dropdown Menus */}
 
-      {/* Apply dropdown only if logged in */}
       {session && (
         <div className="dropdown">
           <button className="dropbtn">Applying ▾</button>
           <div className="dropdown-content">
             <Link href="/apply">Apply to join a Flat</Link>
-            <Link href="/addflat">List your flat</Link>
+            <button onClick={handleListFlat} className="dropbtn">
+              List your flat
+            </button>
           </div>
         </div>
       )}
