@@ -376,6 +376,37 @@ body {
   cursor: pointer;
 }
 
+.geocoder-container {
+  margin-bottom: 1rem;
+
+  label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .mapboxgl-ctrl-geocoder {
+    max-width: 100%;
+    min-width: 300px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: inherit;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    input[type="text"] {
+      padding: 10px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .suggestions {
+      border-top: 1px solid #eee;
+    }
+  }
+}
+
 
 /* Responsive Layout */
 @media screen and (max-width: 840px) {

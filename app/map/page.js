@@ -11,6 +11,10 @@ import "../css/globals.scss";
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
+  const geocoderRef = useRef(null);
+    const geocoderControlRef = useRef(null);
+    const userMarkerRef = useRef(null);
+
   const [map, setMap] = useState(null);
   const [flats, setFlats] = useState([]);
   const [visiblePOIs, setVisiblePOIs] = useState({
@@ -239,43 +243,32 @@ export default function MapPage() {
   }, [mapStyle]);
 
   useEffect(() => {
-    if (!map) return;
-
-    markers.forEach((marker) => marker.remove());
-
-    const newMarkers = addFlatsToMap(map, flats);
-    setMarkers(newMarkers);
-
-    addPOIsToMap(map, POIS);
-  }, [visiblePOIs, tagFilters, minRent, maxRent, minRooms, maxDistanceFromUni, flats, map]);
-
-  const handleAddressSearch = async () => {
-    setSearchError("");
-    setSearchDistance(null);
+    if (!map || !geocoderRef.current) return;
   
-    const query = searchAddress + ", Dunedin, New Zealand";
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+      placeholder: "Search for a place in Dunedin",
+      marker: false,
+      proximity: { longitude: 170.5028, latitude: -45.8788 },
+      bbox: [170.4, -45.95, 170.6, -45.8] 
+    });
   
-    try {
-      const res = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}`
-      );
-      const data = await res.json();
-      const feature = data.features[0];
+    geocoderRef.current.innerHTML = ""; 
+    geocoderRef.current.appendChild(geocoder.onAdd(map));
   
-      if (!feature || !feature.place_name.includes("Dunedin")) {
-        setSearchError("Address not found in Dunedin.");
-        return;
-      }
-  
-      const coords = feature.geometry.coordinates;
+    geocoder.on("result", (e) => {
+      const coords = e.result.geometry.coordinates;
+      setSearchError("");
+      setSearchDistance(null);
   
       if (searchMarker) {
         searchMarker.remove();
       }
   
-      const newMarker = new mapboxgl.Marker({ color: "#FF5733" }) 
+      const newMarker = new mapboxgl.Marker({ color: "#FF5733" })
         .setLngLat(coords)
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`You searched: ${feature.place_name}`))
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`You searched: ${e.result.place_name}`))
         .addTo(map);
   
       setSearchMarker(newMarker);
@@ -291,12 +284,21 @@ export default function MapPage() {
         return null;
       }).filter(Boolean);
   
-      const closest = distances.reduce((a, b) => (a.distance < b.distance ? a : b));
-      setSearchDistance(`Closest flat: ${closest.name || "Unnamed"} is ${closest.distance.toFixed(2)} km away`);
-    } catch (err) {
-      setSearchError("Failed to fetch address.");
-    }
-  };
+      if (distances.length > 0) {
+        const closest = distances.reduce((a, b) => (a.distance < b.distance ? a : b));
+        setSearchDistance(`Closest flat: ${closest.name || "Unnamed"} is ${closest.distance.toFixed(2)} km away`);
+      } else {
+        setSearchDistance("No flats found nearby.");
+      }
+    });
+  
+    return () => {
+      if (geocoderRef.current) {
+        geocoderRef.current.innerHTML = "";
+      }
+    };
+  }, [map, searchMarker, flats]);
+
 
   return (
     <div className="map-page" style={{ display: "flex" }}>
@@ -376,21 +378,56 @@ export default function MapPage() {
           ))}
         </div>
 
-        <div style={{ marginTop: "1rem" }}>
-          <h3>Find Distance to Custom Address</h3>
-          <input
-            type="text"
-            placeholder="Enter address in Dunedin"
-            value={searchAddress}
-            onChange={(e) => setSearchAddress(e.target.value)}
-            style={{ width: "100%", marginBottom: "0.5rem", padding: "0.25rem" }}
-          />
-          <button onClick={handleAddressSearch} style={{ padding: "0.5rem", width: "100%", cursor: "pointer" }}>
-            Check Distance
-          </button>
-          {searchDistance && <p style={{ marginTop: "0.5rem", color: "green" }}>{searchDistance}</p>}
-          {searchError && <p style={{ marginTop: "0.5rem", color: "red" }}>{searchError}</p>}
+        <div style={{
+          marginTop: "1rem",
+          padding: "1rem",
+          background: "#f8f9fc",
+          border: "1px solid #dee2e6",
+          borderRadius: "8px"
+        }}>
+          <h3 style={{ marginBottom: "0.5rem", color: "#314ccd" }}>
+            Search for closest flat to location
+          </h3>
+          <div ref={geocoderRef} />
+
+          {searchDistance && (
+            <div
+              style={{
+                marginTop: "0.75rem",
+                padding: "0.75rem 1rem",
+                backgroundColor: "#eaf4ff",
+                border: "1px solid #b3d4fc",
+                borderRadius: "6px",
+                color: "#1e3a8a",
+                fontWeight: 500,
+                lineHeight: 1.4,
+                boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+              }}
+            >
+              📍 {searchDistance}
+            </div>
+          )}
+
+          {searchError && (
+            <div
+              style={{
+                marginTop: "0.75rem",
+                padding: "0.75rem 1rem",
+                backgroundColor: "#ffeaea",
+                border: "1px solid #f5a3a3",
+                borderRadius: "6px",
+                color: "#a30000",
+                fontWeight: 500,
+                lineHeight: 1.4,
+                boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+              }}
+            >
+              ❌ {searchError}
+            </div>
+          )}
+
         </div>
+
 
       </div>
 
