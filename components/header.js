@@ -7,6 +7,7 @@ import Link from "next/link";
 export default function Header() {
   const { data: session } = useSession();
   const [hasFlat, setHasFlat] = useState(false);
+  const [flatId, setFlatId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,10 +25,17 @@ export default function Header() {
         const data = await res.json();
         console.log("Flat info API result:", data);
 
-        setHasFlat(!!data.flat);
+        if (data.flat) {
+          setHasFlat(true);
+          setFlatId(data.flat._id); // Adjust this based on your schema
+        } else {
+          setHasFlat(false);
+          setFlatId(null);
+        }
       } catch (err) {
         console.error("Error fetching flat info:", err);
         setHasFlat(false);
+        setFlatId(null);
       }
 
       setLoading(false);
@@ -41,6 +49,33 @@ export default function Header() {
   };
 
   const username = session?.user?.name || session?.user?.email?.split("@")[0];
+
+  const handleListFlatClick = async () => {
+    if (hasFlat && flatId) {
+      const confirmDelete = window.confirm(
+        "You have already listed a flat, would you like to delete the current one or cancel?"
+      );
+      if (confirmDelete) {
+        try {
+          const res = await fetch(`/api/deleteFlat/${flatId}`, {
+            method: "DELETE",
+          });
+          if (res.ok) {
+            alert("Flat deleted successfully.");
+            setHasFlat(false);
+            setFlatId(null);
+          } else {
+            alert("Failed to delete flat.");
+          }
+        } catch (err) {
+          console.error("Error deleting flat:", err);
+          alert("Error deleting flat.");
+        }
+      }
+    } else {
+      window.location.href = "/addflat";
+    }
+  };
 
   return (
     <header className="header">
@@ -62,19 +97,9 @@ export default function Header() {
           <button className="dropbtn">Applying ▾</button>
           <div className="dropdown-content">
             <Link href="/apply">Apply to join a Flat</Link>
-            {hasFlat ? (
-              <span
-                style={{
-                  padding: "8px 16px",
-                  color: "gray",
-                  cursor: "not-allowed",
-                }}
-              >
-                Already Listed
-              </span>
-            ) : (
-              <Link href="/addflat">List your flat</Link>
-            )}
+            <button onClick={handleListFlatClick} className="dropbtn">
+              List your flat
+            </button>
           </div>
         </div>
       )}
