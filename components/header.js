@@ -13,13 +13,20 @@ export default function Header() {
     const checkFlat = async () => {
       if (session?.user?.email) {
         const email = session.user.email.toLowerCase();
-        
-        const res = await fetch(`/api/flat/getFlat?email=${email}`);
-        const data = await res.json();
-        const userFlat = data.flat;
 
-        if (userFlat) {
-          setHasFlat(true);
+        const res = await fetch(`/api/getUserByEmail?email=${email}`);
+        const data = await res.json();
+
+        const user = data?.user;
+        if (user?.listing) {
+          const flatRes = await fetch(`/api/flat/getFlat?id=${user.listing}`);
+          const flatData = await flatRes.json();
+
+          if (flatData.flat) {
+            setHasFlat(true);
+          } else {
+            setHasFlat(false);
+          }
         } else {
           setHasFlat(false);
         }
