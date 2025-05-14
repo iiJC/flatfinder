@@ -8,6 +8,7 @@ jest.mock("mapbox-gl", () => {
     Map: jest.fn().mockImplementation(() => ({
       on: jest.fn(),
       addControl: jest.fn(),
+      remove: jest.fn(), 
     })),
     Marker: jest.fn().mockImplementation(() => ({
       setLngLat: jest.fn(),
@@ -15,6 +16,7 @@ jest.mock("mapbox-gl", () => {
     })),
   };
 });
+
 
 jest.mock("@mapbox/mapbox-gl-geocoder", () => {
   return jest.fn().mockImplementation(() => ({
