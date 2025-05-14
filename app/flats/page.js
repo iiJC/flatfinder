@@ -39,12 +39,11 @@ export default function FlatsPage() {
       <div className="flats-box">
         <h2 className="title">Browse Available Flats</h2>
 
-        <input
+        <input className="search"
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by address or tag..."
-          style={{ marginBottom: "1rem", padding: "0.5rem", width: "100%", fontSize: "1rem" }}
         />
 
         <ul className="flats-list">
@@ -73,6 +72,7 @@ export default function FlatsPage() {
           ))}
         </ul>
       </div>
+      
     </div>
   );
 }

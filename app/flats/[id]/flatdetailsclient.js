@@ -125,6 +125,7 @@ export default function FlatDetailsClient({ flat }) {
           setUserId(data.userId);
         } catch (error) {
           console.error("Error fetching user ID:", error);
+          showModal("Error fetching user ID");
         }
       };
   

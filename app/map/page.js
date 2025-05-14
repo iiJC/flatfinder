@@ -8,6 +8,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { POIS } from "@/lib/pois";
 import "../css/popUp.scss";
 import "../css/globals.scss";
+import "../css/map.scss";
 
 export default function MapPage() {
   const mapContainerRef = useRef(null);
@@ -302,7 +303,7 @@ export default function MapPage() {
 
   return (
     <div className="map-page" style={{ display: "flex" }}>
-      <div style={{ minWidth: "240px", padding: "1rem" }}>
+      <div className="container" style={{ minWidth: "240px", padding: "1rem" }}>
         <h2>Filter Flats</h2>
 
         <div style={{ marginBottom: "1rem" }}>

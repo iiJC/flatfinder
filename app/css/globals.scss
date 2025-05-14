@@ -359,6 +359,7 @@ body {
 
 .custom-modal {
   background: white;
+  color: var(--color-text);
   padding: 2rem;
   border-radius: 8px;
   max-width: 400px;
@@ -409,26 +410,43 @@ body {
 
 
 /* Responsive Layout */
-@media screen and (max-width: 840px) {
-  .home-page {
-    width: 100vw;
+@media screen and (max-width: 840px) and (orientation: portrait) {
+  .root-layout {
+    max-height: 100vw;
 
-    .buttons-container {
+    .home-page {
+      max-width: 100%;
+      min-width: 60%;
+
+      .buttons-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5rem;
+        // margin: 0 !important;
+      }
+
+      .card {
+        width: 90%;
+        height: 180px;
+      }
+    }
+
+    .footer {
+      .footer-content {
+        // justify-content: space-evenly;
+        padding: 0;
+        margin: 1rem;
+      }
+    }
+
+    .header {
+      max-width: 100%;
       flex-direction: column;
-      align-items: center;
+
+      .dropdown {
+        display: flex;
+        flex-direction: row;
+      }
     }
-
-    .card {
-      width: 90%;
-      height: 180px;
-    }
-  }
-
-  .footer {
-    justify-content: space-evenly;
-  }
-
-  .header {
-    min-width: 100%;
   }
 }

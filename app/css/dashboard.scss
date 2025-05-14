@@ -60,3 +60,15 @@
     }
   }
 }
+
+@media screen and (max-width: 840px) and (orientation: portrait) {
+ 
+  .dashboard-container{
+    .dashboard-title{
+      background-color: white;
+      border-radius: var(--border-radius-lg);
+      padding: 1rem;
+      margin: 1rem;
+    }
+  }
+}
