@@ -21,7 +21,6 @@ export default async function ApplicantsDashboardPage() {
   const client = await clientPromise;
   const db = client.db("flatfinderdb");
 
-  // Find the logged-in user
   const user = await db.collection("users").findOne({ email: session.user.email });
 
   if (!user) {
@@ -32,7 +31,6 @@ export default async function ApplicantsDashboardPage() {
     );
   }
 
-  // Get flat ID listed by this user (assuming it's stored as `listing`)
   const flatId = user.listing;
 
   if (!flatId) {
@@ -43,7 +41,6 @@ export default async function ApplicantsDashboardPage() {
     );
   }
 
-  // Get the flat info
   const flat = await db.collection("flats").findOne({ _id: new ObjectId(flatId) });
 
   if (!flat) {
@@ -54,10 +51,8 @@ export default async function ApplicantsDashboardPage() {
     );
   }
 
-  // Get all applications for this flat
   const applications = await db.collection("applications").find({ flatId: new ObjectId(flatId) }).toArray();
 
-  // Get full user details for each applicant
   const applicantDetails = await Promise.all(
     applications.map(async (app) => {
       const applicant = await db.collection("users").findOne({ _id: new ObjectId(app.applicantId) });
