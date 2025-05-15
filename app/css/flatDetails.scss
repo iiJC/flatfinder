@@ -30,6 +30,9 @@
 }
 
 .flat-details-wrapper{
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
   padding: var(--spacing-sm);
   background-color: var(--color-primary);
   margin: var(--spacing-lg);
@@ -38,7 +41,8 @@
   flex-direction: row;
 
   .flat-card{
-    max-width: 50rem;
+    width: 100%;
+    max-width: 1000px;
     border-radius: var(--border-radius-lg);
     box-shadow: var(--box-shadow-lg);
     position: relative;

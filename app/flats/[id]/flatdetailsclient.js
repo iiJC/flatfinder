@@ -338,26 +338,9 @@ export default function FlatDetailsClient({ flat }) {
                   </button>
                 </>
               )}
-
             </div>
           </div>
         </div>
-        <div className="suggestions">
-          <div className="similar">
-            <h2>Similar flats based on distance </h2>
-          </div>
-          <div className="similar">
-            <h2>Similar flats based on distance </h2>
-          </div>
-        </div>
-        {isModalVisible && (
-          <div className="custom-modal-overlay">
-            <div className="custom-modal">
-              <p>{modalMessage}</p>
-              <button onClick={closeModal}>Close</button>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
