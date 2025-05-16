@@ -1,3 +1,5 @@
+//app\flats\[id]\flatdetailsclient.js
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -119,21 +121,24 @@ export default function FlatDetailsClient({ flat }) {
   }, [flat]);
 
   useEffect(() => {
-    if (session?.user?.email) {
-      const fetchUserId = async () => {
+    const fetchUserId = async () => {
+      if (session?.user?.email) {
         try {
           const res = await fetch(`/api/getUserId/${encodeURIComponent(session.user.email)}`);
           if (!res.ok) throw new Error("Failed to fetch user ID");
           const data = await res.json();
-          setUserId(data.userId);
+          if (data.userId) {
+            setUserId(data.userId);
+          } else {
+            console.error("No user ID returned from API");
+          }
         } catch (error) {
           console.error("Error fetching user ID:", error);
-          showModal("Error fetching user ID");
         }
-      };
+      }
+    };
 
-      fetchUserId();
-    }
+    fetchUserId();
   }, [session]);
 
   useEffect(() => {
@@ -235,30 +240,39 @@ export default function FlatDetailsClient({ flat }) {
       return;
     }
   
+    if (!userId || !flat?._id) {
+      console.error("Missing userId or flatId");
+      return;
+    }
+  
     try {
-      const endpoint = isBookmarked ? "/api/bookmark/remove" : "/api/bookmark/route";
-      const response = await fetch(endpoint, {
+      const response = await fetch("/api/bookmark", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId, flatId: flat._id }),
+        body: JSON.stringify({ 
+          userId, 
+          flatId: flat._id,
+          action: isBookmarked ? "remove" : "add"
+        }),
       });
   
-      if (response.ok) {
-        setIsBookmarked(!isBookmarked);
-        showModal(
-          isBookmarked
-            ? "Flat removed from bookmarks."
-            : "Flat added to bookmarks!"
-        );
-      } else {
-        const data = await response.json();
-        showModal(data.error || "Bookmark action failed.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Bookmark action failed");
       }
+  
+      const data = await response.json();
+      setIsBookmarked(!isBookmarked);
+      showModal(
+        isBookmarked
+          ? "Removed from bookmarks"
+          : "Added to bookmarks!"
+      );
     } catch (error) {
-      console.error("Error toggling bookmark:", error);
-      showModal("Error bookmarking flat.");
+      console.error("Bookmark error:", error);
+      showModal(error.message || "Error updating bookmark");
     }
   };
   

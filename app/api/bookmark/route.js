@@ -1,19 +1,42 @@
-// app/api/bookmark/route.js
-import { addBookmark } from '../../../lib/bookmark'; // Adjust path if needed
+//app\api\bookmark\route.js
 
-export async function POST(req) {
+import { addBookmark, removeBookmark } from '../../../lib/bookmark';
+
+export async function POST(request) {
   try {
-    const { userId, flatId } = await req.json(); // Retrieve JSON body from the request
+    const { userId, flatId, action } = await request.json();
 
-    const updatedUser = await addBookmark(userId, flatId);
+    // Validate inputs
+    if (!userId || !flatId || !action) {
+      return new Response(JSON.stringify({ 
+        error: "Missing required parameters: userId, flatId, action" 
+      }), {
+        status: 400,
+      });
+    }
 
-    return new Response(JSON.stringify(updatedUser), {
+    let result;
+    if (action === 'add') {
+      result = await addBookmark(userId, flatId);
+    } else if (action === 'remove') {
+      result = await removeBookmark(userId, flatId);
+    } else {
+      return new Response(JSON.stringify({ 
+        error: "Invalid action. Must be 'add' or 'remove'" 
+      }), {
+        status: 400,
+      });
+    }
+
+    return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error adding bookmark:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Error in bookmark route:", error);
+    return new Response(JSON.stringify({ 
+      error: error.message || "Server error processing bookmark" 
+    }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
