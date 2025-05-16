@@ -5,9 +5,9 @@ import { sendEmail } from "../../../lib/email";
 
 export async function POST(req) {
   try {
-    const { username, email, password } = await req.json();
+    const { username, name, email, password } = await req.json();
 
-    if (!username || !email || !password) {
+    if ( !name || !username || !email || !password) {
       return NextResponse.json(
         { success: false, message: "Please provide all required fields." },
         { status: 400 }
@@ -34,6 +34,7 @@ export async function POST(req) {
     // Insert the new user into the database
     const newUser = {
       username,
+      name,
       email,
       password: hashedPassword,
       createdAt: new Date()

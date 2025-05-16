@@ -36,6 +36,7 @@ export async function POST(req) {
     const application = {
       flatId: flatObjectId,
       applicantId: user._id,
+      name: user.name,
       address,
       status: "pending",
       dateApplied: new Date(),

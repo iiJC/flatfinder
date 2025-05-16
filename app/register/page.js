@@ -6,16 +6,20 @@ import "../css/globals.scss";
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: "",
+    name: "",
     email: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.type === "email" ? "email" : e.target.type === "password" ? "password" : "username"]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
+  
+  
 
   const [modalMessage, setModalMessage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -32,6 +36,8 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Sending:", formData); // ✅ Check this in browser console
+
 
     const res = await fetch("/api/register", {
       method: "POST",
@@ -55,6 +61,11 @@ export default function RegisterPage() {
           <div className="form-group">
             <label>Username</label>
             <input name="username" type="text" placeholder="Enter your username" onChange={handleChange} />
+          </div>
+
+          <div className="form-group">
+            <label>Full Name</label>
+            <input name="name" type="text" placeholder="Enter your full name" onChange={handleChange} />
           </div>
 
           <div className="form-group">
