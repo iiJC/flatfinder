@@ -2,7 +2,7 @@ import clientPromise from "@/db/database";
 
 export async function GET(request, context) {
   try {
-    const { email } = context.params;
+    const { email } = await context.params;
 
     if (!email || typeof email !== "string") {
       return new Response(JSON.stringify({ error: "Invalid or missing email" }), {
@@ -10,10 +10,12 @@ export async function GET(request, context) {
       });
     }
 
+    const decodedEmail = decodeURIComponent(email);
+
     const client = await clientPromise;
     const db = client.db("flatfinderdb");
 
-    const user = await db.collection("users").findOne({ email });
+    const user = await db.collection("users").findOne({ email: decodedEmail });
 
     if (!user) {
       return new Response(JSON.stringify({ error: "User not found" }), {

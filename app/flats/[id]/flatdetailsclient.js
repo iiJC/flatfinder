@@ -9,7 +9,8 @@ import "../../css/applyform.scss";
 import "../../css/globals.scss";
 import "../../css/flatDetails.scss";
 
-mapboxgl.accessToken = "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
 
 export default function FlatDetailsClient({ flat }) {
   const [showForm, setShowForm] = useState(false);
@@ -23,6 +24,7 @@ export default function FlatDetailsClient({ flat }) {
   const [modalMessage, setModalMessage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false); 
 
   const showModal = (message) => {
     setModalMessage(message);
@@ -98,8 +100,6 @@ export default function FlatDetailsClient({ flat }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
-  
   useEffect(() => {
     if (flat?.coordinates?.coordinates?.length === 2 && mapRef.current) {
       const map = new mapboxgl.Map({
@@ -109,7 +109,10 @@ export default function FlatDetailsClient({ flat }) {
         zoom: 14,
       });
 
-      new mapboxgl.Marker({ color: "#007bff" }).setLngLat(flat.coordinates.coordinates).setPopup(new mapboxgl.Popup().setText("Flat Location")).addTo(map);
+      new mapboxgl.Marker({ color: "#007bff" })
+        .setLngLat(flat.coordinates.coordinates)
+        .setPopup(new mapboxgl.Popup().setText("Flat Location"))
+        .addTo(map);
 
       addPOIsToMap(map);
     }
@@ -128,10 +131,28 @@ export default function FlatDetailsClient({ flat }) {
           showModal("Error fetching user ID");
         }
       };
-  
+
       fetchUserId();
     }
   }, [session]);
+
+  useEffect(() => {
+    const checkIfBookmarked = async () => {
+      if (!userId || !flat?._id) return;
+  
+      try {
+        const response = await fetch(`/api/bookmark/check?userId=${userId}&flatId=${flat._id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setIsBookmarked(data.isBookmarked);
+        }
+      } catch (error) {
+        console.error("Error checking bookmark status:", error);
+      }
+    };
+  
+    checkIfBookmarked();
+  }, [userId, flat]);
 
   const handleNextImage = () => {
     if (!flat.images || flat.images.length <= 1) return;
@@ -208,12 +229,50 @@ export default function FlatDetailsClient({ flat }) {
     }
   };
 
+  const handleBookmark = async () => {
+    if (!session?.user?.email) {
+      setShowLoginPrompt(true);
+      return;
+    }
+  
+    try {
+      const endpoint = isBookmarked ? "/api/bookmark/remove" : "/api/bookmark/route";
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, flatId: flat._id }),
+      });
+  
+      if (response.ok) {
+        setIsBookmarked(!isBookmarked);
+        showModal(
+          isBookmarked
+            ? "Flat removed from bookmarks."
+            : "Flat added to bookmarks!"
+        );
+      } else {
+        const data = await response.json();
+        showModal(data.error || "Bookmark action failed.");
+      }
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+      showModal("Error bookmarking flat.");
+    }
+  };
+  
+
   const renderImage = () => {
     if (flat.images?.length > 0) {
       const image = flat.images[currentImageIndex];
       return (
         <div className="image-slides">
-          <img src={`data:${image.imageType};base64,${image.image}`} alt={`Flat Image ${currentImageIndex + 1}`} style={imageStyle} />
+          <img
+            src={`data:${image.imageType};base64,${image.image}`}
+            alt={`Flat Image ${currentImageIndex + 1}`}
+            style={imageStyle}
+          />
           {flat.images.length > 1 && (
             <>
               <button className="prev" onClick={handlePrevImage}>
@@ -232,7 +291,6 @@ export default function FlatDetailsClient({ flat }) {
   };
 
   const isOwner = userId && flat?.ownerId && userId.toString() === flat.ownerId.toString();
-  console.log("isOwner", isOwner, userId, flat?.ownerId);
 
   return (
     <>
@@ -295,9 +353,19 @@ export default function FlatDetailsClient({ flat }) {
             </div>
 
             <div className="buttons-container">
-              <button className="flat-contact-button" onClick={() => setShowForm(true)}>
+              <button className="flat-contact-button" onClick={handleApplyClick}>
                 Apply Here
               </button>
+
+              {session?.user?.email && (
+                <button
+                  className="bookmark-button"
+                  onClick={handleBookmark}
+                >
+                  {isBookmarked ? "Remove Bookmark" : "Add to Bookmarks"}
+                </button>
+              )}
+
               {showForm && (
                 <div className="modal-overlay">
                   <div className="modal-content">
@@ -325,12 +393,10 @@ export default function FlatDetailsClient({ flat }) {
                   </div>
                 </div>
               )}
+
               {isOwner && (
                 <>
-                  <button
-                    className="edit-listing"
-                    onClick={() => (window.location.href = `/editflat/${flat._id}`)}
-                  >
+                  <button className="edit-listing" onClick={() => (window.location.href = `/editflat/${flat._id}`)}>
                     Edit Listing
                   </button>
                   <button className="delete-listing" onClick={handleDelete}>
@@ -342,6 +408,15 @@ export default function FlatDetailsClient({ flat }) {
           </div>
         </div>
       </div>
+      {isModalVisible && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <p>{modalMessage}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
