@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  bookmarks: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Flat',
+    },
+  ],
 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
