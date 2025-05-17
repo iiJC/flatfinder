@@ -8,9 +8,7 @@ export default function ApplicationList({ initialApplications }) {
     try {
       const response = await fetch("/api/acknowledge", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ applicationId }),
       });
 
@@ -22,7 +20,25 @@ export default function ApplicationList({ initialApplications }) {
         ));
       }
     } catch (error) {
-      console.error("Update failed:", error);
+      console.error("Acknowledge failed:", error);
+    }
+  };
+
+  const handleReject = async (applicationId) => {
+    try {
+      const response = await fetch("/api/reject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ applicationId }),
+      });
+
+      if (response.ok) {
+        setApplications(applications.filter(app => 
+          app.applicationId !== applicationId
+        ));
+      }
+    } catch (error) {
+      console.error("Rejection failed:", error);
     }
   };
 
@@ -44,16 +60,25 @@ export default function ApplicationList({ initialApplications }) {
             <strong>Referee Number:</strong> {app.refereeNumber}
           </p>
           
-          {/* Acknowledge Button */}
-          <button 
-            onClick={() => handleAcknowledge(app.applicationId)}
-            disabled={app.status === "acknowledged"}
-            className="acknowledge-button"
-          >
-            {app.status === "acknowledged" 
-              ? "✓ Acknowledged" 
-              : "Acknowledge Application"}
-          </button>
+          {/* Buttons */}
+          <div className="button-group">
+            <button 
+              onClick={() => handleAcknowledge(app.applicationId)}
+              disabled={app.status === "acknowledged"}
+              className="acknowledge-button"
+            >
+              {app.status === "acknowledged" 
+                ? "✓ Acknowledged" 
+                : "Acknowledge"}
+            </button>
+            
+            <button 
+              onClick={() => handleReject(app.applicationId)}
+              className="reject-button"
+            >
+              Reject
+            </button>
+          </div>
         </li>
       ))}
     </ul>
