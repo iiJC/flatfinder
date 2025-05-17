@@ -1,5 +1,6 @@
 import "../css/dashboard.scss";
 import "../css/globals.scss";
+import ApplicationList from "../../components/ApplicationList";
 
 import React from "react";
 import { getServerSession } from "next-auth";
@@ -58,6 +59,8 @@ export default async function ApplicantsDashboardPage() {
       const applicant = await db.collection("users").findOne({ _id: new ObjectId(app.applicantId) });
 
       return {
+        applicationId: app._id.toString(),
+        status: app.status, 
         name: applicant?.name || "Unknown",
         email: applicant?.email || "Unknown",
         message: app.message || "No message provided",
@@ -66,37 +69,16 @@ export default async function ApplicantsDashboardPage() {
       };
     })
   );
+  
 
   return (
-    <div className="dashboard-container">
-      <h2 className="dashboard-title">Applicants for {flat.address}</h2>
-
-      <div className="application-box">
-        <h3 className="application-heading">Current Applicants</h3>
-
-        {applicantDetails.length > 0 ? (
-          <ul className="application-list">
-            {applicantDetails.map((app, index) => (
-              <li key={index} className="application-item">
-                <p className="application-name">
-                  <strong>Name:</strong> {app.name} ({app.email})
-                </p>
-                <p className="application-message">
-                  <strong>Message:</strong> {app.message}
-                </p>
-                <p className="application-referee">
-                  <strong>Referee Name:</strong> {app.refereeName}
-                </p>
-                <p className="application-referee">
-                  <strong>Referee Number:</strong> {app.refereeNumber}
-                </p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No applicants found for this flat.</p>
-        )}
-      </div>
-    </div>
+    <div className="application-box">
+  <h3 className="application-heading">Current Applicants</h3>
+  {applicantDetails.length > 0 ? (
+    <ApplicationList initialApplications={applicantDetails} />
+  ) : (
+    <p>No applicants found for this flat.</p>
+  )}
+</div>
   );
 }
