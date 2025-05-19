@@ -1,4 +1,4 @@
-import "../css/dashboard.scss";
+import "../css/applicantDashboard.scss";
 import "../css/globals.scss";
 import ApplicationList from "../../components/ApplicationList";
 
@@ -60,7 +60,7 @@ export default async function ApplicantsDashboardPage() {
 
       return {
         applicationId: app._id.toString(),
-        status: app.status, 
+        status: app.status,
         name: applicant?.name || "Unknown",
         email: applicant?.email || "Unknown",
         message: app.message || "No message provided",
@@ -69,16 +69,16 @@ export default async function ApplicantsDashboardPage() {
       };
     })
   );
-  
+
 
   return (
     <div className="application-box">
-  <h3 className="application-heading">Current Applicants</h3>
-  {applicantDetails.length > 0 ? (
-    <ApplicationList initialApplications={applicantDetails} />
-  ) : (
-    <p>No applicants found for this flat.</p>
-  )}
-</div>
+      <h3 className="application-heading">Current Applicants</h3>
+      {applicantDetails.length > 0 ? (
+        <ApplicationList initialApplications={applicantDetails} />
+      ) : (
+        <p>No applicants found for this flat.</p>
+      )}
+    </div>
   );
 }

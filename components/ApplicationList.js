@@ -1,4 +1,8 @@
 "use client";
+
+import "../app/css/applicantDashboard.scss";
+import "../app/css/globals.scss";
+
 import React, { useState } from "react";
 
 export default function ApplicationList({ initialApplications }) {

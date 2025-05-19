@@ -111,34 +111,36 @@ export default function Header() {
         <Link href="/">FlatMate Finder</Link>
       </h1>
 
-      {session && !loading && (
-        <div className="dropdown">
-          <button className="dropbtn">Applying ▾</button>
-          <div className="dropdown-content">
-            <Link href="/apply">Apply to join a Flat</Link>
-            <button onClick={handleListFlatClick} className="dropbtn">
-              List your flat
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="dropdown">
-        <button className="dropbtn">
-          {session ? `Hi ${username}!` : "Personal"} ▾
-        </button>
-        <div className="dropdown-content">
-          {session ? (
-            <>
-              <Link href="/dashboard">Dashboard</Link>
-              <Link href="/applicantsDashboard">Flat Listing</Link>
-              <button onClick={handleLogout} className="dropbtn">
-                Logout
+      <div className="dropdown-container">
+        {session && !loading && (
+          <div className="dropdown">
+            <button className="dropbtn">Applying ▾</button>
+            <div className="dropdown-content">
+              <Link href="/apply">Apply to join a Flat</Link>
+              <button onClick={handleListFlatClick} className="dropbtn">
+                List your flat
               </button>
-            </>
-          ) : (
-            <Link href="/login">Login</Link>
-          )}
+            </div>
+          </div>
+        )}
+
+        <div className="dropdown">
+          <button className="dropbtn">
+            {session ? `Hi ${username}!` : "Personal"} ▾
+          </button>
+          <div className="dropdown-content">
+            {session ? (
+              <>
+                <Link href="/dashboard">Dashboard</Link>
+                <Link href="/applicantsDashboard">Flat Listing</Link>
+                <button onClick={handleLogout} className="dropbtn">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link href="/login">Login</Link>
+            )}
+          </div>
         </div>
       </div>
 
