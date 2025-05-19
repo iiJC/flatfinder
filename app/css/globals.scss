@@ -112,12 +112,13 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-  }
 
-  // Dropdown base
-  .dropdown {
-    position: relative;
-    display: inline-block;
+
+    // Dropdown base
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
   }
 
   .dropbtn {
