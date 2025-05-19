@@ -8,131 +8,138 @@ export async function POST(req) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
-    return new Response(JSON.stringify({ message: "Not authenticated" }), {
+    return new Response(JSON.stringify({ error: "Not authenticated" }), {
       status: 401
     });
   }
 
   const body = await req.json();
-  const { phone, location, budget, rooms, about, type, flatId } = body;
+  const { flatId, phone, location, budget, rooms, about, type } = body;
+
+  if (!ObjectId.isValid(flatId)) {
+    return new Response(JSON.stringify({ error: "Invalid flat ID" }), {
+      status: 400
+    });
+  }
+
+  const client = await clientPromise;
+  const db = client.db("flatfinderdb");
+  const mongoSession = client.startSession();
 
   try {
-    const client = await clientPromise;
-    const db = client.db("flatfinderdb");
-    const users = db.collection("users");
-    const flats = db.collection("flats");
-    const applications = db.collection("applications");
+    let flat, owner, applicant, applicationId;
 
-    const user = await users.findOne({ email: session.user.email });
-    if (!user) {
-      return new Response(JSON.stringify({ message: "User not found" }), {
-        status: 404
+    await mongoSession.withTransaction(async () => {
+      const users = db.collection("users");
+      const flats = db.collection("flats");
+      const applications = db.collection("applications");
+
+      // Get applicant
+      applicant = await users.findOne(
+        { email: session.user.email },
+        { session: mongoSession }
+      );
+      if (!applicant) throw new Error("User not found");
+
+      // Get flat
+      flat = await flats.findOne(
+        { _id: new ObjectId(flatId) },
+        { session: mongoSession }
+      );
+      if (!flat) throw new Error("Flat not found");
+
+      // Get flat owner
+      if (!flat.ownerId || !ObjectId.isValid(flat.ownerId)) {
+        throw new Error("Flat has invalid or missing ownerId");
+      }
+
+      owner = await users.findOne(
+        { _id: new ObjectId(flat.ownerId) },
+        { session: mongoSession, projection: { name: 1, email: 1 } }
+      );
+      if (!owner) throw new Error("Owner not found");
+
+      // Create application
+      const application = {
+        flatId: flat._id,
+        applicantId: applicant._id,
+        address: flat.address,
+        phone,
+        location,
+        budget,
+        rooms,
+        about,
+        type,
+        status: "pending",
+        dateApplied: new Date()
+      };
+
+      const result = await applications.insertOne(application, {
+        session: mongoSession
       });
-    }
+      applicationId = result.insertedId;
 
-    const flat = await flats.findOne({ _id: new ObjectId(flatId) });
-    if (!flat) {
-      return new Response(JSON.stringify({ message: "Flat not found" }), {
-        status: 404
-      });
-    }
+      // Track applicant in flat document
+      await flats.updateOne(
+        { _id: flat._id },
+        { $addToSet: { applicants: applicant._id } },
+        { session: mongoSession }
+      );
+    });
 
-    const flatOwner = await users.findOne({ _id: flat.ownerId });
-    if (!flatOwner) {
-      return new Response(JSON.stringify({ message: "Flat owner not found" }), {
-        status: 404
-      });
-    }
-
-    const application = {
-      flatId: new ObjectId(flatId),
-      applicantId: user._id,
-      phone,
-      location,
-      budget,
-      rooms,
-      about,
-      type,
-      address: flat.address,
-      dateApplied: new Date(),
-      status: "pending"
-    };
-
-    const mongoSession = client.startSession();
-    try {
-      await mongoSession.withTransaction(async () => {
-        await applications.insertOne(application, { session: mongoSession });
-
-        await flats.updateOne(
-          { _id: new ObjectId(flatId) },
-          { $addToSet: { applicants: user._id } },
-          { session: mongoSession }
-        );
-      });
-    } finally {
-      await mongoSession.endSession();
-    }
-
-    // Send email to applicant
-    await sendEmail({
-      to: user.email,
-      subject: "Your FlatFinder Application Confirmation",
+    // 📧 Send confirmation to applicant
+    const applicantEmailResult = await sendEmail({
+      to: applicant.email,
+      subject: `Application Submitted for ${flat.address}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #4a6fa5;">Application Submitted Successfully!</h2>
-          <p>Hello ${user.name},</p>
-          <p>We've received your application for the flat at <strong>${flat.address}</strong>.</p>
-          <p>Here are your application details:</p>
-          <ul>
-            <li><strong>Budget:</strong> ${budget}</li>
-            <li><strong>Preferred Rooms:</strong> ${rooms}</li>
-            <li><strong>Location Preference:</strong> ${location}</li>
-          </ul>
-          <p>The flat owner will review your application and contact you if interested.</p>
-          <p style="margin-top: 30px;">Good luck with your flat search!</p>
-          <p>Best regards,<br>The FlatFinder Team</p>
-        </div>
+        <p>Hi ${applicant.name || applicant.username},</p>
+        <p>Your application for <strong>${
+          flat.address
+        }</strong> has been received.</p>
+        <p>We'll notify the owner and let you know if they respond.</p>
       `
     });
 
-    // Send notification email to flat owner
-    await sendEmail({
-      to: flatOwner.email,
+    if (!applicantEmailResult.success) {
+      console.error(
+        "❌ Email to applicant failed:",
+        applicantEmailResult.error
+      );
+    }
+
+    // 📧 Notify flat owner
+    const ownerEmailResult = await sendEmail({
+      to: owner.email,
       subject: `New Application for Your Flat at ${flat.address}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #4a6fa5;">New Flat Application</h2>
-          <p>Hello ${flatOwner.name},</p>
-          <p>You've received a new application for your flat at <strong>${flat.address}</strong>.</p>
-          <p>Applicant details:</p>
-          <ul>
-            <li><strong>Name:</strong> ${user.name}</li>
-            <li><strong>Email:</strong> ${user.email}</li>
-            <li><strong>Phone:</strong> ${phone}</li>
-            <li><strong>Budget:</strong> ${budget}</li>
-            <li><strong>Preferred Rooms:</strong> ${rooms}</li>
-            <li><strong>About:</strong> ${about}</li>
-          </ul>
-          <p>Please log in to your FlatFinder account to review and respond to this application.</p>
-          <p style="margin-top: 30px;">Best regards,<br>The FlatFinder Team</p>
-        </div>
+        <p>Hello ${owner.name || "Owner"},</p>
+        <p>You have received a new application for your flat at <strong>${
+          flat.address
+        }</strong>.</p>
+        <p><strong>Applicant:</strong> ${
+          applicant.name || applicant.username
+        }</p>
+        <p><strong>Email:</strong> ${applicant.email}</p>
+        <p><strong>Budget:</strong> ${budget}</p>
+        <p><strong>Rooms:</strong> ${rooms}</p>
+        <p><strong>Location Preference:</strong> ${location}</p>
+        <p><strong>About:</strong> ${about}</p>
       `
     });
 
-    return new Response(
-      JSON.stringify({
-        message: "Application submitted successfully"
-      }),
-      { status: 200 }
-    );
+    if (!ownerEmailResult.success) {
+      console.error("❌ Email to owner failed:", ownerEmailResult.error);
+    }
+
+    return new Response(JSON.stringify({ success: true, applicationId }), {
+      status: 200
+    });
   } catch (error) {
-    console.error("Error during application submission:", error);
-    return new Response(
-      JSON.stringify({
-        message: "An error occurred while processing your application",
-        error: error.message
-      }),
-      { status: 500 }
-    );
+    console.error("❌ Error in /api/apply:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500
+    });
+  } finally {
+    await mongoSession.endSession();
   }
 }
