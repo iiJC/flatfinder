@@ -31,6 +31,7 @@ export async function POST(req) {
       let applicationId;
       let flatDetails;
       let ownerDetails;
+      let user;
 
       await mongoSession.withTransaction(async () => {
         const users = db.collection("users");
@@ -38,7 +39,7 @@ export async function POST(req) {
         const applications = db.collection("applications");
 
         // Get user and flat details
-        const user = await users.findOne(
+        user = await users.findOne(
           { email: session.user.email },
           { session: mongoSession }
         );
@@ -65,7 +66,6 @@ export async function POST(req) {
           flatId: flatObjectId,
           applicantId: user._id,
           name: user.name,
-          email: user.email,
           address,
           status: "pending",
           dateApplied: new Date(),
@@ -87,20 +87,20 @@ export async function POST(req) {
       });
 
       // Send emails after successful transaction
-      const applicantEmail = session.user.email;
+      const applicantEmail = user.email;
+      const applicantName = user.name;
       const ownerEmail = ownerDetails.email;
+      const flatAddress = flatDetails.address;
 
       // Email to applicant
       await sendEmail({
         to: applicantEmail,
-        subject: `Application Submitted for ${flatDetails.address}`,
+        subject: `Application Submitted for ${flatAddress}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #4a6fa5;">Application Submitted Successfully</h2>
-            <p>Hello ${session.user.name},</p>
-            <p>Your application for the property at <strong>${
-              flatDetails.address
-            }</strong> has been received.</p>
+            <p>Hello ${applicantName},</p>
+            <p>Your application for the property at <strong>${flatAddress}</strong> has been received.</p>
             <p><strong>Application ID:</strong> ${applicationId}</p>
             <p><strong>Submitted on:</strong> ${new Date().toLocaleDateString()}</p>
             ${message ? `<p><strong>Your message:</strong> ${message}</p>` : ""}
@@ -113,17 +113,15 @@ export async function POST(req) {
       // Email to property owner
       await sendEmail({
         to: ownerEmail,
-        subject: `New Application for ${flatDetails.address}`,
+        subject: `New Application for ${flatAddress}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #4a6fa5;">New Rental Application</h2>
             <p>Hello ${ownerDetails.name},</p>
-            <p>You have received a new application for your property at <strong>${
-              flatDetails.address
-            }</strong>.</p>
+            <p>You have received a new application for your property at <strong>${flatAddress}</strong>.</p>
             <h3 style="color: #4a6fa5;">Applicant Details</h3>
-            <p><strong>Name:</strong> ${session.user.name}</p>
-            <p><strong>Contact Email:</strong> ${session.user.email}</p>
+            <p><strong>Name:</strong> ${applicantName}</p>
+            <p><strong>Contact Email:</strong> ${applicantEmail}</p>
             ${
               address
                 ? `<p><strong>Current Address:</strong> ${address}</p>`

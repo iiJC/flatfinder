@@ -27,6 +27,12 @@ export async function POST(req) {
     });
     if (!application) return new Response("Not found", { status: 404 });
 
+    // Get applicant user info
+    const applicant = await db
+      .collection("users")
+      .findOne({ _id: application.applicantId });
+    if (!applicant) return new Response("Applicant not found", { status: 404 });
+
     // Delete the application
     const result = await db.collection("applications").deleteOne({
       _id: new ObjectId(applicationId),
@@ -38,13 +44,15 @@ export async function POST(req) {
 
     // Send rejection email
     await sendEmail({
-      to: application.email,
+      to: applicant.email,
       subject: "Application Update – Rejected",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #a94442;">Application Rejected</h2>
-          <p>Hello ${application.name},</p>
-          <p>We regret to inform you that your application for the property at <strong>${application.address}</strong> has not been successful.</p>
+          <p>Hello ${applicant.name || "applicant"},</p>
+          <p>We regret to inform you that your application for the property at <strong>${
+            application.address
+          }</strong> has not been successful.</p>
           <p>Thank you for your interest in FlatFinder. We wish you all the best in your search for accommodation.</p>
           <p style="margin-top: 30px;">Best regards,<br>The FlatFinder Team</p>
         </div>
