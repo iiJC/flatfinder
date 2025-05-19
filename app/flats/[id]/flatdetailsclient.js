@@ -27,6 +27,8 @@ export default function FlatDetailsClient({ flat }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [userId, setUserId] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false); 
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
 
   const showModal = (message) => {
     setModalMessage(message);
@@ -235,44 +237,49 @@ export default function FlatDetailsClient({ flat }) {
   };
 
   const handleBookmark = async () => {
-    if (!session?.user?.email) {
-      setShowLoginPrompt(true);
-      return;
-    }
-  
-    if (!userId || !flat?._id) {
-      console.error("Missing userId or flatId");
-      return;
-    }
-  
+    if (bookmarkLoading) return;
+    
+    setBookmarkLoading(true);
     try {
-      const response = await fetch("/api/bookmark", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          userId, 
+      if (!session?.user?.email) {
+        setShowLoginPrompt(true);
+        return;
+      }
+
+      if (!userId || !flat?._id) {
+        console.error("Missing required IDs");
+        return;
+      }
+
+      const action = isBookmarked ? 'remove' : 'add';
+      const response = await fetch('/api/bookmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
           flatId: flat._id,
-          action: isBookmarked ? "remove" : "add"
+          action
         }),
       });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Bookmark action failed");
-      }
-  
+
       const data = await response.json();
-      setIsBookmarked(!isBookmarked);
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Action failed');
+      }
+
+      setIsBookmarked(action === 'add');
       showModal(
-        isBookmarked
-          ? "Removed from bookmarks"
-          : "Added to bookmarks!"
+        action === 'add' 
+          ? 'Added to bookmarks!' 
+          : 'Removed from bookmarks'
       );
+
     } catch (error) {
-      console.error("Bookmark error:", error);
-      showModal(error.message || "Error updating bookmark");
+      console.error('Bookmark error:', error);
+      showModal(error.message);
+    } finally {
+      setBookmarkLoading(false);
     }
   };
   
@@ -373,10 +380,17 @@ export default function FlatDetailsClient({ flat }) {
 
               {session?.user?.email && (
                 <button
-                  className="bookmark-button"
+                  className={`bookmark-button ${bookmarkLoading ? 'loading' : ''}`}
                   onClick={handleBookmark}
+                  disabled={bookmarkLoading}
                 >
-                  {isBookmarked ? "Remove Bookmark" : "Add to Bookmarks"}
+                  {bookmarkLoading ? (
+                    <span>Processing...</span>
+                  ) : isBookmarked ? (
+                    <span>Remove Bookmark</span>
+                  ) : (
+                    <span>Add Bookmark</span>
+                  )}
                 </button>
               )}
 
