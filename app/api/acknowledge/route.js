@@ -27,7 +27,13 @@ export async function POST(req) {
     });
     if (!application) return new Response("Not found", { status: 404 });
 
-    // Update status
+    // Get applicant details
+    const applicant = await db
+      .collection("users")
+      .findOne({ _id: application.applicantId });
+    if (!applicant) return new Response("Applicant not found", { status: 404 });
+
+    // Update application status
     await db
       .collection("applications")
       .updateOne(
@@ -37,13 +43,15 @@ export async function POST(req) {
 
     // Send email to applicant
     await sendEmail({
-      to: application.email,
+      to: applicant.email,
       subject: "Your Application Has Been Acknowledged",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #4a6fa5;">Application Acknowledged</h2>
-          <p>Hello ${application.name},</p>
-          <p>Your application for the property at <strong>${application.address}</strong> has been acknowledged by the owner.</p>
+          <p>Hello ${applicant.name || "applicant"},</p>
+          <p>Your application for the property at <strong>${
+            application.address
+          }</strong> has been acknowledged by the owner.</p>
           <p>The owner may contact you directly with further steps or questions.</p>
           <p style="margin-top: 30px;">Best regards,<br>The FlatFinder Team</p>
         </div>

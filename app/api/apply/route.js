@@ -7,30 +7,21 @@ import { sendEmail } from "../../../lib/email";
 export async function POST(req) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session?.user?.email) {
     return new Response(JSON.stringify({ message: "Not authenticated" }), {
       status: 401
     });
   }
 
   const body = await req.json();
-  const {
-    flatId,
-    fullName,
-    email,
-    phone,
-    location,
-    budget,
-    rooms,
-    about,
-    type
-  } = body;
+  const { phone, location, budget, rooms, about, type, flatId } = body;
 
   try {
     const client = await clientPromise;
     const db = client.db("flatfinderdb");
     const users = db.collection("users");
     const flats = db.collection("flats");
+    const applications = db.collection("applications");
 
     const user = await users.findOne({ email: session.user.email });
     if (!user) {
@@ -39,7 +30,6 @@ export async function POST(req) {
       });
     }
 
-    // Get flat details including owner information
     const flat = await flats.findOne({ _id: new ObjectId(flatId) });
     if (!flat) {
       return new Response(JSON.stringify({ message: "Flat not found" }), {
@@ -56,46 +46,41 @@ export async function POST(req) {
 
     const application = {
       flatId: new ObjectId(flatId),
-      fullName,
-      email,
+      applicantId: user._id,
       phone,
       location,
       budget,
       rooms,
       about,
       type,
+      address: flat.address,
       dateApplied: new Date(),
       status: "pending"
     };
 
-    // Update user and flat in a transaction for data consistency
-    const session = client.startSession();
+    const mongoSession = client.startSession();
     try {
-      await session.withTransaction(async () => {
-        await users.updateOne(
-          { email: session.user.email },
-          { $push: { applications: application } },
-          { session }
-        );
+      await mongoSession.withTransaction(async () => {
+        await applications.insertOne(application, { session: mongoSession });
 
         await flats.updateOne(
           { _id: new ObjectId(flatId) },
           { $addToSet: { applicants: user._id } },
-          { session }
+          { session: mongoSession }
         );
       });
     } finally {
-      await session.endSession();
+      await mongoSession.endSession();
     }
 
     // Send email to applicant
-    const applicantEmailResult = await sendEmail({
-      to: email,
+    await sendEmail({
+      to: user.email,
       subject: "Your FlatFinder Application Confirmation",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #4a6fa5;">Application Submitted Successfully!</h2>
-          <p>Hello ${fullName},</p>
+          <p>Hello ${user.name},</p>
           <p>We've received your application for the flat at <strong>${flat.address}</strong>.</p>
           <p>Here are your application details:</p>
           <ul>
@@ -111,7 +96,7 @@ export async function POST(req) {
     });
 
     // Send notification email to flat owner
-    const ownerEmailResult = await sendEmail({
+    await sendEmail({
       to: flatOwner.email,
       subject: `New Application for Your Flat at ${flat.address}`,
       html: `
@@ -121,8 +106,8 @@ export async function POST(req) {
           <p>You've received a new application for your flat at <strong>${flat.address}</strong>.</p>
           <p>Applicant details:</p>
           <ul>
-            <li><strong>Name:</strong> ${fullName}</li>
-            <li><strong>Email:</strong> ${email}</li>
+            <li><strong>Name:</strong> ${user.name}</li>
+            <li><strong>Email:</strong> ${user.email}</li>
             <li><strong>Phone:</strong> ${phone}</li>
             <li><strong>Budget:</strong> ${budget}</li>
             <li><strong>Preferred Rooms:</strong> ${rooms}</li>
@@ -134,18 +119,9 @@ export async function POST(req) {
       `
     });
 
-    if (!applicantEmailResult.success || !ownerEmailResult.success) {
-      console.error("Email sending issues:", {
-        applicant: applicantEmailResult.error,
-        owner: ownerEmailResult.error
-      });
-      // Continue despite email issues since the application was successfully submitted
-    }
-
     return new Response(
       JSON.stringify({
-        message: "Application submitted successfully",
-        applicationId: application._id
+        message: "Application submitted successfully"
       }),
       { status: 200 }
     );
