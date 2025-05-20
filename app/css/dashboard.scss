@@ -4,7 +4,7 @@
   padding: var(--spacing-lg);
   min-height: 10rem;
   border-radius: var(--border-radius-lg);
-  height: 100vh;
+  min-height: 100vh;
 
   .dashboard-title {
     font-size: 1.5rem;
@@ -14,10 +14,6 @@
   }
 
   .application-box {
-    padding: var(--spacing-lg);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: var(--color-white);
-
     .application-heading {
       font-size: 1.25rem;
       font-weight: 600;
@@ -26,8 +22,11 @@
 
     .application-list {
       list-style: none;
-      padding: 0;
-      
+      padding: var(--spacing-lg);
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: var(--color-white);
+      border-radius: var(--border-radius-lg);
+
       .application-item {
         background-color: var(--color-white);
         border-radius: var(--border-radius-lg);
@@ -43,7 +42,7 @@
 
         .application-status {
           font-size: 0.875rem;
-          color: #4b5563; 
+          color: #4b5563;
 
           &.pending {
             color: #f59e0b; // Orange for pending
@@ -60,12 +59,54 @@
       }
     }
   }
+
+  .bookmark-box {
+    margin-top: var(--spacing-lg);
+
+    .application-list {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      gap: var(--spacing-lg);
+      flex-wrap: wrap;
+      .application-item {
+        margin-left: 0;
+        list-style: none;
+        background-color: var(--color-white);
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius-lg);
+        margin-top: var(--spacing-lg);
+        min-width: 40%;
+        max-width: 40%;
+
+        a{
+          text-decoration: none;
+          color: var(--color-text);
+          margin-top: var(--spacing-lg);
+          strong{
+            text-align: center;
+            font-size: 1.125rem;
+            justify-content: center;
+            font-weight: 600;
+          }
+        }
+
+        .bookmark-image{
+          img{
+            max-width: 100%;
+            width: 100%;
+            height: 50%;
+          }
+        }
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 840px) and (orientation: portrait) {
- 
-  .dashboard-container{
-    .dashboard-title{
+
+  .dashboard-container {
+    .dashboard-title {
       background-color: white;
       border-radius: var(--border-radius-lg);
       padding: 1rem;

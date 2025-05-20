@@ -138,6 +138,16 @@
           cursor: pointer;
         }
 
+        .bookmark-button{
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          background-color: var(--color-primary);
+          color: white;
+          border: none;
+          border-radius: var(--border-radius-lg);
+          cursor: pointer;
+        }
+
         //dont need modal stuff as in different file
         
         .edit-listing{

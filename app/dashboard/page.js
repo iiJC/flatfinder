@@ -47,7 +47,6 @@ export default async function DashboardPage() {
     })
   );
 
-  
   let bookmarkedFlats = [];
   if (user.bookmarks && user.bookmarks.length > 0) {
     bookmarkedFlats = await db
@@ -71,8 +70,7 @@ export default async function DashboardPage() {
                   <strong>Flat Address:</strong> {app.flatAddress}
                 </p>
                 <p className={`application-status ${app.status.toLowerCase()}`}>
-                  <strong>Status:</strong>{" "}
-                  {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                  <strong>Status:</strong> {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                 </p>
               </li>
             ))}
@@ -81,15 +79,22 @@ export default async function DashboardPage() {
           <p>No applications found.</p>
         )}
       </div>
-  
+
       <div className="bookmark-box">
         <h3 className="application-heading">Bookmarked Flats</h3>
         {bookmarkedFlats.length > 0 ? (
           <ul className="application-list">
             {bookmarkedFlats.map((flat) => (
               <li key={flat._id} className="application-item">
+                <div className="bookmark-image">
+                  <img
+                    src={flat.images?.[0] ? `data:${flat.images[0].imageType};base64,${flat.images[0].image}` : "/thumbnailpic.webp"}
+                    alt="Flat Image"
+                    className="flat-main-image"
+                  />
+                </div>
                 <a href={`/flats/${flat._id}`}>
-                  <strong>{flat.title || flat.address || "Flat"}</strong>
+                  <strong>{flat.name || flat.title || flat.address || "Flat"}</strong>
                 </a>
                 {flat.address && (
                   <p className="application-name">
