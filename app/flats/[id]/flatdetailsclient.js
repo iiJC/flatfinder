@@ -363,17 +363,15 @@ export default function FlatDetailsClient({ flat }) {
 
               {session?.user?.email && (
                 <button
-                  className={`bookmark-button ${bookmarkLoading ? 'loading' : ''}`}
+                  className={`bookmark-button${bookmarkLoading ? " loading" : ""}`}
                   onClick={handleBookmark}
                   disabled={bookmarkLoading}
                 >
-                  {bookmarkLoading ? (
-                    <span>Processing...</span>
-                  ) : isBookmarked ? (
-                    <span>Remove Bookmark</span>
-                  ) : (
-                    <span>Add Bookmark</span>
-                  )}
+                  {bookmarkLoading
+                    ? "Loading..."
+                    : isBookmarked
+                      ? "Remove Bookmark"
+                      : "Bookmark"}
                 </button>
               )}
 
