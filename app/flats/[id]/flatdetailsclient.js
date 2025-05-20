@@ -237,27 +237,34 @@ export default function FlatDetailsClient({ flat }) {
   };
 
   const handleBookmark = async () => {
-  try {
-    const response = await fetch('/api/bookmark', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        flatId: flat._id, 
-        action: isBookmarked ? 'remove' : 'add'
-      }),
-    });
+    setBookmarkLoading(true);
+    try {
+      const response = await fetch('/api/bookmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          flatId: flat._id,
+          action: isBookmarked ? 'remove' : 'add'
+        }),
+      });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error);
-    
-    setIsBookmarked(data.isBookmarked);
-    showModal(data.isBookmarked ? 'Bookmarked!' : 'Removed bookmark');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
 
-  } catch (error) {
-    console.error('Bookmark error:', error);
-    showModal(error.message);
-  }
-};
+      const checkRes = await fetch(`/api/bookmark/check?userId=${userId}&flatId=${flat._id}`);
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        setIsBookmarked(checkData.isBookmarked);
+      }
+
+      showModal(data.isBookmarked ? 'Bookmarked!' : 'Removed bookmark');
+    } catch (error) {
+      console.error('Bookmark error:', error);
+      showModal(error.message);
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
   
 
   const renderImage = () => {

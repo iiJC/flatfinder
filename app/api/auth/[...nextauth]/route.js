@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import clientPromise from "../../../../db/database";
 import bcrypt from "bcryptjs";
 
-// 👇 Export this separately
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -39,6 +38,14 @@ export const authOptions = {
     error: "/auth/error",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async session({ session, token, user }) {
+      if (token && token.sub) {
+        session.user.id = token.sub;
+      }
+      return session;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

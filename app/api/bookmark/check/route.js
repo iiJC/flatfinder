@@ -1,6 +1,6 @@
 //app\api\bookmark\check\route.js
 
-import { checkBookmark } from '/lib/bookmark';
+import { checkBookmark } from '@/lib/bookmark';
 
 export async function GET(request) {
   try {
