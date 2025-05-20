@@ -26,7 +26,7 @@ export default function FlatDetailsClient({ flat }) {
   const [modalMessage, setModalMessage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [userId, setUserId] = useState(null);
-  const [isBookmarked, setIsBookmarked] = useState(false); 
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
 
@@ -144,22 +144,15 @@ export default function FlatDetailsClient({ flat }) {
   }, [session]);
 
   useEffect(() => {
-    const checkIfBookmarked = async () => {
-      if (!userId || !flat?._id) return;
-  
-      try {
-        const response = await fetch(`/api/bookmark/check?userId=${userId}&flatId=${flat._id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setIsBookmarked(data.isBookmarked);
-        }
-      } catch (error) {
-        console.error("Error checking bookmark status:", error);
+    const fetchBookmarkStatus = async () => {
+      const res = await fetch(`/api/bookmark/check?userId=${userId}&flatId=${flat._id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setIsBookmarked(data.isBookmarked);
       }
     };
-  
-    checkIfBookmarked();
-  }, [userId, flat]);
+    if (userId && flat?._id) fetchBookmarkStatus();
+  }, [userId, flat?._id]);
 
   const handleNextImage = () => {
     if (!flat.images || flat.images.length <= 1) return;
