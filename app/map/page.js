@@ -463,35 +463,58 @@ export default function MapPage() {
 
         <div
           style={{
-            marginTop: "1rem",
-            padding: "1rem",
-            background: "#f8f9fc",
-            border: "1px solid #dee2e6",
-            borderRadius: "8px",
+            marginTop: "1.5rem",
+            padding: "1.5rem",
+            background: "#f9fafb",
+            border: "1px solid #d1d5db",
+            borderRadius: "12px",
+            boxShadow: "0 2px 8px rgba(49,76,205,0.08)",
+            maxWidth: 420,
+            marginLeft: "auto",
+            marginRight: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "stretch",
+            gap: "0.75rem",
           }}
         >
-          <h3
+          <label
+            htmlFor="closest-flat-search"
             style={{
-              marginBottom: "0.5rem",
+              fontWeight: 600,
               color: "#314ccd",
+              fontSize: "1.08rem",
+              marginBottom: "0.5rem",
+              letterSpacing: "0.01em",
             }}
           >
-            Search for closest flat to location
-          </h3>
-          <div ref={geocoderRef} />
-
+            Search for Closest Flat
+          </label>
+          <div
+            ref={geocoderRef}
+            id="closest-flat-search"
+            style={{
+              border: "1.5px solid #b3b8c5",
+              borderRadius: "8px",
+              overflow: "hidden",
+              background: "#fff",
+              minHeight: "44px",
+              boxShadow: "0 1px 2px rgba(49,76,205,0.04)",
+              marginBottom: 0,
+            }}
+          />
           {searchDistance && (
             <div
               style={{
-                marginTop: "0.75rem",
+                marginTop: "0.5rem",
                 padding: "0.75rem 1rem",
                 backgroundColor: "#eaf4ff",
                 border: "1px solid #b3d4fc",
-                borderRadius: "6px",
+                borderRadius: "7px",
                 color: "#1e3a8a",
                 fontWeight: 500,
                 lineHeight: 1.4,
-                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                fontSize: "1rem",
               }}
             >
               📍 {searchDistance}
@@ -501,15 +524,15 @@ export default function MapPage() {
           {searchError && (
             <div
               style={{
-                marginTop: "0.75rem",
+                marginTop: "0.5rem",
                 padding: "0.75rem 1rem",
                 backgroundColor: "#ffeaea",
                 border: "1px solid #f5a3a3",
-                borderRadius: "6px",
+                borderRadius: "7px",
                 color: "#a30000",
                 fontWeight: 500,
                 lineHeight: 1.4,
-                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                fontSize: "1rem",
               }}
             >
               ❌ {searchError}
