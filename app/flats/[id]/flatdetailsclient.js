@@ -10,6 +10,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "../../css/applyform.scss";
 import "../../css/globals.scss";
 import "../../css/flatDetails.scss";
+import { useEffect, useState } from "react";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
@@ -145,13 +146,14 @@ export default function FlatDetailsClient({ flat }) {
 
   useEffect(() => {
     const fetchBookmarkStatus = async () => {
+      if (!userId || !flat?._id) return;
       const res = await fetch(`/api/bookmark/check?userId=${userId}&flatId=${flat._id}`);
       if (res.ok) {
         const data = await res.json();
         setIsBookmarked(data.isBookmarked);
       }
     };
-    if (userId && flat?._id) fetchBookmarkStatus();
+    fetchBookmarkStatus();
   }, [userId, flat?._id]);
 
   const handleNextImage = () => {
