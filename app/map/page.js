@@ -344,8 +344,8 @@ export default function MapPage() {
   ]);
 
   return (
-    <div className="map-page" style={{ display: "flex" }}>
-      <div className="container" style={{ minWidth: "240px", padding: "1rem" }}>
+    <div className="map-page">
+      <div className="container">
         <h2>Filter Flats</h2>
 
         <div style={{ marginBottom: "1rem" }}>
@@ -461,7 +461,7 @@ export default function MapPage() {
           ))}
         </div>
 
-        <div
+        <div className="closest-flat-search"
           style={{
             marginTop: "1.5rem",
             padding: "1.5rem",

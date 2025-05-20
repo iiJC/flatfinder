@@ -6,10 +6,10 @@
   margin: var(--spacing-lg);
 
 
-  .map-container {
+  .container {
     position: relative;
     flex: 1;
-    height: 90vh;
+    height: 82vh;
     border-radius: 8px;
     overflow: hidden;
     max-width: 50%;
@@ -169,6 +169,8 @@
   overflow: hidden !important;
   z-index: 10 !important;
 }
+
+
 
 @media screen and (max-width: 840px) and (orientation: portrait) {
   .map-page{
