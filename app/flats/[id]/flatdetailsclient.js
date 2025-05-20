@@ -246,13 +246,17 @@ export default function FlatDetailsClient({ flat }) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
 
-      const checkRes = await fetch(`/api/bookmark/check?userId=${userId}&flatId=${flat._id}`);
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        setIsBookmarked(checkData.isBookmarked);
-      }
-
+      setIsBookmarked(data.isBookmarked);
       showModal(data.isBookmarked ? 'Bookmarked!' : 'Removed bookmark');
+
+      setTimeout(async () => {
+        const checkRes = await fetch(`/api/bookmark/check?userId=${userId}&flatId=${flat._id}`);
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          setIsBookmarked(checkData.isBookmarked);
+        }
+      }, 300);
+
     } catch (error) {
       console.error('Bookmark error:', error);
       showModal(error.message);
