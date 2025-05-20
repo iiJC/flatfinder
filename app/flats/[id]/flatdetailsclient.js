@@ -237,51 +237,27 @@ export default function FlatDetailsClient({ flat }) {
   };
 
   const handleBookmark = async () => {
-    if (bookmarkLoading) return;
+  try {
+    const response = await fetch('/api/bookmark', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        flatId: flat._id, 
+        action: isBookmarked ? 'remove' : 'add'
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
     
-    setBookmarkLoading(true);
-    try {
-      if (!session?.user?.email) {
-        setShowLoginPrompt(true);
-        return;
-      }
+    setIsBookmarked(data.isBookmarked);
+    showModal(data.isBookmarked ? 'Bookmarked!' : 'Removed bookmark');
 
-      if (!userId || !flat?._id) {
-        console.error("Missing required IDs");
-        return;
-      }
-
-      const action = isBookmarked ? 'remove' : 'add';
-      const response = await fetch('/api/bookmark', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          flatId: flat._id,
-          action
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Action failed');
-      }
-
-      setIsBookmarked(action === 'add');
-      showModal(
-        action === 'add' 
-          ? 'Added to bookmarks!' 
-          : 'Removed from bookmarks'
-      );
-
-    } catch (error) {
-      console.error('Bookmark error:', error);
-      showModal(error.message);
-    } finally {
-      setBookmarkLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error('Bookmark error:', error);
+    showModal(error.message);
+  }
+};
   
 
   const renderImage = () => {
