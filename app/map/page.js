@@ -38,6 +38,7 @@ export default function MapPage() {
   const [searchDistance, setSearchDistance] = useState(null);
   const [searchError, setSearchError] = useState("");
   const [searchMarker, setSearchMarker] = useState(null);
+  const [closestFlatId, setClosestFlatId] = useState(null);
 
   const allTags = [
     "Warm",
@@ -104,9 +105,8 @@ export default function MapPage() {
     `;
   };
 
-  const addFlatsToMap = (map, flatsData) => {
+  const addFlatsToMap = (map, flatsData, closestFlatId) => {
     const newMarkers = [];
-
     const uniCoords = [170.5028, -45.8788];
 
     flatsData.forEach((flat) => {
@@ -114,7 +114,6 @@ export default function MapPage() {
         const flatCoords = flat.coordinates.coordinates;
         const flatPoint = turf.point(flatCoords);
         const uniPoint = turf.point(uniCoords);
-        // Distance in meters
         const distance = turf.distance(flatPoint, uniPoint, { units: "meters" });
 
         if (
@@ -134,7 +133,7 @@ export default function MapPage() {
           font-size: 24px;
           width: 48px;
           height: 48px;
-          background: #79b6fc;
+          background: ${closestFlatId && flat._id === closestFlatId ? "#ff3333" : "#79b6fc"};
           color: #222;
           display: flex;
           align-items: center;
@@ -309,12 +308,14 @@ export default function MapPage() {
         const closest = distances.reduce((a, b) =>
           a.distance < b.distance ? a : b
         );
+        setClosestFlatId(closest._id);
         setSearchDistance(
           `Closest flat: ${closest.name || "Unnamed"} is ${closest.distance.toFixed(
             2
           )} km away`
         );
       } else {
+        setClosestFlatId(null);
         setSearchDistance("No flats found nearby.");
       }
     });
@@ -328,10 +329,8 @@ export default function MapPage() {
 
   useEffect(() => {
     if (!map) return;
-
     markers.forEach((marker) => marker.remove());
-
-    const newMarkers = addFlatsToMap(map, flats);
+    const newMarkers = addFlatsToMap(map, flats, closestFlatId);
     setMarkers(newMarkers);
   }, [
     map,
@@ -340,7 +339,8 @@ export default function MapPage() {
     maxRent,
     minRooms,
     maxDistanceFromUni,
-    tagFilters
+    tagFilters,
+    closestFlatId,
   ]);
 
   return (
