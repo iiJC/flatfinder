@@ -10,7 +10,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "../../css/applyform.scss";
 import "../../css/globals.scss";
 import "../../css/flatDetails.scss";
-import { useEffect, useState } from "react";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiaHVuYmU4MzMiLCJhIjoiY205Z2Z6Y2IxMWZmdjJscHFiZmJicWNoOCJ9.LxKNU1afAzTYLzx21hAYhQ";
