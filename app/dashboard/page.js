@@ -47,6 +47,15 @@ export default async function DashboardPage() {
     })
   );
 
+  
+  let bookmarkedFlats = [];
+  if (user.bookmarks && user.bookmarks.length > 0) {
+    bookmarkedFlats = await db
+      .collection("flats")
+      .find({ _id: { $in: user.bookmarks.map((id) => new ObjectId(id)) } })
+      .toArray();
+  }
+
   return (
     <div className="dashboard-container">
       <h2 className="dashboard-title">Your Applications</h2>
@@ -70,6 +79,29 @@ export default async function DashboardPage() {
           </ul>
         ) : (
           <p>No applications found.</p>
+        )}
+      </div>
+
+  
+      <div className="bookmark-box">
+        <h3 className="application-heading">Bookmarked Flats</h3>
+        {bookmarkedFlats.length > 0 ? (
+          <ul className="application-list">
+            {bookmarkedFlats.map((flat) => (
+              <li key={flat._id} className="application-item">
+                <a href={`/flats/${flat._id}`}>
+                  <strong>{flat.title || flat.address || "Flat"}</strong>
+                </a>
+                {flat.address && (
+                  <p className="application-name">
+                    <strong>Address:</strong> {flat.address}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No bookmarks yet.</p>
         )}
       </div>
     </div>
