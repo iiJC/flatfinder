@@ -81,7 +81,6 @@ export default async function DashboardPage() {
           <p>No applications found.</p>
         )}
       </div>
-
   
       <div className="bookmark-box">
         <h3 className="application-heading">Bookmarked Flats</h3>
