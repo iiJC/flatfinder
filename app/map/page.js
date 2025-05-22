@@ -107,7 +107,7 @@ export default function MapPage() {
 
   const addFlatsToMap = (map, flatsData, closestFlatId) => {
     const newMarkers = [];
-    const uniCoords = [170.5028, -45.8788];
+    const uniCoords = [170.514759, -45.864558];
 
     flatsData.forEach((flat) => {
       if (flat.coordinates?.coordinates?.length === 2) {
