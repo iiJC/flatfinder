@@ -61,7 +61,8 @@ npm run dev
 
 Visit http://localhost:3000 in your browser.
 
-📦 Tech Stack
+### 📦 Tech Stack
+
 Next.js
 
 MongoDB
