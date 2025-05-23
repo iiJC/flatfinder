@@ -31,7 +31,7 @@ Create an account via the navigation bar on the top right to begin using the app
 2. Use filters to narrow down listings.
 3. Click a flat to see its details.
 4. Submit an application with your message and referee info.
-5. Track your application statuses and saved flats through the **Dashboard** page.
+5. Track your application statuses and saved flats through the **"Dashboard"** page.
 6. Get notified by email if the flat owner acknowledges your application.
 7. Once acknowledged, applicants and owners contact each other outside the app to arrange a meeting.
 
