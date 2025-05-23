@@ -31,14 +31,15 @@ Create an account via the navigation bar on the top right to begin using the app
 2. Use filters to narrow down listings.
 3. Click a flat to see its details.
 4. Submit an application with your message and referee info.
-5. Get notified by email if the flat owner acknowledges your application.
-6. Once acknowledged, applicants and owners contact each other outside the app to arrange a meeting.
+5. Track your application statuses and saved flats through the **Dashboard** page.
+6. Get notified by email if the flat owner acknowledges your application.
+7. Once acknowledged, applicants and owners contact each other outside the app to arrange a meeting.
 
 ### 🧑‍💼 Listing a Flat?
 
 1. Log in and go to **“List a Flat.”**
 2. Fill in details (address, rent, bond, available rooms, tags, and photos).
-3. After posting, review applications and accept, reject, or acknowledge each one.
+3. After posting, review applications and accept, reject, or acknowledge each one through **"Flat Listing"** on the top right.
 4. Once acknowledged, applicants and owners contact each other outside the app to arrange a meeting.
 
 ---
