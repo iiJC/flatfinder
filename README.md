@@ -79,5 +79,12 @@ Playwright for E2E testing
 🚀 Deployment
 The app is automatically deployed via Vercel. Pushes to main trigger deployments.
 
+---
+
+## Project Documentation
+
+- 📄 [Feasibility Study, Risk Report, etc.](https://docs.google.com/document/d/1Xum9e8Tj2adPCKmqlr-do7mA50MLTTFDfUcoY-nKDzI/edit?usp=sharing)
+- 🗂️ SCRUM Sheets are available in the root directory of this repository.
+
 📄 License
 MIT License. Feel free to fork, contribute, or suggest improvements.
