@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     try {
       const client = await clientPromise;
       const db = client.db("flatfinderdb");
-      
+
       // Update the application status
       const result = await db
         .collection("applications")
@@ -21,12 +21,14 @@ export default async function handler(req, res) {
           { _id: new ObjectId(applicationId) },
           { $set: { status: "acknowledged" } }
         );
-        
+
       if (result.matchedCount === 0) {
         return res.status(404).json({ error: "Application not found." });
       }
 
-      return res.status(200).json({ message: "Application acknowledged successfully." });
+      return res
+        .status(200)
+        .json({ message: "Application acknowledged successfully." });
     } catch (error) {
       return res.status(500).json({ error: "Internal server error." });
     }

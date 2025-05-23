@@ -1,10 +1,12 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import AddFlat from "@/app/addflat/page";
 
+// mock window alert before tests run
 beforeAll(() => {
   window.alert = jest.fn();
 });
 
+// reset mocks after each test
 afterEach(() => {
   jest.clearAllMocks();
 });
@@ -13,7 +15,7 @@ describe("AddFlat", () => {
   it("submits with missing coordinates shows alert", () => {
     render(<AddFlat />);
 
-    // Fill in required fields (except address / coordinates)
+    // fill in required fields except address
     fireEvent.change(screen.getByPlaceholderText("Flat Name"), {
       target: { value: "Test Flat" }
     });
@@ -33,12 +35,12 @@ describe("AddFlat", () => {
       target: { value: "2" }
     });
 
-    // Submit without selecting coordinates (no geocoder selection)
+    // try to submit without selecting coordinates
     fireEvent.click(screen.getByText(/Submit Flat/i));
 
-    // have changed to an alert modal so need to change this
+    // old alert check commented out since modal is now used
     // expect(window.alert).toHaveBeenCalledWith(
-      // "Please select a valid address from suggestions."
+    //   "Please select a valid address from suggestions."
     // );
   });
 });

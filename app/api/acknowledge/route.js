@@ -5,11 +5,13 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import { sendEmail } from "@/lib/email";
 
 export async function POST(req) {
+  // get user session
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  // parse request body
   const { applicationId } = await req.json();
 
   if (!ObjectId.isValid(applicationId)) {
@@ -24,7 +26,7 @@ export async function POST(req) {
     const applications = db.collection("applications");
     const flats = db.collection("flats");
 
-    // Find the current user
+    // find current user
     const user = await users.findOne({ email: session.user.email });
     if (!user || !user.listing) {
       return new Response("You must own a flat to acknowledge applications", {
@@ -32,7 +34,7 @@ export async function POST(req) {
       });
     }
 
-    // Find the application and ensure it belongs to the user's flat
+    // find application linked to user's flat
     const application = await applications.findOne({
       _id: new ObjectId(applicationId),
       flatId: user.listing
@@ -45,13 +47,13 @@ export async function POST(req) {
       );
     }
 
-    // Update the application status
+    // update application status to acknowledged
     await applications.updateOne(
       { _id: new ObjectId(applicationId) },
       { $set: { status: "acknowledged" } }
     );
 
-    // Fetch applicant's email and name
+    // get applicant info
     const applicant = await users.findOne({
       _id: new ObjectId(application.applicantId)
     });
@@ -59,7 +61,7 @@ export async function POST(req) {
       return new Response("Applicant not found", { status: 404 });
     }
 
-    // Send confirmation email to applicant
+    // send email notification to applicant
     const emailResult = await sendEmail({
       to: applicant.email,
       subject: "Your Application Has Been Acknowledged",

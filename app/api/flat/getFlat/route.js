@@ -13,12 +13,15 @@ export async function POST(req) {
     const client = await clientPromise;
     const db = client.db("flatfinderdb");
 
+    // find user by email
     const user = await db.collection("users").findOne({ email });
 
+    // if user has no listing, return null
     if (!user?.listing) {
       return NextResponse.json({ flat: null });
     }
 
+    // fetch flat by id
     const flat = await db
       .collection("flats")
       .findOne({ _id: new ObjectId(user.listing) });

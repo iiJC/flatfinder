@@ -13,7 +13,7 @@ export async function POST(request) {
     }
 
     const { flatId, action } = await request.json();
-    
+
     if (!flatId || !action) {
       console.error("Bad Request: Missing parameters", { flatId, action });
       return Response.json({ error: "Missing parameters" }, { status: 400 });
@@ -29,20 +29,25 @@ export async function POST(request) {
     const userId = new ObjectId(session.user.id);
     const flatObjectId = new ObjectId(flatId);
 
-    const userExists = await db.collection("users").countDocuments({ _id: userId });
+    // check user exists
+    const userExists = await db
+      .collection("users")
+      .countDocuments({ _id: userId });
     if (!userExists) {
       console.error("User not found", { userId: session.user.id });
       return Response.json({ error: "User not found" }, { status: 404 });
     }
 
-    const update = action === 'add'
-      ? { $addToSet: { bookmarks: flatObjectId } }
-      : { $pull: { bookmarks: flatObjectId } };
+    // build update action
+    const update =
+      action === "add"
+        ? { $addToSet: { bookmarks: flatObjectId } }
+        : { $pull: { bookmarks: flatObjectId } };
 
-    const result = await db.collection("users").updateOne(
-      { _id: userId },
-      update
-    );
+    // update user document
+    const result = await db
+      .collection("users")
+      .updateOne({ _id: userId }, update);
 
     console.log("Update result:", {
       userId: session.user.id,
@@ -57,22 +62,22 @@ export async function POST(request) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
 
+    // return bookmark status
     return Response.json({
       success: true,
-      isBookmarked: action === 'add',
+      isBookmarked: action === "add",
       changed: result.modifiedCount > 0,
       bookmarkCount: await db.collection("users").countDocuments({
         _id: userId,
         bookmarks: flatObjectId
       })
     });
-
   } catch (error) {
     console.error("Bookmark operation failed:", error);
     return Response.json(
-      { 
+      {
         error: error.message || "Internal server error",
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined
       },
       { status: 500 }
     );

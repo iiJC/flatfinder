@@ -9,11 +9,11 @@ export async function PATCH(req, context) {
 
   const client = await clientPromise;
   const db = client.db("flatfinderdb");
-
+  // update flat with new data
   const result = await db
     .collection("flats")
     .updateOne({ _id: new ObjectId(id) }, { $set: body });
-
+  // handle no update
   if (result.modifiedCount === 0) {
     return NextResponse.json({ message: "No update" }, { status: 400 });
   }

@@ -2,7 +2,7 @@ import clientPromise from "../../../db/database";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { ObjectId } from "mongodb"; // <-- Needed for user ID
+import { ObjectId } from "mongodb"; // needed for user id
 
 export async function POST(req) {
   try {
@@ -15,6 +15,7 @@ export async function POST(req) {
       );
     }
 
+    // parse form data from request
     const formData = await req.formData();
 
     // Connect to MongoDB
@@ -22,7 +23,9 @@ export async function POST(req) {
     const db = client.db("flatfinderdb");
 
     // Get the user from DB to access _id
-    const user = await db.collection("users").findOne({ email: session.user.email });
+    const user = await db
+      .collection("users")
+      .findOne({ email: session.user.email });
 
     if (!user) {
       return NextResponse.json(
@@ -31,6 +34,7 @@ export async function POST(req) {
       );
     }
 
+    // create flat object from form data
     const flat = {
       name: formData.get("flat_name"),
       address: formData.get("address"),
@@ -47,10 +51,10 @@ export async function POST(req) {
       distance_from_supermarket: formData.get("distance_from_supermarket"),
       utilities_included: formData.get("utilities_included"),
       coordinates: JSON.parse(formData.get("coordinates")),
-      ownerId: user._id, // ✅ Store user ID as owner
+      ownerId: user._id // ✅ Store user ID as owner
     };
 
-    // Handle multiple images
+    // convert image files to base64, handles multiple images
     const imageFiles = formData.getAll("images");
     const imageBuffers = [];
 
@@ -59,27 +63,27 @@ export async function POST(req) {
         const buffer = Buffer.from(await imageFile.arrayBuffer());
         imageBuffers.push({
           image: buffer.toString("base64"),
-          imageType: imageFile.type,
+          imageType: imageFile.type
         });
       }
     }
 
     flat.images = imageBuffers;
 
+    // insert flat into db
     const flatResult = await db.collection("flats").insertOne(flat);
     const flatId = flatResult.insertedId;
 
-    // Optionally save the flat ID to the user doc
-    await db.collection("users").updateOne(
-      { _id: user._id },
-      { $set: { listing: flatId } }
-    );
+    // Optionally save the flat ID to the user doc, links flat to user
+    await db
+      .collection("users")
+      .updateOne({ _id: user._id }, { $set: { listing: flatId } });
 
     return NextResponse.json(
       {
         success: true,
         message: "Flat added successfully!",
-        insertedId: flatId,
+        insertedId: flatId
       },
       { status: 201 }
     );

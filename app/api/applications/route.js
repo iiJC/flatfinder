@@ -32,6 +32,7 @@ export async function POST(req) {
     let ownerDetails;
     let applicant;
 
+    // start transaction
     await mongoSession.withTransaction(async () => {
       const users = db.collection("users");
       const flats = db.collection("flats");

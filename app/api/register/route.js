@@ -7,7 +7,7 @@ export async function POST(req) {
   try {
     const { username, name, email, password } = await req.json();
 
-    if ( !name || !username || !email || !password) {
+    if (!name || !username || !email || !password) {
       return NextResponse.json(
         { success: false, message: "Please provide all required fields." },
         { status: 400 }
